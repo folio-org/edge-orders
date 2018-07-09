@@ -146,7 +146,7 @@ public class MainVerticleTest {
     logger.info("=== Test validate w/ valid key ===");
 
     RestAssured
-      .get("/validate?type=GOBI&apiKey=" + apiKey)
+      .get("/orders/validate?type=GOBI&apiKey=" + apiKey)
       .then()
       .statusCode(204);
   }
@@ -156,7 +156,7 @@ public class MainVerticleTest {
     logger.info("=== Test validate w/ invalid key ===");
 
     final Response resp = RestAssured
-      .get("/validate?type=GOBI&apiKey=" + badApiKey)
+      .get("/orders/validate?type=GOBI&apiKey=" + badApiKey)
       .then()
       .contentType(APPLICATION_XML)
       .statusCode(401)
@@ -173,7 +173,7 @@ public class MainVerticleTest {
     logger.info("=== Test validate w/ bad type ===");
 
     final Response resp = RestAssured
-      .get("/validate?type=bogus&apiKey=" + apiKey)
+      .get("/orders/validate?type=bogus&apiKey=" + apiKey)
       .then()
       .contentType(APPLICATION_XML)
       .statusCode(400)
@@ -190,7 +190,7 @@ public class MainVerticleTest {
     logger.info("=== Test validate w/ missing type ===");
 
     final Response resp = RestAssured
-      .get("/validate?apiKey=" + apiKey)
+      .get("/orders/validate?apiKey=" + apiKey)
       .then()
       .contentType(APPLICATION_XML)
       .statusCode(400)
@@ -207,7 +207,7 @@ public class MainVerticleTest {
     logger.info("=== Test validate w/ empty type ===");
 
     final Response resp = RestAssured
-      .get("/validate?type=&apiKey=" + apiKey)
+      .get("/orders/validate?type=&apiKey=" + apiKey)
       .then()
       .contentType(APPLICATION_XML)
       .statusCode(400)
