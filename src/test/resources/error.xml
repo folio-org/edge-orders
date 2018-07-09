@@ -1,0 +1,6 @@
+<Response>
+	<Error>
+		<Code>INVALID_FUND_CODE</Code>
+		<Message>The FundCode "law" is not a valid FundCode.</Message>
+	</Error>
+</Response>

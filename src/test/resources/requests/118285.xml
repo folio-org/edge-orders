@@ -1,0 +1,36 @@
+<PurchaseOrder>
+  <CustomerDetail>
+    <BaseAccount>5095</BaseAccount>
+    <SubAccount>509564</SubAccount>
+  </CustomerDetail>
+  <Order>
+    <UnlistedPrintSerial>
+      <collection>
+        <record>
+          <leader>00000nYs a2200000u  4500</leader>
+          <controlfield tag="001">99962603525</controlfield>
+          <controlfield tag="003">NhCcYBP</controlfield>
+          <controlfield tag="005">20151119104653.0</controlfield>
+          <controlfield tag="008">151119nuuuuuuuuxx ||||||||||||||   und d</controlfield>
+          <datafield tag="020" ind1=" " ind2=" ">
+            <subfield code="a">978123123122</subfield>
+            <subfield code="c">0</subfield>
+          </datafield>
+          <datafield tag="245" ind1="0" ind2="0">
+            <subfield code="a">Test Print Serial Title</subfield>
+          </datafield>
+        </record>
+      </collection>
+      <OrderDetail>
+        <ItemPONumber>118285</ItemPONumber>
+        <FundCode>4SETH</FundCode>
+        <OrderNotes>Test Note|v.9|ISSN: 123</OrderNotes>
+        <Quantity>1</Quantity>
+        <YBPOrderKey>99962603525</YBPOrderKey>
+        <OrderPlaced>2015-10-21T16:29:41</OrderPlaced>
+        <Initials>KH</Initials>
+        <StartWithVolume>.</StartWithVolume>
+      </OrderDetail>
+    </UnlistedPrintSerial>
+  </Order>
+</PurchaseOrder>

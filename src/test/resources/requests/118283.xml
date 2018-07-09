@@ -1,0 +1,67 @@
+<PurchaseOrder>
+  <CustomerDetail>
+    <BaseAccount>5095</BaseAccount>
+    <SubAccount>509501</SubAccount>
+  </CustomerDetail>
+  <Order>
+    <UnlistedPrintMonograph>
+      <collection>
+        <record>
+          <leader>00000nam a2200000u  4500</leader>
+          <controlfield tag="001">99962603526</controlfield>
+          <controlfield tag="003">NhCcYBP</controlfield>
+          <controlfield tag="005">20151119104637.0</controlfield>
+          <controlfield tag="008">151119t20162016xx ||||||||||||||   und d</controlfield>
+          <datafield tag="020" ind1=" " ind2=" ">
+            <subfield code="a">9781231231231</subfield>
+            <subfield code="c">0</subfield>
+          </datafield>
+          <datafield tag="100" ind1="1" ind2=" ">
+            <subfield code="a">test Author</subfield>
+          </datafield>
+          <datafield tag="245" ind1="1" ind2="0">
+            <subfield code="a">Test unlisted Print Title</subfield>
+          </datafield>
+          <datafield tag="250" ind1=" " ind2=" ">
+            <subfield code="a">3</subfield>
+          </datafield>
+          <datafield tag="260" ind1=" " ind2=" ">
+            <subfield code="a">NH</subfield>
+            <subfield code="b">Test Publisher</subfield>
+            <subfield code="c">2016</subfield>
+          </datafield>
+        </record>
+      </collection>
+      <OrderDetail>
+        <ItemPONumber>118283</ItemPONumber>
+        <FundCode>afrb3</FundCode>
+        <OrderNotes>Test Note to ybp</OrderNotes>
+        <Location>CONE</Location>
+        <Quantity>2</Quantity>
+        <YBPOrderKey>99962603526</YBPOrderKey>
+        <OrderPlaced>2015-10-21T16:35:13</OrderPlaced>
+        <Initials>KHA</Initials>
+        <ListPrice>
+          <Amount>0</Amount>
+          <Currency>USD</Currency>
+        </ListPrice>
+        <LocalData>
+          <Description>LocalData1</Description>
+          <Value>To Any Location</Value>
+        </LocalData>
+        <LocalData>
+          <Description>LocalData2</Description>
+          <Value>Test Proc Instructions</Value>
+        </LocalData>
+        <LocalData>
+          <Description>LocalData3</Description>
+          <Value>Test Local Data 3</Value>
+        </LocalData>
+        <LocalData>
+          <Description>LocalData4</Description>
+          <Value>Test Local Data 4</Value>
+        </LocalData>
+      </OrderDetail>
+    </UnlistedPrintMonograph>
+  </Order>
+</PurchaseOrder>

@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+<xs:element name="Response">
+  <xs:complexType>
+    <xs:choice>
+      <xs:element name="PoLineNumber" type="xs:string"/>
+      <xs:element ref="Error"/>
+    </xs:choice>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="Error">
+  <xs:complexType>
+    <xs:sequence>
+      <xs:element name="Code" type="xs:string" minOccurs="1" maxOccurs="1"/>
+      <xs:element name="Message" type="xs:string" minOccurs="1" maxOccurs="1"/>      
+    </xs:sequence>
+  </xs:complexType>
+</xs:element>
+
+</xs:schema>

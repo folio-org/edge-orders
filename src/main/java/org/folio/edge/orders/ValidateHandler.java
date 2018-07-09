@@ -1,0 +1,40 @@
+package org.folio.edge.orders;
+
+import static org.folio.edge.orders.Constants.PARAM_TYPE;
+
+import org.apache.log4j.Logger;
+import org.folio.edge.core.security.SecureStore;
+import org.folio.edge.orders.Constants.PurchasingSystems;
+import org.folio.edge.orders.utils.OrdersOkapiClient;
+import org.folio.edge.orders.utils.OrdersOkapiClientFactory;
+
+import io.vertx.ext.web.RoutingContext;
+
+public class ValidateHandler extends OrdersHandler {
+
+  private static final Logger logger = Logger.getLogger(ValidateHandler.class);
+
+  public ValidateHandler(SecureStore secureStore, OrdersOkapiClientFactory ocf) {
+    super(secureStore, ocf);
+  }
+
+  @Override
+  protected void handle(RoutingContext ctx) {
+    handleCommon(ctx,
+        new String[] {},
+        new String[] {},
+        (client, params) -> {
+          String type = params.get(PARAM_TYPE);
+          PurchasingSystems ps = PurchasingSystems.fromValue(type);
+          if (PurchasingSystems.GOBI == ps) {
+            logger.info("Request is from purchasing system: " + ps.toString());
+            ((OrdersOkapiClient) client).validate(
+                ctx.request().headers(),
+                resp -> handleProxyResponse(ctx, resp),
+                t -> handleProxyException(ctx, t));
+          } else {
+            badRequest(ctx, "Unknown Purchasing System Specified: " + type);
+          }
+        });
+  }
+}
