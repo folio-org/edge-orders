@@ -87,7 +87,7 @@ public class OrdersHandler extends Handler {
         String respBody = body.toString();
 
         if (logger.isDebugEnabled()) {
-          logger.debug("response: " + respBody);
+          logger.debug("status: " + resp.statusCode() + " response: " + respBody);
         }
 
         String xml;
