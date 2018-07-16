@@ -29,7 +29,7 @@ public class ValidateHandler extends OrdersHandler {
           ((OrdersOkapiClient) client).validate(
               ps,
               ctx.request().headers(),
-              resp -> handleProxyResponse(ctx, resp),
+              resp -> handleProxyResponse(ps, ctx, resp),
               t -> handleProxyException(ctx, t));
         });
   }

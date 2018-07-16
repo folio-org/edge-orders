@@ -1,5 +1,6 @@
 package org.folio.edge.orders;
 
+import static org.folio.edge.core.Constants.APPLICATION_JSON;
 import static org.folio.edge.core.Constants.APPLICATION_XML;
 import static org.folio.edge.core.Constants.MSG_ACCESS_DENIED;
 import static org.folio.edge.core.Constants.MSG_REQUEST_TIMEOUT;
@@ -66,13 +67,23 @@ public class OrdersHandler extends Handler {
               ps,
               ctx.getBodyAsString(),
               ctx.request().headers(),
-              resp -> handleProxyResponse(ctx, resp),
+              resp -> handleProxyResponse(ps, ctx, resp),
               t -> handleProxyException(ctx, t));
         });
   }
 
-  @Override
-  protected void handleProxyResponse(RoutingContext ctx, HttpClientResponse resp) {
+  protected void handleProxyResponse(PurchasingSystems ps, RoutingContext ctx, HttpClientResponse resp) {
+    if (PurchasingSystems.GOBI == ps) {
+      handleGobiResponse(ctx, resp);
+    } else {
+      // Should never get here... Only GOBI is supported so far.
+      // OrdersOkapiClient will throw a NotImplementedException for
+      // anything else, and the request will be handled by the exception
+      // handler.
+    }
+  }
+
+  protected void handleGobiResponse(RoutingContext ctx, HttpClientResponse resp) {
     final StringBuilder body = new StringBuilder();
     resp.handler(buf -> {
 
@@ -83,6 +94,7 @@ public class OrdersHandler extends Handler {
       body.append(buf);
     }).endHandler(v -> {
       ctx.response().setStatusCode(resp.statusCode());
+      String contentType = resp.getHeader(HttpHeaders.CONTENT_TYPE);
 
       if (body.length() > 0) {
         String respBody = body.toString();
@@ -92,20 +104,25 @@ public class OrdersHandler extends Handler {
         }
 
         String xml;
+        ResponseWrapper wrapper;
         try {
-          xml = ResponseWrapper.fromJson(respBody).toXml();
+          if (APPLICATION_JSON.equals(contentType)) {
+            wrapper = ResponseWrapper.fromJson(respBody);
+          } else {
+            String code = ErrorCodes.fromValue(resp.statusCode()).toString();
+            wrapper = new ResponseWrapper(new ErrorWrapper(code, respBody));
+          }
+          xml = wrapper.toXml();
         } catch (Exception e) {
           logger.error("Failed to convert FOLIO response from JSON -> XML", e);
           internalServerError(ctx, "Failed to convert FOLIO response from JSON -> XML");
           return;
         }
 
-        String contentType = resp.getHeader(HttpHeaders.CONTENT_TYPE);
-        if (contentType != null) {
-          ctx.response().putHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_XML);
-        }
+        ctx.response()
+          .putHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_XML)
+          .end(xml);
 
-        ctx.response().end(xml);
         return;
       } else {
         ctx.response().end();

@@ -8,9 +8,42 @@ public class Constants {
   public static final String PARAM_TYPE = "type";
 
   public enum ErrorCodes {
-    ACCESS_DENIED, BAD_REQUEST, REQUEST_TIMEOUT, INTERNAL_SERVER_ERROR;
-  }
 
+    ACCESS_DENIED(401), 
+    FORBIDDEN(403), 
+    BAD_REQUEST(400), 
+    REQUEST_TIMEOUT(408), 
+    INTERNAL_SERVER_ERROR(500),
+    NOT_FOUND(404);
+    
+    private final int value;
+    private static final Map<Integer, ErrorCodes> CONSTANTS = new HashMap<>();
+
+    static {
+      for (ErrorCodes c : values()) {
+        CONSTANTS.put(c.value, c);
+      }
+    }
+
+    private ErrorCodes(int value) {
+      this.value = value;
+    }
+
+    @Override
+    public String toString() {
+      return this.name();
+    }
+
+    public static ErrorCodes fromValue(int value) {
+      ErrorCodes constant = CONSTANTS.get(value);
+      if (constant == null) {
+        return null;
+      } else {
+        return constant;
+      }
+    }
+  }
+  
   public enum PurchasingSystems {
 
     GOBI("GOBI");

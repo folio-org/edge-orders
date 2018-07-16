@@ -44,13 +44,20 @@ public class OrdersMockOkapi extends MockOkapi {
 
   public void validateHandler(RoutingContext ctx) {
     String token = ctx.request().getHeader(X_OKAPI_TOKEN);
+    String status = ctx.request().getHeader(X_ECHO_STATUS);
 
     if (token == null || !token.equals(MOCK_TOKEN)) {
       ctx.response()
         .setStatusCode(403)
         .putHeader(HttpHeaders.CONTENT_TYPE, TEXT_PLAIN)
         .end("Access requires permission: gobi.order.post");
+    } else if (status != null && !status.isEmpty()) {
+      ctx.response()
+        .setStatusCode(Integer.valueOf(status))
+        .putHeader(HttpHeaders.CONTENT_TYPE, TEXT_PLAIN)
+        .end("No suitable module found for path /gobi/validate");
     } else {
+
       ctx.response()
         .setStatusCode(204)
         .end();
