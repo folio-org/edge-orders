@@ -42,6 +42,11 @@ public class OrdersHandler extends Handler {
       return;
     }
 
+    if (PurchasingSystems.fromValue(type) == null) {
+      badRequest(ctx, "Unknown Purchasing System Specified: " + type);
+      return;
+    }
+
     super.handleCommon(ctx, requiredParams, optionalParams, (client, params) -> {
       final OrdersOkapiClient ordersClient = new OrdersOkapiClient(client);
 
@@ -55,18 +60,14 @@ public class OrdersHandler extends Handler {
         new String[] {},
         new String[] {},
         (client, params) -> {
-          String type = params.get(PARAM_TYPE);
-          PurchasingSystems ps = PurchasingSystems.fromValue(type);
-          if (PurchasingSystems.GOBI == ps) {
-            logger.info("Request is from purchasing system: " + ps.toString());
-            ((OrdersOkapiClient) client).placeGobiOrder(
-                ctx.getBodyAsString(),
-                ctx.request().headers(),
-                resp -> handleProxyResponse(ctx, resp),
-                t -> handleProxyException(ctx, t));
-          } else {
-            badRequest(ctx, "Unknown Purchasing System Specified: " + type);
-          }
+          PurchasingSystems ps = PurchasingSystems.fromValue(params.get(PARAM_TYPE));
+          logger.info("Request is from purchasing system: " + ps.toString());
+          ((OrdersOkapiClient) client).placeOrder(
+              ps,
+              ctx.getBodyAsString(),
+              ctx.request().headers(),
+              resp -> handleProxyResponse(ctx, resp),
+              t -> handleProxyException(ctx, t));
         });
   }
 
@@ -151,6 +152,7 @@ public class OrdersHandler extends Handler {
 
   @Override
   protected void internalServerError(RoutingContext ctx, String msg) {
+    Thread.dumpStack();
     if (!ctx.response().ended()) {
       ResponseWrapper resp = new ResponseWrapper(new ErrorWrapper(ErrorCodes.INTERNAL_SERVER_ERROR.name(), msg));
       handleError(ctx, 500, resp);

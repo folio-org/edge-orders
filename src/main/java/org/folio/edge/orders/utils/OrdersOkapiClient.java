@@ -1,6 +1,8 @@
 package org.folio.edge.orders.utils;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.folio.edge.core.utils.OkapiClient;
+import org.folio.edge.orders.Constants.PurchasingSystems;
 
 import io.vertx.core.Handler;
 import io.vertx.core.MultiMap;
@@ -15,6 +17,26 @@ public class OrdersOkapiClient extends OkapiClient {
 
   public OrdersOkapiClient(OkapiClient client) {
     super(client);
+  }
+
+  public void validate(PurchasingSystems ps, MultiMap headers, Handler<HttpClientResponse> responseHandler,
+      Handler<Throwable> exceptionHandler) {
+    if (PurchasingSystems.GOBI == ps) {
+      validateGobi(headers, responseHandler, exceptionHandler);
+    } else {
+      exceptionHandler
+        .handle(new NotImplementedException("validate(...) for " + ps + " is not supported yet"));
+    }
+  }
+
+  public void placeOrder(PurchasingSystems ps, String payload, MultiMap headers,
+      Handler<HttpClientResponse> responseHandler,
+      Handler<Throwable> exceptionHandler) {
+    if (PurchasingSystems.GOBI == ps) {
+      placeGobiOrder(payload, headers, responseHandler, exceptionHandler);
+    } else {
+      exceptionHandler.handle(new NotImplementedException("placeOrder(...) for " + ps + " is not supported yet"));
+    }
   }
 
   public void placeGobiOrder(String payload, Handler<HttpClientResponse> responseHandler,
@@ -33,12 +55,12 @@ public class OrdersOkapiClient extends OkapiClient {
         exceptionHandler);
   }
 
-  public void validate(Handler<HttpClientResponse> responseHandler,
+  public void validateGobi(Handler<HttpClientResponse> responseHandler,
       Handler<Throwable> exceptionHandler) {
-    validate(null, responseHandler, exceptionHandler);
+    validateGobi(null, responseHandler, exceptionHandler);
   }
 
-  public void validate(MultiMap headers, Handler<HttpClientResponse> responseHandler,
+  public void validateGobi(MultiMap headers, Handler<HttpClientResponse> responseHandler,
       Handler<Throwable> exceptionHandler) {
     get(
         String.format("%s/gobi/validate", okapiURL),

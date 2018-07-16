@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.apache.log4j.Logger;
 import org.folio.edge.core.utils.test.TestUtils;
 import org.junit.After;
@@ -78,7 +79,27 @@ public class OrdersOkapiClientTest {
   }
 
   @Test
-  public void testValidateSuccess(TestContext context) {
+  public void testValidateGobiSuccess(TestContext context) {
+    logger.info("=== Test successful validate ===");
+
+    Async async = context.async();
+    client.login("admin", "password").thenAcceptAsync(v -> {
+      // Redundant - also checked in testLogin(...), but can't hurt
+      context.assertEquals(MOCK_TOKEN, client.getToken());
+
+      client.validateGobi(
+          resp -> {
+            context.assertEquals(204, resp.statusCode());
+            async.complete();
+          },
+          t -> {
+            context.fail(t.getMessage());
+          });
+    });
+  }
+
+  @Test
+  public void testValidateUnsupportedPurchasingSystem(TestContext context) {
     logger.info("=== Test successful validate ===");
 
     Async async = context.async();
@@ -87,12 +108,14 @@ public class OrdersOkapiClientTest {
       context.assertEquals(MOCK_TOKEN, client.getToken());
 
       client.validate(
+          null,
+          null,
           resp -> {
-            context.assertEquals(204, resp.statusCode());
-            async.complete();
+            context.fail("Expected a NotImplementedException to be thrown");
           },
           t -> {
-            context.fail(t.getMessage());
+            context.assertEquals(NotImplementedException.class, t.getClass());
+            async.complete();
           });
     });
   }
@@ -120,6 +143,31 @@ public class OrdersOkapiClientTest {
           }),
           t -> {
             context.fail(t.getMessage());
+          });
+    });
+  }
+
+  @Test
+  public void testPlaceOrderUnsupportedPurchasingSystem(TestContext context) {
+    logger.info("=== Test successful GOBI order placement ===");
+
+    String PO = mockRequests.keySet().iterator().next();
+    String reqBody = mockRequests.get(PO);
+
+    Async async = context.async();
+    client.login("admin", "password").thenAcceptAsync(v -> {
+      // Redundant - also checked in testLogin(...), but can't hurt
+      context.assertEquals(MOCK_TOKEN, client.getToken());
+
+      client.placeOrder(null,
+          reqBody,
+          null,
+          resp -> {
+            context.fail("Expected a NotImplementedException to be thrown");
+          },
+          t -> {
+            context.assertEquals(NotImplementedException.class, t.getClass());
+            async.complete();
           });
     });
   }

@@ -24,17 +24,13 @@ public class ValidateHandler extends OrdersHandler {
         new String[] {},
         new String[] {},
         (client, params) -> {
-          String type = params.get(PARAM_TYPE);
-          PurchasingSystems ps = PurchasingSystems.fromValue(type);
-          if (PurchasingSystems.GOBI == ps) {
-            logger.info("Request is from purchasing system: " + ps.toString());
-            ((OrdersOkapiClient) client).validate(
-                ctx.request().headers(),
-                resp -> handleProxyResponse(ctx, resp),
-                t -> handleProxyException(ctx, t));
-          } else {
-            badRequest(ctx, "Unknown Purchasing System Specified: " + type);
-          }
+          PurchasingSystems ps = PurchasingSystems.fromValue(params.get(PARAM_TYPE));
+          logger.info("Request is from purchasing system: " + ps.toString());
+          ((OrdersOkapiClient) client).validate(
+              ps,
+              ctx.request().headers(),
+              resp -> handleProxyResponse(ctx, resp),
+              t -> handleProxyException(ctx, t));
         });
   }
 }
