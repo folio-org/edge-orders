@@ -1,6 +1,6 @@
 package org.folio.edge.orders.utils;
 
-import static org.folio.edge.core.Constants.APPLICATION_JSON;
+import static org.folio.edge.core.Constants.APPLICATION_XML;
 import static org.folio.edge.core.utils.test.MockOkapi.MOCK_TOKEN;
 
 import java.io.File;
@@ -137,7 +137,7 @@ public class OrdersOkapiClientTest {
           resp -> resp.bodyHandler(actual -> {
             logger.info("mod-gobi response body: " + actual);
             context.assertEquals(201, resp.statusCode());
-            context.assertEquals(APPLICATION_JSON, resp.getHeader(HttpHeaders.CONTENT_TYPE));
+            context.assertEquals(APPLICATION_XML, resp.getHeader(HttpHeaders.CONTENT_TYPE));
             context.assertEquals(expected, actual.toString());
             async.complete();
           }),

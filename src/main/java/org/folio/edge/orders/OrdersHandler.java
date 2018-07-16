@@ -1,6 +1,5 @@
 package org.folio.edge.orders;
 
-import static org.folio.edge.core.Constants.APPLICATION_JSON;
 import static org.folio.edge.core.Constants.APPLICATION_XML;
 import static org.folio.edge.core.Constants.MSG_ACCESS_DENIED;
 import static org.folio.edge.core.Constants.MSG_REQUEST_TIMEOUT;
@@ -18,8 +17,6 @@ import org.folio.edge.orders.model.ErrorWrapper;
 import org.folio.edge.orders.model.ResponseWrapper;
 import org.folio.edge.orders.utils.OrdersOkapiClient;
 import org.folio.edge.orders.utils.OrdersOkapiClientFactory;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 import io.vertx.core.http.HttpClientResponse;
 import io.vertx.core.http.HttpHeaders;
@@ -94,10 +91,10 @@ public class OrdersHandler extends Handler {
       body.append(buf);
     }).endHandler(v -> {
       ctx.response().setStatusCode(resp.statusCode());
-      String contentType = resp.getHeader(HttpHeaders.CONTENT_TYPE);
 
       if (body.length() > 0) {
         String respBody = body.toString();
+        String contentType = resp.getHeader(HttpHeaders.CONTENT_TYPE);
 
         if (logger.isDebugEnabled()) {
           logger.debug("status: " + resp.statusCode() + " response: " + respBody);
@@ -106,16 +103,16 @@ public class OrdersHandler extends Handler {
         String xml;
         ResponseWrapper wrapper;
         try {
-          if (APPLICATION_JSON.equals(contentType)) {
-            wrapper = ResponseWrapper.fromJson(respBody);
+          if (APPLICATION_XML.equals(contentType)) {
+            wrapper = ResponseWrapper.fromXml(respBody);
           } else {
             String code = ErrorCodes.fromValue(resp.statusCode()).toString();
             wrapper = new ResponseWrapper(new ErrorWrapper(code, respBody));
           }
           xml = wrapper.toXml();
         } catch (Exception e) {
-          logger.error("Failed to convert FOLIO response from JSON -> XML", e);
-          internalServerError(ctx, "Failed to convert FOLIO response from JSON -> XML");
+          logger.error("Failed to convert FOLIO response to XML", e);
+          internalServerError(ctx, "Failed to convert FOLIO response to XML");
           return;
         }
 
@@ -134,7 +131,7 @@ public class OrdersHandler extends Handler {
     String xml = null;
     try {
       xml = respBody.toXml();
-    } catch (JsonProcessingException e) {
+    } catch (Exception e) {
       logger.error("Exception marshalling XML", e);
     }
     ctx.response().setStatusCode(status);

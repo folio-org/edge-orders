@@ -1,6 +1,6 @@
 package org.folio.edge.orders.utils;
 
-import static org.folio.edge.core.Constants.APPLICATION_JSON;
+import static org.folio.edge.core.Constants.APPLICATION_XML;
 import static org.folio.edge.core.Constants.TEXT_PLAIN;
 import static org.folio.edge.core.Constants.X_OKAPI_TOKEN;
 
@@ -84,7 +84,7 @@ public class OrdersMockOkapi extends MockOkapi {
 
         ctx.response()
           .setStatusCode(201)
-          .putHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON)
+          .putHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_XML)
           .end(getGobiOrderAsString("PO-" + id));
       } catch (Exception e) {
         logger.error("Exception parsing request", e);
@@ -99,23 +99,10 @@ public class OrdersMockOkapi extends MockOkapi {
   public static String getGobiOrderAsString(String id) {
     try {
       ResponseWrapper resp = new ResponseWrapper(id);
-      return resp.toJson();
+      return resp.toXml();
     } catch (JsonProcessingException e) {
       return Mappers.XML_PROLOG + "<Response><PoLineNumber>" + id + "</PoLineNumber></Response>";
     }
   }
-
-  // public static String getGobiOrderErrorAsString(String code, String message)
-  // {
-  // try {
-  // ErrorWrapper error = new ErrorWrapper(code, message);
-  // ResponseWrapper resp = new ResponseWrapper(error);
-  // return resp.toXml();
-  // } catch (JsonProcessingException e) {
-  // return Mappers.XML_PROLOG + "<Response><Error><Code>" + code +
-  // "</Code><Message>" + message
-  // + "</Message></Error></Response>";
-  // }
-  // }
 
 }

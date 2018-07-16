@@ -9,13 +9,9 @@ public class Constants {
 
   public enum ErrorCodes {
 
-    ACCESS_DENIED(401), 
-    FORBIDDEN(403), 
-    BAD_REQUEST(400), 
-    REQUEST_TIMEOUT(408), 
-    INTERNAL_SERVER_ERROR(500),
-    NOT_FOUND(404);
-    
+    ACCESS_DENIED(401), FORBIDDEN(403), BAD_REQUEST(400), REQUEST_TIMEOUT(408), INTERNAL_SERVER_ERROR(500), NOT_FOUND(
+        404);
+
     private final int value;
     private static final Map<Integer, ErrorCodes> CONSTANTS = new HashMap<>();
 
@@ -35,15 +31,10 @@ public class Constants {
     }
 
     public static ErrorCodes fromValue(int value) {
-      ErrorCodes constant = CONSTANTS.get(value);
-      if (constant == null) {
-        return null;
-      } else {
-        return constant;
-      }
+      return CONSTANTS.get(value);
     }
   }
-  
+
   public enum PurchasingSystems {
 
     GOBI("GOBI");
@@ -66,12 +57,7 @@ public class Constants {
     }
 
     public static PurchasingSystems fromValue(String value) {
-      PurchasingSystems constant = CONSTANTS.get(value);
-      if (constant == null) {
-        return null;
-      } else {
-        return constant;
-      }
+      return CONSTANTS.get(value.toUpperCase());
     }
   }
 
