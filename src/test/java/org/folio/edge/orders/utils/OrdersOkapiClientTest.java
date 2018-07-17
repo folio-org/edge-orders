@@ -75,6 +75,7 @@ public class OrdersOkapiClientTest {
 
   @After
   public void tearDown(TestContext context) {
+    client.close();
     mockOkapi.close();
   }
 
@@ -126,7 +127,7 @@ public class OrdersOkapiClientTest {
 
     String PO = mockRequests.keySet().iterator().next();
     String reqBody = mockRequests.get(PO);
-    String expected = OrdersMockOkapi.getGobiOrderAsString("PO-" + PO);
+    String expected = OrdersMockOkapi.getGobiOrderAsXml("PO-" + PO);
 
     Async async = context.async();
     client.login("admin", "password").thenAcceptAsync(v -> {

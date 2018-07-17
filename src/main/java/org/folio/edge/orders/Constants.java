@@ -9,10 +9,15 @@ public class Constants {
 
   public enum ErrorCodes {
 
-    ACCESS_DENIED(401), FORBIDDEN(403), BAD_REQUEST(400), REQUEST_TIMEOUT(408), INTERNAL_SERVER_ERROR(500), NOT_FOUND(
-        404);
+    // Subject to change pending additional information from the GOBI folks
+    BAD_REQUEST(400),
+    ACCESS_DENIED(401),
+    FORBIDDEN(403),
+    NOT_FOUND(404),
+    REQUEST_TIMEOUT(408),
+    INTERNAL_SERVER_ERROR(null);
 
-    private final int value;
+    private final Integer value;
     private static final Map<Integer, ErrorCodes> CONSTANTS = new HashMap<>();
 
     static {
@@ -21,7 +26,7 @@ public class Constants {
       }
     }
 
-    private ErrorCodes(int value) {
+    private ErrorCodes(Integer value) {
       this.value = value;
     }
 
@@ -30,7 +35,7 @@ public class Constants {
       return this.name();
     }
 
-    public static ErrorCodes fromValue(int value) {
+    public static ErrorCodes fromValue(Integer value) {
       return CONSTANTS.get(value);
     }
   }

@@ -1,5 +1,6 @@
 package org.folio.edge.orders;
 
+import static org.folio.edge.core.Constants.APPLICATION_JSON;
 import static org.folio.edge.core.Constants.APPLICATION_XML;
 import static org.folio.edge.core.Constants.MSG_ACCESS_DENIED;
 import static org.folio.edge.core.Constants.MSG_REQUEST_TIMEOUT;
@@ -27,10 +28,10 @@ import java.util.Map;
 
 import org.apache.http.HttpHeaders;
 import org.apache.log4j.Logger;
-import org.folio.edge.core.InstitutionalUserHelper;
-import org.folio.edge.core.InstitutionalUserHelper.MalformedApiKeyException;
 import org.folio.edge.core.cache.TokenCache;
 import org.folio.edge.core.model.ClientInfo;
+import org.folio.edge.core.utils.ApiKeyUtils;
+import org.folio.edge.core.utils.ApiKeyUtils.MalformedApiKeyException;
 import org.folio.edge.core.utils.test.TestUtils;
 import org.folio.edge.orders.Constants.ErrorCodes;
 import org.folio.edge.orders.model.ErrorWrapper;
@@ -72,7 +73,7 @@ public class MainVerticleTest {
     int serverPort = TestUtils.getPort();
 
     List<String> knownTenants = new ArrayList<>();
-    knownTenants.add(InstitutionalUserHelper.parseApiKey(apiKey).tenantId);
+    knownTenants.add(ApiKeyUtils.parseApiKey(apiKey).tenantId);
 
     mockOkapi = spy(new OrdersMockOkapi(okapiPort, knownTenants));
     mockOkapi.start(context);
@@ -242,13 +243,35 @@ public class MainVerticleTest {
 
   @Test
   public void testPlaceOrderSuccess(TestContext context) throws JsonProcessingException {
-    logger.info("=== Test place order - Success ===");
+    logger.info("=== Test place order - Success (XML) ===");
 
     String PO = "118279";
     String body = mockRequests.get(PO);
 
     final Response resp = RestAssured
       .with()
+      .body(body)
+      .post("/orders?type=GOBI&apiKey=" + apiKey)
+      .then()
+      .contentType(APPLICATION_XML)
+      .statusCode(201)
+      .extract()
+      .response();
+
+    assertEquals(new ResponseWrapper("PO-" + PO).toXml(), resp.body().asString());
+  }
+
+  @Test
+  public void testPlaceOrderJson(TestContext context) throws JsonProcessingException {
+    logger.info("=== Test place order - Success (JSON) ===");
+
+    String PO = "118279";
+    String body = mockRequests.get(PO);
+
+    final Response resp = RestAssured
+      .with()
+      .accept(APPLICATION_JSON) // note this gets passed through to OKAPI, but
+                                // we still get XML back.
       .body(body)
       .post("/orders?type=GOBI&apiKey=" + apiKey)
       .then()
@@ -355,7 +378,7 @@ public class MainVerticleTest {
     String PO = "118279";
     String body = mockRequests.get(PO);
 
-    ClientInfo clientInfo = InstitutionalUserHelper.parseApiKey(apiKey);
+    ClientInfo clientInfo = ApiKeyUtils.parseApiKey(apiKey);
     TokenCache.getInstance().put(clientInfo.clientId, clientInfo.tenantId, clientInfo.username, null);
 
     final Response resp = RestAssured

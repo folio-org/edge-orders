@@ -1,5 +1,6 @@
 package org.folio.edge.orders.utils;
 
+import static org.folio.edge.core.Constants.APPLICATION_JSON;
 import static org.folio.edge.core.Constants.APPLICATION_XML;
 import static org.folio.edge.core.Constants.TEXT_PLAIN;
 import static org.folio.edge.core.Constants.X_OKAPI_TOKEN;
@@ -82,10 +83,20 @@ public class OrdersMockOkapi extends MockOkapi {
         String expression = "//ItemPONumber";
         id = xPath.compile(expression).evaluate(xmlDocument);
 
+        String body = null;
+        String accept = ctx.request().getHeader(HttpHeaders.ACCEPT);
+        logger.info("ACCEPT = " + accept);
+        if (accept != null && accept.equals(APPLICATION_JSON)) {
+          body = getGobiOrderAsJson("PO-" + id);
+          ctx.response().putHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON);
+        } else {
+          body = getGobiOrderAsXml("PO-" + id);
+          ctx.response().putHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_XML);
+        }
+
         ctx.response()
           .setStatusCode(201)
-          .putHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_XML)
-          .end(getGobiOrderAsString("PO-" + id));
+          .end(body);
       } catch (Exception e) {
         logger.error("Exception parsing request", e);
         ctx.response()
@@ -96,12 +107,21 @@ public class OrdersMockOkapi extends MockOkapi {
     }
   }
 
-  public static String getGobiOrderAsString(String id) {
+  public static String getGobiOrderAsXml(String id) {
     try {
       ResponseWrapper resp = new ResponseWrapper(id);
       return resp.toXml();
     } catch (JsonProcessingException e) {
       return Mappers.XML_PROLOG + "<Response><PoLineNumber>" + id + "</PoLineNumber></Response>";
+    }
+  }
+
+  public static String getGobiOrderAsJson(String id) {
+    try {
+      ResponseWrapper resp = new ResponseWrapper(id);
+      return resp.toJson();
+    } catch (JsonProcessingException e) {
+      return "{ \"id\": \"" + id + "\" }";
     }
   }
 

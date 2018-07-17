@@ -1,5 +1,7 @@
 package org.folio.edge.orders.utils;
 
+import static org.folio.edge.core.Constants.XML_OR_TEXT;
+
 import org.apache.commons.lang3.NotImplementedException;
 import org.folio.edge.core.utils.OkapiClient;
 import org.folio.edge.orders.Constants.PurchasingSystems;
@@ -8,6 +10,7 @@ import io.vertx.core.Handler;
 import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpClientResponse;
+import io.vertx.core.http.HttpHeaders;
 
 public class OrdersOkapiClient extends OkapiClient {
 
@@ -17,6 +20,12 @@ public class OrdersOkapiClient extends OkapiClient {
 
   public OrdersOkapiClient(OkapiClient client) {
     super(client);
+  }
+
+  @Override
+  protected void initDefaultHeaders() {
+    super.initDefaultHeaders();
+    defaultHeaders.set(HttpHeaders.ACCEPT, XML_OR_TEXT);
   }
 
   public void validate(PurchasingSystems ps, MultiMap headers, Handler<HttpClientResponse> responseHandler,

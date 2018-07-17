@@ -1,10 +1,12 @@
 package org.folio.edge.orders;
 
+import static org.folio.edge.core.Constants.APPLICATION_JSON;
 import static org.folio.edge.core.Constants.APPLICATION_XML;
 import static org.folio.edge.core.Constants.MSG_ACCESS_DENIED;
 import static org.folio.edge.core.Constants.MSG_REQUEST_TIMEOUT;
 import static org.folio.edge.orders.Constants.PARAM_TYPE;
 
+import java.io.IOException;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -94,37 +96,40 @@ public class OrdersHandler extends Handler {
 
       if (body.length() > 0) {
         String respBody = body.toString();
-        String contentType = resp.getHeader(HttpHeaders.CONTENT_TYPE);
 
         if (logger.isDebugEnabled()) {
           logger.debug("status: " + resp.statusCode() + " response: " + respBody);
         }
 
-        String xml;
-        ResponseWrapper wrapper;
         try {
-          if (APPLICATION_XML.equals(contentType)) {
-            wrapper = ResponseWrapper.fromXml(respBody);
-          } else {
-            String code = ErrorCodes.fromValue(resp.statusCode()).toString();
-            wrapper = new ResponseWrapper(new ErrorWrapper(code, respBody));
-          }
-          xml = wrapper.toXml();
+          String xml = parseResponse(resp, respBody).toXml();
+          ctx.response()
+            .putHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_XML)
+            .end(xml);
         } catch (Exception e) {
           logger.error("Failed to convert FOLIO response to XML", e);
           internalServerError(ctx, "Failed to convert FOLIO response to XML");
-          return;
         }
-
-        ctx.response()
-          .putHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_XML)
-          .end(xml);
-
-        return;
       } else {
         ctx.response().end();
       }
     });
+  }
+
+  private ResponseWrapper parseResponse(HttpClientResponse resp, String respBody) throws IOException {
+    ResponseWrapper wrapper;
+
+    String contentType = resp.getHeader(HttpHeaders.CONTENT_TYPE);
+
+    if (APPLICATION_XML.equals(contentType)) {
+      wrapper = ResponseWrapper.fromXml(respBody);
+    } else if (APPLICATION_JSON.equals(contentType)) {
+      wrapper = ResponseWrapper.fromJson(respBody);
+    } else {
+      String code = ErrorCodes.fromValue(resp.statusCode()).toString();
+      wrapper = new ResponseWrapper(new ErrorWrapper(code, respBody));
+    }
+    return wrapper;
   }
 
   private void handleError(RoutingContext ctx, int status, ResponseWrapper respBody) {
