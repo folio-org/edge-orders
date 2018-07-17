@@ -11,6 +11,7 @@ public class Constants {
 
     // Subject to change pending additional information from the GOBI folks
     BAD_REQUEST(400),
+    API_KEY_INVALID(-1),
     ACCESS_DENIED(401),
     FORBIDDEN(403),
     NOT_FOUND(404),
