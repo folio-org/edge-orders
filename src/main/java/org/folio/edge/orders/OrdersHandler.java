@@ -1,10 +1,12 @@
 package org.folio.edge.orders;
 
+import static org.folio.edge.core.Constants.APPLICATION_JSON;
 import static org.folio.edge.core.Constants.APPLICATION_XML;
 import static org.folio.edge.core.Constants.MSG_ACCESS_DENIED;
 import static org.folio.edge.core.Constants.MSG_REQUEST_TIMEOUT;
 import static org.folio.edge.orders.Constants.PARAM_TYPE;
 
+import java.io.IOException;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -17,8 +19,6 @@ import org.folio.edge.orders.model.ErrorWrapper;
 import org.folio.edge.orders.model.ResponseWrapper;
 import org.folio.edge.orders.utils.OrdersOkapiClient;
 import org.folio.edge.orders.utils.OrdersOkapiClientFactory;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 import io.vertx.core.http.HttpClientResponse;
 import io.vertx.core.http.HttpHeaders;
@@ -42,6 +42,11 @@ public class OrdersHandler extends Handler {
       return;
     }
 
+    if (PurchasingSystems.fromValue(type) == null) {
+      badRequest(ctx, "Unknown Purchasing System Specified: " + type);
+      return;
+    }
+
     super.handleCommon(ctx, requiredParams, optionalParams, (client, params) -> {
       final OrdersOkapiClient ordersClient = new OrdersOkapiClient(client);
 
@@ -55,23 +60,29 @@ public class OrdersHandler extends Handler {
         new String[] {},
         new String[] {},
         (client, params) -> {
-          String type = params.get(PARAM_TYPE);
-          PurchasingSystems ps = PurchasingSystems.fromValue(type);
-          if (PurchasingSystems.GOBI == ps) {
-            logger.info("Request is from purchasing system: " + ps.toString());
-            ((OrdersOkapiClient) client).placeGobiOrder(
-                ctx.getBodyAsString(),
-                ctx.request().headers(),
-                resp -> handleProxyResponse(ctx, resp),
-                t -> handleProxyException(ctx, t));
-          } else {
-            badRequest(ctx, "Unknown Purchasing System Specified: " + type);
-          }
+          PurchasingSystems ps = PurchasingSystems.fromValue(params.get(PARAM_TYPE));
+          logger.info("Request is from purchasing system: " + ps.toString());
+          ((OrdersOkapiClient) client).placeOrder(
+              ps,
+              ctx.getBodyAsString(),
+              ctx.request().headers(),
+              resp -> handleProxyResponse(ps, ctx, resp),
+              t -> handleProxyException(ctx, t));
         });
   }
 
-  @Override
-  protected void handleProxyResponse(RoutingContext ctx, HttpClientResponse resp) {
+  protected void handleProxyResponse(PurchasingSystems ps, RoutingContext ctx, HttpClientResponse resp) {
+    if (PurchasingSystems.GOBI == ps) {
+      handleGobiResponse(ctx, resp);
+    } else {
+      // Should never get here... Only GOBI is supported so far.
+      // OrdersOkapiClient will throw a NotImplementedException for
+      // anything else, and the request will be handled by the exception
+      // handler.
+    }
+  }
+
+  protected void handleGobiResponse(RoutingContext ctx, HttpClientResponse resp) {
     final StringBuilder body = new StringBuilder();
     resp.handler(buf -> {
 
@@ -90,33 +101,42 @@ public class OrdersHandler extends Handler {
           logger.debug("status: " + resp.statusCode() + " response: " + respBody);
         }
 
-        String xml;
         try {
-          xml = ResponseWrapper.fromJson(respBody).toXml();
+          String xml = parseResponse(resp, respBody).toXml();
+          ctx.response()
+            .putHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_XML)
+            .end(xml);
         } catch (Exception e) {
-          logger.error("Failed to convert FOLIO response from JSON -> XML", e);
-          internalServerError(ctx, "Failed to convert FOLIO response from JSON -> XML");
-          return;
+          logger.error("Failed to convert FOLIO response to XML", e);
+          internalServerError(ctx, "Failed to convert FOLIO response to XML");
         }
-
-        String contentType = resp.getHeader(HttpHeaders.CONTENT_TYPE);
-        if (contentType != null) {
-          ctx.response().putHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_XML);
-        }
-
-        ctx.response().end(xml);
-        return;
       } else {
         ctx.response().end();
       }
     });
   }
 
+  private ResponseWrapper parseResponse(HttpClientResponse resp, String respBody) throws IOException {
+    ResponseWrapper wrapper;
+
+    String contentType = resp.getHeader(HttpHeaders.CONTENT_TYPE);
+
+    if (APPLICATION_XML.equals(contentType)) {
+      wrapper = ResponseWrapper.fromXml(respBody);
+    } else if (APPLICATION_JSON.equals(contentType)) {
+      wrapper = ResponseWrapper.fromJson(respBody);
+    } else {
+      String code = ErrorCodes.fromValue(resp.statusCode()).toString();
+      wrapper = new ResponseWrapper(new ErrorWrapper(code, respBody));
+    }
+    return wrapper;
+  }
+
   private void handleError(RoutingContext ctx, int status, ResponseWrapper respBody) {
     String xml = null;
     try {
       xml = respBody.toXml();
-    } catch (JsonProcessingException e) {
+    } catch (Exception e) {
       logger.error("Exception marshalling XML", e);
     }
     ctx.response().setStatusCode(status);
@@ -151,6 +171,7 @@ public class OrdersHandler extends Handler {
 
   @Override
   protected void internalServerError(RoutingContext ctx, String msg) {
+    Thread.dumpStack();
     if (!ctx.response().ended()) {
       ResponseWrapper resp = new ResponseWrapper(new ErrorWrapper(ErrorCodes.INTERNAL_SERVER_ERROR.name(), msg));
       handleError(ctx, 500, resp);

@@ -1,5 +1,6 @@
 package org.folio.edge.orders;
 
+import static org.folio.edge.core.Constants.APPLICATION_JSON;
 import static org.folio.edge.core.Constants.APPLICATION_XML;
 import static org.folio.edge.core.Constants.MSG_ACCESS_DENIED;
 import static org.folio.edge.core.Constants.MSG_REQUEST_TIMEOUT;
@@ -10,6 +11,7 @@ import static org.folio.edge.core.Constants.SYS_REQUEST_TIMEOUT_MS;
 import static org.folio.edge.core.Constants.SYS_SECURE_STORE_PROP_FILE;
 import static org.folio.edge.core.Constants.TEXT_PLAIN;
 import static org.folio.edge.core.utils.test.MockOkapi.X_DURATION;
+import static org.folio.edge.core.utils.test.MockOkapi.X_ECHO_STATUS;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.spy;
@@ -26,11 +28,12 @@ import java.util.Map;
 
 import org.apache.http.HttpHeaders;
 import org.apache.log4j.Logger;
-import org.folio.edge.core.InstitutionalUserHelper;
-import org.folio.edge.core.InstitutionalUserHelper.MalformedApiKeyException;
 import org.folio.edge.core.cache.TokenCache;
 import org.folio.edge.core.model.ClientInfo;
+import org.folio.edge.core.utils.ApiKeyUtils;
+import org.folio.edge.core.utils.ApiKeyUtils.MalformedApiKeyException;
 import org.folio.edge.core.utils.test.TestUtils;
+import org.folio.edge.orders.Constants.ErrorCodes;
 import org.folio.edge.orders.model.ErrorWrapper;
 import org.folio.edge.orders.model.ResponseWrapper;
 import org.folio.edge.orders.utils.OrdersMockOkapi;
@@ -70,7 +73,7 @@ public class MainVerticleTest {
     int serverPort = TestUtils.getPort();
 
     List<String> knownTenants = new ArrayList<>();
-    knownTenants.add(InstitutionalUserHelper.parseApiKey(apiKey).tenantId);
+    knownTenants.add(ApiKeyUtils.parseApiKey(apiKey).tenantId);
 
     mockOkapi = spy(new OrdersMockOkapi(okapiPort, knownTenants));
     mockOkapi.start(context);
@@ -114,10 +117,10 @@ public class MainVerticleTest {
     logger.info("Shutting down server");
     vertx.close(res -> {
       if (res.failed()) {
-        logger.error("Failed to shut down edge-rtac server", res.cause());
+        logger.error("Failed to shut down edge-orders server", res.cause());
         fail(res.cause().getMessage());
       } else {
-        logger.info("Successfully shut down edge-rtac server");
+        logger.info("Successfully shut down edge-orders server");
       }
 
       logger.info("Shutting down mock Okapi");
@@ -149,6 +152,25 @@ public class MainVerticleTest {
       .get("/orders/validate?type=GOBI&apiKey=" + apiKey)
       .then()
       .statusCode(204);
+  }
+
+  @Test
+  public void testValidateNotFound(TestContext context) throws JsonProcessingException {
+    logger.info("=== Test validate w/ module not found ===");
+
+    final Response resp = RestAssured
+      .with()
+      .header(X_ECHO_STATUS, 404)
+      .get("/orders/validate?type=GOBI&apiKey=" + apiKey)
+      .then()
+      .contentType(APPLICATION_XML)
+      .statusCode(404)
+      .extract()
+      .response();
+
+    ResponseWrapper respBody = new ResponseWrapper(
+        new ErrorWrapper(ErrorCodes.NOT_FOUND.toString(), "No suitable module found for path /gobi/validate"));
+    assertEquals(respBody.toXml(), resp.body().asString());
   }
 
   @Test
@@ -221,13 +243,35 @@ public class MainVerticleTest {
 
   @Test
   public void testPlaceOrderSuccess(TestContext context) throws JsonProcessingException {
-    logger.info("=== Test place order - Success ===");
+    logger.info("=== Test place order - Success (XML) ===");
 
     String PO = "118279";
     String body = mockRequests.get(PO);
 
     final Response resp = RestAssured
       .with()
+      .body(body)
+      .post("/orders?type=GOBI&apiKey=" + apiKey)
+      .then()
+      .contentType(APPLICATION_XML)
+      .statusCode(201)
+      .extract()
+      .response();
+
+    assertEquals(new ResponseWrapper("PO-" + PO).toXml(), resp.body().asString());
+  }
+
+  @Test
+  public void testPlaceOrderJson(TestContext context) throws JsonProcessingException {
+    logger.info("=== Test place order - Success (JSON) ===");
+
+    String PO = "118279";
+    String body = mockRequests.get(PO);
+
+    final Response resp = RestAssured
+      .with()
+      .accept(APPLICATION_JSON) // note this gets passed through to OKAPI, but
+                                // we still get XML back.
       .body(body)
       .post("/orders?type=GOBI&apiKey=" + apiKey)
       .then()
@@ -278,9 +322,9 @@ public class MainVerticleTest {
       .extract()
       .response();
 
-    ResponseWrapper respBody = new ResponseWrapper(
+    ResponseWrapper expected = new ResponseWrapper(
         new ErrorWrapper("ACCESS_DENIED", MSG_ACCESS_DENIED));
-    assertEquals(respBody.toXml(), resp.body().asString());
+    assertEquals(expected.toXml(), resp.body().asString());
   }
 
   @Test
@@ -334,7 +378,7 @@ public class MainVerticleTest {
     String PO = "118279";
     String body = mockRequests.get(PO);
 
-    ClientInfo clientInfo = InstitutionalUserHelper.parseApiKey(apiKey);
+    ClientInfo clientInfo = ApiKeyUtils.parseApiKey(apiKey);
     TokenCache.getInstance().put(clientInfo.clientId, clientInfo.tenantId, clientInfo.username, null);
 
     final Response resp = RestAssured

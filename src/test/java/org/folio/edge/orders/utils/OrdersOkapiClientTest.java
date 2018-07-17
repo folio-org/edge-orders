@@ -1,6 +1,6 @@
 package org.folio.edge.orders.utils;
 
-import static org.folio.edge.core.Constants.APPLICATION_JSON;
+import static org.folio.edge.core.Constants.APPLICATION_XML;
 import static org.folio.edge.core.utils.test.MockOkapi.MOCK_TOKEN;
 
 import java.io.File;
@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.apache.log4j.Logger;
 import org.folio.edge.core.utils.test.TestUtils;
 import org.junit.After;
@@ -74,11 +75,12 @@ public class OrdersOkapiClientTest {
 
   @After
   public void tearDown(TestContext context) {
+    client.close();
     mockOkapi.close();
   }
 
   @Test
-  public void testValidateSuccess(TestContext context) {
+  public void testValidateGobiSuccess(TestContext context) {
     logger.info("=== Test successful validate ===");
 
     Async async = context.async();
@@ -86,7 +88,7 @@ public class OrdersOkapiClientTest {
       // Redundant - also checked in testLogin(...), but can't hurt
       context.assertEquals(MOCK_TOKEN, client.getToken());
 
-      client.validate(
+      client.validateGobi(
           resp -> {
             context.assertEquals(204, resp.statusCode());
             async.complete();
@@ -98,12 +100,34 @@ public class OrdersOkapiClientTest {
   }
 
   @Test
+  public void testValidateUnsupportedPurchasingSystem(TestContext context) {
+    logger.info("=== Test successful validate ===");
+
+    Async async = context.async();
+    client.login("admin", "password").thenAcceptAsync(v -> {
+      // Redundant - also checked in testLogin(...), but can't hurt
+      context.assertEquals(MOCK_TOKEN, client.getToken());
+
+      client.validate(
+          null,
+          null,
+          resp -> {
+            context.fail("Expected a NotImplementedException to be thrown");
+          },
+          t -> {
+            context.assertEquals(NotImplementedException.class, t.getClass());
+            async.complete();
+          });
+    });
+  }
+
+  @Test
   public void testPlaceGobiOrderSuccess(TestContext context) {
     logger.info("=== Test successful GOBI order placement ===");
 
     String PO = mockRequests.keySet().iterator().next();
     String reqBody = mockRequests.get(PO);
-    String expected = OrdersMockOkapi.getGobiOrderAsString("PO-" + PO);
+    String expected = OrdersMockOkapi.getGobiOrderAsXml("PO-" + PO);
 
     Async async = context.async();
     client.login("admin", "password").thenAcceptAsync(v -> {
@@ -114,12 +138,37 @@ public class OrdersOkapiClientTest {
           resp -> resp.bodyHandler(actual -> {
             logger.info("mod-gobi response body: " + actual);
             context.assertEquals(201, resp.statusCode());
-            context.assertEquals(APPLICATION_JSON, resp.getHeader(HttpHeaders.CONTENT_TYPE));
+            context.assertEquals(APPLICATION_XML, resp.getHeader(HttpHeaders.CONTENT_TYPE));
             context.assertEquals(expected, actual.toString());
             async.complete();
           }),
           t -> {
             context.fail(t.getMessage());
+          });
+    });
+  }
+
+  @Test
+  public void testPlaceOrderUnsupportedPurchasingSystem(TestContext context) {
+    logger.info("=== Test successful GOBI order placement ===");
+
+    String PO = mockRequests.keySet().iterator().next();
+    String reqBody = mockRequests.get(PO);
+
+    Async async = context.async();
+    client.login("admin", "password").thenAcceptAsync(v -> {
+      // Redundant - also checked in testLogin(...), but can't hurt
+      context.assertEquals(MOCK_TOKEN, client.getToken());
+
+      client.placeOrder(null,
+          reqBody,
+          null,
+          resp -> {
+            context.fail("Expected a NotImplementedException to be thrown");
+          },
+          t -> {
+            context.assertEquals(NotImplementedException.class, t.getClass());
+            async.complete();
           });
     });
   }

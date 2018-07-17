@@ -8,7 +8,36 @@ public class Constants {
   public static final String PARAM_TYPE = "type";
 
   public enum ErrorCodes {
-    ACCESS_DENIED, BAD_REQUEST, REQUEST_TIMEOUT, INTERNAL_SERVER_ERROR;
+
+    // Subject to change pending additional information from the GOBI folks
+    BAD_REQUEST(400),
+    ACCESS_DENIED(401),
+    FORBIDDEN(403),
+    NOT_FOUND(404),
+    REQUEST_TIMEOUT(408),
+    INTERNAL_SERVER_ERROR(null);
+
+    private final Integer value;
+    private static final Map<Integer, ErrorCodes> CONSTANTS = new HashMap<>();
+
+    static {
+      for (ErrorCodes c : values()) {
+        CONSTANTS.put(c.value, c);
+      }
+    }
+
+    private ErrorCodes(Integer value) {
+      this.value = value;
+    }
+
+    @Override
+    public String toString() {
+      return this.name();
+    }
+
+    public static ErrorCodes fromValue(Integer value) {
+      return CONSTANTS.get(value);
+    }
   }
 
   public enum PurchasingSystems {
@@ -33,12 +62,7 @@ public class Constants {
     }
 
     public static PurchasingSystems fromValue(String value) {
-      PurchasingSystems constant = CONSTANTS.get(value);
-      if (constant == null) {
-        return null;
-      } else {
-        return constant;
-      }
+      return CONSTANTS.get(value.toUpperCase());
     }
   }
 

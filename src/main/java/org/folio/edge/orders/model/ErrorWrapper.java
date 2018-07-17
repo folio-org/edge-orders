@@ -1,11 +1,6 @@
 package org.folio.edge.orders.model;
 
-import java.io.IOException;
-
-import org.folio.edge.core.utils.Mappers;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
 @JacksonXmlRootElement(localName = "Error")
@@ -53,22 +48,6 @@ public final class ErrorWrapper {
       return false;
     }
     return true;
-  }
-
-  public String toXml() throws JsonProcessingException {
-    return Mappers.XML_PROLOG + Mappers.xmlMapper.writeValueAsString(this);
-  }
-
-  public String toJson() throws JsonProcessingException {
-    return Mappers.jsonMapper.writeValueAsString(this);
-  }
-
-  public static ErrorWrapper fromJson(String json) throws IOException {
-    return Mappers.jsonMapper.readValue(json, ErrorWrapper.class);
-  }
-
-  public static ErrorWrapper fromXml(String xml) throws IOException {
-    return Mappers.xmlMapper.readValue(xml, ErrorWrapper.class);
   }
 
 }

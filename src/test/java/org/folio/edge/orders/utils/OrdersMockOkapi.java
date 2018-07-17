@@ -1,6 +1,7 @@
 package org.folio.edge.orders.utils;
 
 import static org.folio.edge.core.Constants.APPLICATION_JSON;
+import static org.folio.edge.core.Constants.APPLICATION_XML;
 import static org.folio.edge.core.Constants.TEXT_PLAIN;
 import static org.folio.edge.core.Constants.X_OKAPI_TOKEN;
 
@@ -44,13 +45,20 @@ public class OrdersMockOkapi extends MockOkapi {
 
   public void validateHandler(RoutingContext ctx) {
     String token = ctx.request().getHeader(X_OKAPI_TOKEN);
+    String status = ctx.request().getHeader(X_ECHO_STATUS);
 
     if (token == null || !token.equals(MOCK_TOKEN)) {
       ctx.response()
         .setStatusCode(403)
         .putHeader(HttpHeaders.CONTENT_TYPE, TEXT_PLAIN)
         .end("Access requires permission: gobi.order.post");
+    } else if (status != null && !status.isEmpty()) {
+      ctx.response()
+        .setStatusCode(Integer.valueOf(status))
+        .putHeader(HttpHeaders.CONTENT_TYPE, TEXT_PLAIN)
+        .end("No suitable module found for path /gobi/validate");
     } else {
+
       ctx.response()
         .setStatusCode(204)
         .end();
@@ -75,10 +83,20 @@ public class OrdersMockOkapi extends MockOkapi {
         String expression = "//ItemPONumber";
         id = xPath.compile(expression).evaluate(xmlDocument);
 
+        String body = null;
+        String accept = ctx.request().getHeader(HttpHeaders.ACCEPT);
+        logger.info("ACCEPT = " + accept);
+        if (accept != null && accept.equals(APPLICATION_JSON)) {
+          body = getGobiOrderAsJson("PO-" + id);
+          ctx.response().putHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON);
+        } else {
+          body = getGobiOrderAsXml("PO-" + id);
+          ctx.response().putHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_XML);
+        }
+
         ctx.response()
           .setStatusCode(201)
-          .putHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON)
-          .end(getGobiOrderAsString("PO-" + id));
+          .end(body);
       } catch (Exception e) {
         logger.error("Exception parsing request", e);
         ctx.response()
@@ -89,26 +107,22 @@ public class OrdersMockOkapi extends MockOkapi {
     }
   }
 
-  public static String getGobiOrderAsString(String id) {
+  public static String getGobiOrderAsXml(String id) {
     try {
       ResponseWrapper resp = new ResponseWrapper(id);
-      return resp.toJson();
+      return resp.toXml();
     } catch (JsonProcessingException e) {
       return Mappers.XML_PROLOG + "<Response><PoLineNumber>" + id + "</PoLineNumber></Response>";
     }
   }
 
-  // public static String getGobiOrderErrorAsString(String code, String message)
-  // {
-  // try {
-  // ErrorWrapper error = new ErrorWrapper(code, message);
-  // ResponseWrapper resp = new ResponseWrapper(error);
-  // return resp.toXml();
-  // } catch (JsonProcessingException e) {
-  // return Mappers.XML_PROLOG + "<Response><Error><Code>" + code +
-  // "</Code><Message>" + message
-  // + "</Message></Error></Response>";
-  // }
-  // }
+  public static String getGobiOrderAsJson(String id) {
+    try {
+      ResponseWrapper resp = new ResponseWrapper(id);
+      return resp.toJson();
+    } catch (JsonProcessingException e) {
+      return "{ \"id\": \"" + id + "\" }";
+    }
+  }
 
 }
