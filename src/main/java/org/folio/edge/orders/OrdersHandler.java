@@ -3,6 +3,7 @@ package org.folio.edge.orders;
 import static org.folio.edge.core.Constants.APPLICATION_JSON;
 import static org.folio.edge.core.Constants.APPLICATION_XML;
 import static org.folio.edge.core.Constants.MSG_ACCESS_DENIED;
+import static org.folio.edge.core.Constants.MSG_INVALID_API_KEY;
 import static org.folio.edge.core.Constants.MSG_REQUEST_TIMEOUT;
 import static org.folio.edge.orders.Constants.PARAM_TYPE;
 
@@ -148,6 +149,13 @@ public class OrdersHandler extends Handler {
     } else {
       ctx.response().end();
     }
+  }
+
+  @Override
+  protected void invalidApiKey(RoutingContext ctx, String key) {
+    ResponseWrapper resp = new ResponseWrapper(
+        new ErrorWrapper(ErrorCodes.API_KEY_INVALID.name(), MSG_INVALID_API_KEY + ": " + key));
+    handleError(ctx, 401, resp);
   }
 
   @Override

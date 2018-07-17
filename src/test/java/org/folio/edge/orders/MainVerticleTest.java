@@ -3,6 +3,7 @@ package org.folio.edge.orders;
 import static org.folio.edge.core.Constants.APPLICATION_JSON;
 import static org.folio.edge.core.Constants.APPLICATION_XML;
 import static org.folio.edge.core.Constants.MSG_ACCESS_DENIED;
+import static org.folio.edge.core.Constants.MSG_INVALID_API_KEY;
 import static org.folio.edge.core.Constants.MSG_REQUEST_TIMEOUT;
 import static org.folio.edge.core.Constants.SYS_LOG_LEVEL;
 import static org.folio.edge.core.Constants.SYS_OKAPI_URL;
@@ -186,7 +187,7 @@ public class MainVerticleTest {
       .response();
 
     ResponseWrapper respBody = new ResponseWrapper(
-        new ErrorWrapper("ACCESS_DENIED", MSG_ACCESS_DENIED));
+        new ErrorWrapper(ErrorCodes.API_KEY_INVALID.name(), MSG_INVALID_API_KEY + ": " + badApiKey));
     assertEquals(respBody.toXml(), resp.body().asString());
   }
 
@@ -323,7 +324,7 @@ public class MainVerticleTest {
       .response();
 
     ResponseWrapper expected = new ResponseWrapper(
-        new ErrorWrapper("ACCESS_DENIED", MSG_ACCESS_DENIED));
+        new ErrorWrapper(ErrorCodes.API_KEY_INVALID.name(), MSG_INVALID_API_KEY + ": " + badApiKey));
     assertEquals(expected.toXml(), resp.body().asString());
   }
 
@@ -345,7 +346,7 @@ public class MainVerticleTest {
       .response();
 
     ResponseWrapper respBody = new ResponseWrapper(
-        new ErrorWrapper("ACCESS_DENIED", MSG_ACCESS_DENIED));
+        new ErrorWrapper(ErrorCodes.API_KEY_INVALID.name(), MSG_INVALID_API_KEY + ": "));
     assertEquals(respBody.toXml(), resp.body().asString());
   }
 
