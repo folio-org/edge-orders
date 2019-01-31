@@ -7,7 +7,7 @@ Version 2.0. See the file "[LICENSE](LICENSE)" for more information.
 
 ## Overview
 
-The purpose of this edge API is to bridge the gap between 3rd party purchasing systems/vendors and FOLIO.  More specifically, the initial implementation was built with EBSCO's GOBI (Global Online Bibliographic Interface) service in mind.  
+The purpose of this edge API is to bridge the gap between 3rd party purchasing systems/vendors and FOLIO.  More specifically, the initial implementation was built with EBSCO's GOBI (Global Online Bibliographic Interface) service in mind.
 
 ## Security
 
@@ -21,7 +21,7 @@ See [edge-common](https://github.com/folio-org/edge-common) for a description of
 
 ### Issue tracker
 
-See project [FOLIO](https://issues.folio.org/browse/EDGORDERS)
+See project [EDGORDERS](https://issues.folio.org/browse/EDGORDERS)
 at the [FOLIO issue tracker](https://dev.folio.org/guidelines/issue-tracker).
 
 ### Other documentation
