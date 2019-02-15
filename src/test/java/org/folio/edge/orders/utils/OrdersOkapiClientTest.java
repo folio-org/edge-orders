@@ -23,6 +23,7 @@ import org.junit.runner.RunWith;
 
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpHeaders;
+import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
@@ -76,21 +77,43 @@ public class OrdersOkapiClientTest {
   @After
   public void tearDown(TestContext context) {
     client.close();
-    mockOkapi.close();
+    mockOkapi.close(context);
   }
 
   @Test
-  public void testValidateGobiSuccess(TestContext context) {
-    logger.info("=== Test successful validate ===");
+  public void testValidateGetGobiSuccess(TestContext context) {
+    logger.info("=== Test successful GET validate ===");
 
     Async async = context.async();
     client.login("admin", "password").thenAcceptAsync(v -> {
       // Redundant - also checked in testLogin(...), but can't hurt
       context.assertEquals(MOCK_TOKEN, client.getToken());
 
-      client.validateGobi(
+      client.validateGobi(HttpMethod.GET,
+          null,
           resp -> {
-            context.assertEquals(204, resp.statusCode());
+            context.assertEquals(200, resp.statusCode());
+            async.complete();
+          },
+          t -> {
+            context.fail(t.getMessage());
+          });
+    });
+  }
+
+  @Test
+  public void testValidatePostGobiSuccess(TestContext context) {
+    logger.info("=== Test successful POST validate ===");
+
+    Async async = context.async();
+    client.login("admin", "password").thenAcceptAsync(v -> {
+      // Redundant - also checked in testLogin(...), but can't hurt
+      context.assertEquals(MOCK_TOKEN, client.getToken());
+
+      client.validateGobi(HttpMethod.POST,
+          null,
+          resp -> {
+            context.assertEquals(200, resp.statusCode());
             async.complete();
           },
           t -> {
@@ -101,7 +124,7 @@ public class OrdersOkapiClientTest {
 
   @Test
   public void testValidateUnsupportedPurchasingSystem(TestContext context) {
-    logger.info("=== Test successful validate ===");
+    logger.info("=== Test successful GET validate ===");
 
     Async async = context.async();
     client.login("admin", "password").thenAcceptAsync(v -> {
@@ -109,6 +132,7 @@ public class OrdersOkapiClientTest {
       context.assertEquals(MOCK_TOKEN, client.getToken());
 
       client.validate(
+          HttpMethod.GET,
           null,
           null,
           resp -> {

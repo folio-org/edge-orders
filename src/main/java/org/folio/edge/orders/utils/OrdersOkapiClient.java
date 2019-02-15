@@ -11,6 +11,7 @@ import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpClientResponse;
 import io.vertx.core.http.HttpHeaders;
+import io.vertx.core.http.HttpMethod;
 
 public class OrdersOkapiClient extends OkapiClient {
 
@@ -28,10 +29,10 @@ public class OrdersOkapiClient extends OkapiClient {
     defaultHeaders.set(HttpHeaders.ACCEPT, XML_OR_TEXT);
   }
 
-  public void validate(PurchasingSystems ps, MultiMap headers, Handler<HttpClientResponse> responseHandler,
+  public void validate(HttpMethod method, PurchasingSystems ps, MultiMap headers, Handler<HttpClientResponse> responseHandler,
       Handler<Throwable> exceptionHandler) {
     if (PurchasingSystems.GOBI == ps) {
-      validateGobi(headers, responseHandler, exceptionHandler);
+      validateGobi(method, headers, responseHandler, exceptionHandler);
     } else {
       exceptionHandler
         .handle(new NotImplementedException("validate(...) for " + ps + " is not supported yet"));
@@ -64,18 +65,22 @@ public class OrdersOkapiClient extends OkapiClient {
         exceptionHandler);
   }
 
-  public void validateGobi(Handler<HttpClientResponse> responseHandler,
+  public void validateGobi(HttpMethod method, MultiMap headers, Handler<HttpClientResponse> responseHandler,
       Handler<Throwable> exceptionHandler) {
-    validateGobi(null, responseHandler, exceptionHandler);
-  }
-
-  public void validateGobi(MultiMap headers, Handler<HttpClientResponse> responseHandler,
-      Handler<Throwable> exceptionHandler) {
-    get(
+    if(HttpMethod.GET.equals(method))
+     get(
         String.format("%s/gobi/validate", okapiURL),
         tenant,
         combineHeadersWithDefaults(headers),
         responseHandler,
         exceptionHandler);
+    else
+      post(
+          String.format("%s/gobi/validate", okapiURL),
+          null,
+          tenant,
+          combineHeadersWithDefaults(headers),
+          responseHandler,
+          exceptionHandler);
   }
 }

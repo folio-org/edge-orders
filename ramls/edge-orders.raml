@@ -14,8 +14,11 @@ schemas:
   get:
     description: 'Validate that the API Key provided can be used to place an order'
     responses:
-      '204':
+      '200':
         description: Success
+        body:
+          application/xml:
+          schema: "<test>GET - OK</test>"
       '400':
         description: 'Bad Request'
         body:
@@ -43,6 +46,41 @@ schemas:
       apikey:
         description: 'API Key'
         type: string
+  post:
+    description: 'Validate that the API Key provided can be used to place an order'
+    responses:
+      '200':
+        description: Success
+        body:
+          application/xml:
+          schema: "<test>GET - OK</test>"
+      '400':
+        description: 'Bad Request'
+        body:
+          application/xml:
+            schema: orders
+      '401':
+        description: 'Access Denied'
+        body:
+          application/xml:
+            schema: orders
+      '408':
+        description: 'Request Timeout'
+        body:
+          application/xml:
+            schema: orders
+      '500':
+        description: 'Internal Server Error'
+        body:
+          application/xml:
+            schema: orders
+    queryParameters:
+      type:
+        description: 'purchasing system type'
+        type: string
+      apikey:
+        description: 'API Key'
+        type: string     
 /orders:
   displayName: 'Place Order'
   post:

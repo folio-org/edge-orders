@@ -7,7 +7,7 @@ import org.folio.edge.core.security.SecureStore;
 import org.folio.edge.orders.Constants.PurchasingSystems;
 import org.folio.edge.orders.utils.OrdersOkapiClient;
 import org.folio.edge.orders.utils.OrdersOkapiClientFactory;
-
+import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.web.RoutingContext;
 
 public class ValidateHandler extends OrdersHandler {
@@ -26,7 +26,22 @@ public class ValidateHandler extends OrdersHandler {
         (client, params) -> {
           PurchasingSystems ps = PurchasingSystems.fromValue(params.get(PARAM_TYPE));
           logger.info("Request is from purchasing system: " + ps.toString());
-          ((OrdersOkapiClient) client).validate(
+          ((OrdersOkapiClient) client).validate(HttpMethod.GET,
+              ps,
+              ctx.request().headers(),
+              resp -> handleProxyResponse(ps, ctx, resp),
+              t -> handleProxyException(ctx, t));
+        });
+  }
+
+  protected void handlePost(RoutingContext ctx) {
+    handleCommon(ctx,
+        new String[] {},
+        new String[] {},
+        (client, params) -> {
+          PurchasingSystems ps = PurchasingSystems.fromValue(params.get(PARAM_TYPE));
+          logger.info("Request is from purchasing system: " + ps.toString());
+          ((OrdersOkapiClient) client).validate(HttpMethod.POST,
               ps,
               ctx.request().headers(),
               resp -> handleProxyResponse(ps, ctx, resp),

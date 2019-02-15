@@ -9,7 +9,7 @@ import static org.folio.edge.orders.Constants.PARAM_TYPE;
 
 import java.io.IOException;
 import java.util.Map;
-
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.folio.edge.core.Handler;
 import org.folio.edge.core.security.SecureStore;
@@ -27,6 +27,7 @@ import io.vertx.ext.web.RoutingContext;
 
 public class OrdersHandler extends Handler {
 
+  private static final String VALIDATE_SUCCESS = "<test>";
   private static final Logger logger = Logger.getLogger(OrdersHandler.class);
 
   public OrdersHandler(SecureStore secureStore, OrdersOkapiClientFactory ocf) {
@@ -103,7 +104,13 @@ public class OrdersHandler extends Handler {
         }
 
         try {
-          String xml = parseResponse(resp, respBody).toXml();
+          String xml = StringUtils.EMPTY;
+          if(respBody.contains(VALIDATE_SUCCESS)){
+            xml = respBody;
+          }else {
+            xml = parseResponse(resp, respBody).toXml();
+          }
+
           ctx.response()
             .putHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_XML)
             .end(xml);

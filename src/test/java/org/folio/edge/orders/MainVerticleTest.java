@@ -51,15 +51,16 @@ import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
+import static org.hamcrest.Matchers.containsString;
 
 @RunWith(VertxUnitRunner.class)
 public class MainVerticleTest {
 
   private static final Logger logger = Logger.getLogger(MainVerticleTest.class);
 
-  private static final String apiKey = "Z1luMHVGdjNMZl9kaWt1X2Rpa3U=";
-  private static final String badApiKey = "ZnMwMDAwMDAwMA==0000";
-  private static final String unknownTenantApiKey = "Z1luMHVGdjNMZl9ib2d1c19ib2d1cw==";
+  private static final String apiKey = ApiKeyUtils.generateApiKey(10, "diku", "diku");
+  private static final String badApiKey = apiKey + "0000";
+  private static final String unknownTenantApiKey = ApiKeyUtils.generateApiKey(10, "bogus", "diku");
 
   private static final long requestTimeoutMs = 3000L;
 
@@ -80,7 +81,6 @@ public class MainVerticleTest {
     mockOkapi.start(context);
 
     vertx = Vertx.vertx();
-
     System.setProperty(SYS_PORT, String.valueOf(serverPort));
     System.setProperty(SYS_OKAPI_URL, "http://localhost:" + okapiPort);
     System.setProperty(SYS_SECURE_STORE_PROP_FILE, "src/main/resources/ephemeral.properties");
@@ -125,7 +125,7 @@ public class MainVerticleTest {
       }
 
       logger.info("Shutting down mock Okapi");
-      mockOkapi.close();
+      mockOkapi.close(context);
     });
   }
 
@@ -146,13 +146,27 @@ public class MainVerticleTest {
   }
 
   @Test
-  public void testValidateSuccess(TestContext context) {
-    logger.info("=== Test validate w/ valid key ===");
+  public void testGetValidateSuccess(TestContext context) {
+    logger.info("=== Test GET validate w/ valid key ===");
 
     RestAssured
       .get("/orders/validate?type=GOBI&apiKey=" + apiKey)
       .then()
-      .statusCode(204);
+      .statusCode(200)
+      .assertThat()
+      .body(containsString("<test>GET - OK</test>"));
+  }
+
+  @Test
+  public void testPostValidateSuccess(TestContext context) {
+    logger.info("=== Test POST validate w/ valid key ===");
+
+    RestAssured
+      .post("/orders/validate?type=GOBI&apiKey=" + apiKey)
+      .then()
+      .statusCode(200)
+      .assertThat()
+      .body(containsString("<test>POST - OK</test>"));
   }
 
   @Test
@@ -380,7 +394,7 @@ public class MainVerticleTest {
     String body = mockRequests.get(PO);
 
     ClientInfo clientInfo = ApiKeyUtils.parseApiKey(apiKey);
-    TokenCache.getInstance().put(clientInfo.clientId, clientInfo.tenantId, clientInfo.username, null);
+    TokenCache.getInstance().put(clientInfo.salt, clientInfo.tenantId, clientInfo.username, null);
 
     final Response resp = RestAssured
       .with()
