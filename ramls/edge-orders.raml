@@ -1,13 +1,11 @@
-#%RAML 0.8
+#%RAML 1.0
 title: 'Edge API - Orders'
 baseUri: 'https://github.com/folio-org/edge-orders'
 version: v1
 documentation:
-  -
     title: 'Edge API - Orders'
     content: 'Edge API to interface with FOLIO for 3rd party purchasing systems for placing orders'
-schemas:
-  -
+types:
     orders: !include orders.xsd
 /orders/validate:
   displayName: Validate
@@ -18,27 +16,27 @@ schemas:
         description: Success
         body:
           application/xml:
-          schema: "<test>GET - OK</test>"
+          type: "<test>GET - OK</test>"
       '400':
         description: 'Bad Request'
         body:
           application/xml:
-            schema: orders
+            type: orders
       '401':
         description: 'Access Denied'
         body:
           application/xml:
-            schema: orders
+            type: orders
       '408':
         description: 'Request Timeout'
         body:
           application/xml:
-            schema: orders
+            type: orders
       '500':
         description: 'Internal Server Error'
         body:
           application/xml:
-            schema: orders
+            type: orders
     queryParameters:
       type:
         description: 'purchasing system type'
@@ -53,27 +51,27 @@ schemas:
         description: Success
         body:
           application/xml:
-          schema: "<test>GET - OK</test>"
+          type: "<test>GET - OK</test>"
       '400':
         description: 'Bad Request'
         body:
           application/xml:
-            schema: orders
+            type: orders
       '401':
         description: 'Access Denied'
         body:
           application/xml:
-            schema: orders
+            type: orders
       '408':
         description: 'Request Timeout'
         body:
           application/xml:
-            schema: orders
+            type: orders
       '500':
         description: 'Internal Server Error'
         body:
           application/xml:
-            schema: orders
+            type: orders
     queryParameters:
       type:
         description: 'purchasing system type'
@@ -90,27 +88,27 @@ schemas:
         description: Success
         body:
           application/xml:
-            schema: orders
+            type: orders
       '400':
         description: 'Bad Request'
         body:
           application/xml:
-            schema: orders
+            type: orders
       '401':
         description: 'Access Denied'
         body:
           application/xml:
-            schema: orders
+            type: orders
       '408':
         description: 'Request Timeout'
         body:
           application/xml:
-            schema: orders
+            type: orders
       '500':
         description: 'Internal Server Error'
         body:
           application/xml:
-            schema: orders
+            type: orders
     queryParameters:
       type:
         description: 'purchasing system type'
