@@ -93,35 +93,38 @@ public class OrdersHandler extends Handler {
       }
 
       body.append(buf);
-    }).endHandler(v -> {
-      ctx.response().setStatusCode(resp.statusCode());
-
-      if (body.length() > 0) {
-        String respBody = body.toString();
-
-        if (logger.isDebugEnabled()) {
-          logger.debug("status: " + resp.statusCode() + " response: " + respBody);
-        }
-
-        try {
-          String xml = StringUtils.EMPTY;
-          if(respBody.contains(VALIDATE_SUCCESS)){
-            xml = respBody;
-          }else {
-            xml = parseResponse(resp, respBody).toXml();
-          }
-
+    })
+        .endHandler(v -> {
           ctx.response()
-            .putHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_XML)
-            .end(xml);
-        } catch (Exception e) {
-          logger.error("Failed to convert FOLIO response to XML", e);
-          internalServerError(ctx, "Failed to convert FOLIO response to XML");
-        }
-      } else {
-        ctx.response().end();
-      }
-    });
+              .setStatusCode(resp.statusCode());
+
+          if (body.length() > 0) {
+            String respBody = body.toString();
+
+            if (logger.isDebugEnabled()) {
+              logger.debug("status: " + resp.statusCode() + " response: " + respBody);
+            }
+
+            try {
+              String xml = StringUtils.EMPTY;
+              if (respBody.contains(VALIDATE_SUCCESS)) {
+                xml = respBody;
+              } else {
+                xml = parseResponse(resp, respBody).toXml();
+              }
+
+              ctx.response()
+                  .putHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_XML)
+                  .end(xml);
+            } catch (Exception e) {
+              logger.error("Failed to convert FOLIO response to XML", e);
+              internalServerError(ctx, "Failed to convert FOLIO response to XML");
+            }
+          } else {
+            ctx.response()
+                .end();
+          }
+        });
   }
 
   private ResponseWrapper parseResponse(HttpClientResponse resp, String respBody) throws IOException {
