@@ -39,7 +39,7 @@ public class OrdersMockOkapi extends MockOkapi {
   public Router defineRoutes() {
     Router router = super.defineRoutes();
     router.route(HttpMethod.GET, "/gobi/validate").handler(this::validateHandler);
-    router.route(HttpMethod.POST, "/gobi/validate").handler(this::postValidateHandler);
+    router.route(HttpMethod.POST, "/gobi/validate").handler(this::validateHandler);
     router.route(HttpMethod.POST, "/gobi/orders").handler(this::placeOrdersHandler);
     return router;
   }
@@ -50,43 +50,25 @@ public class OrdersMockOkapi extends MockOkapi {
 
     if (token == null || !token.equals(MOCK_TOKEN)) {
       ctx.response()
-        .setStatusCode(403)
-        .putHeader(HttpHeaders.CONTENT_TYPE, TEXT_PLAIN)
-        .end("Access requires permission: gobi.order.post");
+          .setStatusCode(403)
+          .putHeader(HttpHeaders.CONTENT_TYPE, TEXT_PLAIN)
+          .end("Access requires permission: gobi.order.post");
     } else if (status != null && !status.isEmpty()) {
       ctx.response()
-        .setStatusCode(Integer.valueOf(status))
-        .putHeader(HttpHeaders.CONTENT_TYPE, TEXT_PLAIN)
-        .end("No suitable module found for path /gobi/validate");
+          .setStatusCode(Integer.valueOf(status))
+          .putHeader(HttpHeaders.CONTENT_TYPE, TEXT_PLAIN)
+          .end("No suitable module found for path /gobi/validate");
     } else {
-
-      ctx.response()
-        .putHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_XML)
-        .setStatusCode(200)
-        .end("<test>GET - OK</test>");
-    }
-  }
-
-  public void postValidateHandler(RoutingContext ctx) {
-    String token = ctx.request().getHeader(X_OKAPI_TOKEN);
-    String status = ctx.request().getHeader(X_ECHO_STATUS);
-
-    if (token == null || !token.equals(MOCK_TOKEN)) {
-      ctx.response()
-        .setStatusCode(403)
-        .putHeader(HttpHeaders.CONTENT_TYPE, TEXT_PLAIN)
-        .end("Access requires permission: gobi.order.post");
-    } else if (status != null && !status.isEmpty()) {
-      ctx.response()
-        .setStatusCode(Integer.valueOf(status))
-        .putHeader(HttpHeaders.CONTENT_TYPE, TEXT_PLAIN)
-        .end("No suitable module found for path /gobi/validate");
-    } else {
-
-      ctx.response()
-        .putHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_XML)
-        .setStatusCode(200)
-        .end("<test>POST - OK</test>");
+      if (ctx.request().method().equals(HttpMethod.GET))
+        ctx.response()
+            .putHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_XML)
+            .setStatusCode(200)
+            .end("<test>GET - OK</test>");
+      else
+        ctx.response()
+            .putHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_XML)
+            .setStatusCode(200)
+            .end("<test>POST - OK</test>");
     }
   }
 
