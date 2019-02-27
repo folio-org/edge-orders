@@ -67,14 +67,15 @@ public class OrdersOkapiClient extends OkapiClient {
 
   public void validateGobi(HttpMethod method, MultiMap headers, Handler<HttpClientResponse> responseHandler,
       Handler<Throwable> exceptionHandler) {
-    if(HttpMethod.GET.equals(method))
+    if(HttpMethod.GET.equals(method)) {
      get(
         String.format("%s/gobi/validate", okapiURL),
         tenant,
         combineHeadersWithDefaults(headers),
         responseHandler,
         exceptionHandler);
-    else
+    }
+    else {
       post(
           String.format("%s/gobi/validate", okapiURL),
           null,
@@ -82,5 +83,6 @@ public class OrdersOkapiClient extends OkapiClient {
           combineHeadersWithDefaults(headers),
           responseHandler,
           exceptionHandler);
+    }
   }
 }

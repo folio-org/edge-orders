@@ -38,8 +38,7 @@ public class OrdersMockOkapi extends MockOkapi {
   @Override
   public Router defineRoutes() {
     Router router = super.defineRoutes();
-    router.route(HttpMethod.GET, "/gobi/validate").handler(this::validateHandler);
-    router.route(HttpMethod.POST, "/gobi/validate").handler(this::validateHandler);
+    router.route(HttpMethod.GET, "/gobi/validate").method(HttpMethod.POST).handler(this::validateHandler);
     router.route(HttpMethod.POST, "/gobi/orders").handler(this::placeOrdersHandler);
     return router;
   }
@@ -59,16 +58,18 @@ public class OrdersMockOkapi extends MockOkapi {
           .putHeader(HttpHeaders.CONTENT_TYPE, TEXT_PLAIN)
           .end("No suitable module found for path /gobi/validate");
     } else {
-      if (ctx.request().method().equals(HttpMethod.GET))
+      if (ctx.request().method().equals(HttpMethod.GET)) {
         ctx.response()
             .putHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_XML)
             .setStatusCode(200)
             .end("<test>GET - OK</test>");
-      else
+      }
+      else {
         ctx.response()
             .putHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_XML)
             .setStatusCode(200)
             .end("<test>POST - OK</test>");
+      }
     }
   }
 
