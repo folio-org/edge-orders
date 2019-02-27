@@ -38,7 +38,7 @@ public class OrdersMockOkapi extends MockOkapi {
   @Override
   public Router defineRoutes() {
     Router router = super.defineRoutes();
-    router.route(HttpMethod.GET, "/gobi/validate").handler(this::validateHandler);
+    router.route(HttpMethod.GET, "/gobi/validate").method(HttpMethod.POST).handler(this::validateHandler);
     router.route(HttpMethod.POST, "/gobi/orders").handler(this::placeOrdersHandler);
     return router;
   }
@@ -49,19 +49,27 @@ public class OrdersMockOkapi extends MockOkapi {
 
     if (token == null || !token.equals(MOCK_TOKEN)) {
       ctx.response()
-        .setStatusCode(403)
-        .putHeader(HttpHeaders.CONTENT_TYPE, TEXT_PLAIN)
-        .end("Access requires permission: gobi.order.post");
+          .setStatusCode(403)
+          .putHeader(HttpHeaders.CONTENT_TYPE, TEXT_PLAIN)
+          .end("Access requires permission: gobi.order.post");
     } else if (status != null && !status.isEmpty()) {
       ctx.response()
-        .setStatusCode(Integer.valueOf(status))
-        .putHeader(HttpHeaders.CONTENT_TYPE, TEXT_PLAIN)
-        .end("No suitable module found for path /gobi/validate");
+          .setStatusCode(Integer.valueOf(status))
+          .putHeader(HttpHeaders.CONTENT_TYPE, TEXT_PLAIN)
+          .end("No suitable module found for path /gobi/validate");
     } else {
-
-      ctx.response()
-        .setStatusCode(204)
-        .end();
+      if (ctx.request().method().equals(HttpMethod.GET)) {
+        ctx.response()
+            .putHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_XML)
+            .setStatusCode(200)
+            .end("<test>GET - OK</test>");
+      }
+      else {
+        ctx.response()
+            .putHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_XML)
+            .setStatusCode(200)
+            .end("<test>POST - OK</test>");
+      }
     }
   }
 
@@ -115,6 +123,7 @@ public class OrdersMockOkapi extends MockOkapi {
       return Mappers.XML_PROLOG + "<Response><PoLineNumber>" + id + "</PoLineNumber></Response>";
     }
   }
+
 
   public static String getGobiOrderAsJson(String id) {
     try {

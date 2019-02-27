@@ -9,7 +9,7 @@ import static org.folio.edge.orders.Constants.PARAM_TYPE;
 
 import java.io.IOException;
 import java.util.Map;
-
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.folio.edge.core.Handler;
 import org.folio.edge.core.security.SecureStore;
@@ -27,6 +27,7 @@ import io.vertx.ext.web.RoutingContext;
 
 public class OrdersHandler extends Handler {
 
+  private static final String VALIDATE_SUCCESS = "(?i:<test>(GET|POST) - ok<\\/test>)";
   private static final Logger logger = Logger.getLogger(OrdersHandler.class);
 
   public OrdersHandler(SecureStore secureStore, OrdersOkapiClientFactory ocf) {
@@ -37,7 +38,8 @@ public class OrdersHandler extends Handler {
   protected void handleCommon(RoutingContext ctx, String[] requiredParams, String[] optionalParams,
       TwoParamVoidFunction<OkapiClient, Map<String, String>> action) {
 
-    String type = ctx.request().getParam(PARAM_TYPE);
+    String type = ctx.request()
+        .getParam(PARAM_TYPE);
     if (type == null || type.isEmpty()) {
       badRequest(ctx, "Missing required parameter: " + PARAM_TYPE);
       return;
@@ -57,19 +59,12 @@ public class OrdersHandler extends Handler {
   }
 
   protected void handle(RoutingContext ctx) {
-    handleCommon(ctx,
-        new String[] {},
-        new String[] {},
-        (client, params) -> {
-          PurchasingSystems ps = PurchasingSystems.fromValue(params.get(PARAM_TYPE));
-          logger.info("Request is from purchasing system: " + ps.toString());
-          ((OrdersOkapiClient) client).placeOrder(
-              ps,
-              ctx.getBodyAsString(),
-              ctx.request().headers(),
-              resp -> handleProxyResponse(ps, ctx, resp),
-              t -> handleProxyException(ctx, t));
-        });
+    handleCommon(ctx, new String[] {}, new String[] {}, (client, params) -> {
+      PurchasingSystems ps = PurchasingSystems.fromValue(params.get(PARAM_TYPE));
+      logger.info("Request is from purchasing system: " + ps.toString());
+      ((OrdersOkapiClient) client).placeOrder(ps, ctx.getBodyAsString(), ctx.request()
+          .headers(), resp -> handleProxyResponse(ps, ctx, resp), t -> handleProxyException(ctx, t));
+    });
   }
 
   protected void handleProxyResponse(PurchasingSystems ps, RoutingContext ctx, HttpClientResponse resp) {
@@ -92,29 +87,38 @@ public class OrdersHandler extends Handler {
       }
 
       body.append(buf);
-    }).endHandler(v -> {
-      ctx.response().setStatusCode(resp.statusCode());
-
-      if (body.length() > 0) {
-        String respBody = body.toString();
-
-        if (logger.isDebugEnabled()) {
-          logger.debug("status: " + resp.statusCode() + " response: " + respBody);
-        }
-
-        try {
-          String xml = parseResponse(resp, respBody).toXml();
+    })
+        .endHandler(v -> {
           ctx.response()
-            .putHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_XML)
-            .end(xml);
-        } catch (Exception e) {
-          logger.error("Failed to convert FOLIO response to XML", e);
-          internalServerError(ctx, "Failed to convert FOLIO response to XML");
-        }
-      } else {
-        ctx.response().end();
-      }
-    });
+              .setStatusCode(resp.statusCode());
+
+          if (body.length() > 0) {
+            String respBody = body.toString();
+
+            if (logger.isDebugEnabled()) {
+              logger.debug("status: " + resp.statusCode() + " response: " + respBody);
+            }
+
+            try {
+              String xml = StringUtils.EMPTY;
+              if (respBody.matches(VALIDATE_SUCCESS)) {
+                xml = respBody;
+              } else {
+                xml = parseResponse(resp, respBody).toXml();
+              }
+
+              ctx.response()
+                  .putHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_XML)
+                  .end(xml);
+            } catch (Exception e) {
+              logger.error("Failed to convert FOLIO response to XML", e);
+              internalServerError(ctx, "Failed to convert FOLIO response to XML");
+            }
+          } else {
+            ctx.response()
+                .end();
+          }
+        });
   }
 
   private ResponseWrapper parseResponse(HttpClientResponse resp, String respBody) throws IOException {
@@ -127,7 +131,8 @@ public class OrdersHandler extends Handler {
     } else if (APPLICATION_JSON.equals(contentType)) {
       wrapper = ResponseWrapper.fromJson(respBody);
     } else {
-      String code = ErrorCodes.fromValue(resp.statusCode()).toString();
+      String code = ErrorCodes.fromValue(resp.statusCode())
+          .toString();
       wrapper = new ResponseWrapper(new ErrorWrapper(code, respBody));
     }
     return wrapper;
@@ -140,14 +145,16 @@ public class OrdersHandler extends Handler {
     } catch (Exception e) {
       logger.error("Exception marshalling XML", e);
     }
-    ctx.response().setStatusCode(status);
+    ctx.response()
+        .setStatusCode(status);
 
     if (xml != null) {
       ctx.response()
-        .putHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_XML)
-        .end(xml);
+          .putHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_XML)
+          .end(xml);
     } else {
-      ctx.response().end();
+      ctx.response()
+          .end();
     }
   }
 

@@ -1,91 +1,127 @@
-#%RAML 0.8
-title: 'Edge API - Orders'
-baseUri: 'https://github.com/folio-org/edge-orders'
+#%RAML 1.0
+title: Edge API - Orders
+baseUri: https://github.com/folio-org/edge-orders
 version: v1
 documentation:
-  -
-    title: 'Edge API - Orders'
-    content: 'Edge API to interface with FOLIO for 3rd party purchasing systems for placing orders'
-schemas:
-  -
+  - title: Edge API - Orders
+    content: Edge API to interface with FOLIO for 3rd party purchasing systems for placing orders
+types:
     orders: !include orders.xsd
 /orders/validate:
   displayName: Validate
   get:
-    description: 'Validate that the API Key provided can be used to place an order'
+    description: Validate that the API Key provided can be used to place an order
     responses:
-      '204':
+       200:
         description: Success
-      '400':
-        description: 'Bad Request'
         body:
           application/xml:
-            schema: orders
-      '401':
-        description: 'Access Denied'
+           example: "<test>GET - OK</test>"
+       400:
+        description: Bad Request
         body:
           application/xml:
-            schema: orders
-      '408':
-        description: 'Request Timeout'
+            type: orders
+       401:
+        description: Access Denied
         body:
           application/xml:
-            schema: orders
-      '500':
-        description: 'Internal Server Error'
+            type: orders
+       408:
+        description: Request Timeout
         body:
           application/xml:
-            schema: orders
+            type: orders
+       500:
+        description: Internal Server Error
+        body:
+          application/xml:
+            type: orders
     queryParameters:
       type:
-        description: 'purchasing system type'
+        description: purchasing system type
         type: string
       apikey:
-        description: 'API Key'
+        description: API Key
         type: string
-/orders:
-  displayName: 'Place Order'
   post:
-    description: 'Place an order'
+    description: Validate that the API Key provided can be used to place an order
     responses:
-      '201':
+       200:
         description: Success
         body:
           application/xml:
-            schema: orders
-      '400':
-        description: 'Bad Request'
+           example: "<test>POST - OK</test>"
+       400:
+        description: Bad Request
         body:
           application/xml:
-            schema: orders
-      '401':
-        description: 'Access Denied'
+            type: orders
+       401:
+        description: Access Denied
         body:
           application/xml:
-            schema: orders
-      '408':
-        description: 'Request Timeout'
+            type: orders
+       408:
+        description: Request Timeout
         body:
           application/xml:
-            schema: orders
-      '500':
-        description: 'Internal Server Error'
+            type: orders
+       500:
+        description: Internal Server Error
         body:
           application/xml:
-            schema: orders
+            type: orders
     queryParameters:
       type:
-        description: 'purchasing system type'
+        description: purchasing system type
         type: string
       apikey:
-        description: 'API Key'
+        description: API Key
+        type: string     
+/orders:
+  displayName: Place Order
+  post:
+    description: Place an order
+    responses:
+       201:
+        description: Success
+        body:
+          application/xml:
+            type: orders
+       400:
+        description: Bad Request
+        body:
+          application/xml:
+            type: orders
+       401:
+        description: Access Denied
+        body:
+          application/xml:
+            type: orders
+       408:
+        description: Request Timeout
+        body:
+          application/xml:
+            type: orders
+       500:
+        description: Internal Server Error
+        body:
+          application/xml:
+            type: orders
+    queryParameters:
+      type:
+        description: purchasing system type
+        type: string
+      apikey:
+        description: API Key
         type: string
 /admin/health:
-  displayName: 'Health Check'
+  displayName: Health Check
   get:
-    description: 'Health Check'
+    description: Health Check
     responses:
-      '200':
+      200:
         description: Success
         body:
           text/plain: null
