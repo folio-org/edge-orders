@@ -3,7 +3,6 @@ package org.folio.edge.orders;
 import static org.folio.edge.orders.Constants.PARAM_TYPE;
 
 import io.vertx.ext.web.RoutingContext;
-import org.apache.http.HttpHeaders;
 import org.apache.log4j.Logger;
 import org.folio.edge.core.security.SecureStore;
 import org.folio.edge.orders.Constants.PurchasingSystems;
@@ -28,8 +27,7 @@ public class ValidateHandler extends OrdersHandler {
           logger.info("Request is from purchasing system: " + ps.toString());
           ((OrdersOkapiClient) client).validate(ctx.request().method(),
               ps,
-              // the responses are short, we can safely drop the encoding header if passed
-              ctx.request().headers().remove(HttpHeaders.ACCEPT_ENCODING),
+              ctx.request().headers(),
               resp -> handleProxyResponse(ps, ctx, resp),
               t -> handleProxyException(ctx, t));
         });
