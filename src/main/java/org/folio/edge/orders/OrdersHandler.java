@@ -38,6 +38,11 @@ public class OrdersHandler extends Handler {
   protected void handleCommon(RoutingContext ctx, String[] requiredParams, String[] optionalParams,
       TwoParamVoidFunction<OkapiClient, Map<String, String>> action) {
 
+    // the responses are short, we can safely drop the encoding header if passed
+    if (null != ctx.request().getHeader(HttpHeaders.ACCEPT_ENCODING)) {
+      ctx.request().headers().remove(HttpHeaders.ACCEPT_ENCODING);
+    }
+
     String type = ctx.request()
         .getParam(PARAM_TYPE);
     if (type == null || type.isEmpty()) {
