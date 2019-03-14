@@ -1,6 +1,6 @@
 ## 2.0.0 - Released
 
-Major changes for this release include confirming to the new API Key format changed in edge-common and creating a new /validate API to support both GET and POST Http 
+Major changes for this release include conforming to the new API Key format changed in edge-common and creating a new /validate API to support both GET and POST Http 
 methods.
 
 [Full Changelog](https://github.com/folio-org/edge-orders/compare/v1.0.0...v2.0.0)
