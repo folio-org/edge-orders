@@ -45,6 +45,7 @@ import org.junit.runner.RunWith;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.jayway.restassured.RestAssured;
+import com.jayway.restassured.response.Header;
 import com.jayway.restassured.response.Response;
 
 import io.vertx.core.DeploymentOptions;
@@ -150,6 +151,20 @@ public class MainVerticleTest {
     logger.info("=== Test GET validate w/ valid key ===");
 
     RestAssured
+      .get("/orders/validate?type=GOBI&apiKey=" + apiKey)
+      .then()
+      .statusCode(200)
+      .assertThat()
+      .body(containsString("<test>GET - OK</test>"));
+  }
+
+  @Test
+  public void testGetValidateSuccessWithEncoding(TestContext context) {
+    logger.info("=== Test GET validate w/ valid key and Accept Encoding header===");
+
+    RestAssured
+      .with()
+      .header(new Header(HttpHeaders.ACCEPT_ENCODING, "gzip deflate"))
       .get("/orders/validate?type=GOBI&apiKey=" + apiKey)
       .then()
       .statusCode(200)
