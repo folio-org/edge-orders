@@ -173,6 +173,23 @@ public class MainVerticleTest {
   }
 
   @Test
+  public void testPostValidateSuccessIgnoreBody(TestContext context) {
+  	// EDGORDERS-15 - Ignore processing request body
+    logger.info("=== Test POST validate w/ valid key and ignore processing request body ===");
+
+    String PO = "118279";
+    String body = mockRequests.get(PO);
+    
+    RestAssured
+    .with().body(body)
+      .post("/orders/validate?type=GOBI&apiKey=" + apiKey)
+      .then()
+      .statusCode(200)
+      .assertThat()
+      .body(containsString("<test>POST - OK</test>"));
+  }
+  
+  @Test
   public void testPostValidateSuccess(TestContext context) {
     logger.info("=== Test POST validate w/ valid key ===");
 
