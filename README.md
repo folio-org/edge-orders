@@ -13,6 +13,11 @@ The purpose of this edge API is to bridge the gap between 3rd party purchasing s
 
 See [edge-common](https://github.com/folio-org/edge-common) for a description of the security model.
 
+## Required Permissions
+
+Institutional users should be granted the following permissions in order to use this edge API:
+- `gobi.all
+
 ## Configuration
 
 See [edge-common](https://github.com/folio-org/edge-common) for a description of how configuration works.
