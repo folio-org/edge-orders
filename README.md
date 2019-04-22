@@ -16,7 +16,7 @@ See [edge-common](https://github.com/folio-org/edge-common) for a description of
 ## Required Permissions
 
 Institutional users should be granted the following permissions in order to use this edge API:
-- `gobi.all
+- `gobi.all`
 
 ## Configuration
 
