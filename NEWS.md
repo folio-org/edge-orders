@@ -1,3 +1,12 @@
+### 2.0.1 - Released
+
+This release includes a bug fix to handle a timeout in POST endpoint which contains body
+
+[Full Changelog](https://github.com/folio-org/edge-orders/compare/v2.0.0...v2.0.1)
+
+### Bugs
+* [EDGEORDERS-15](https://issues.folio.org/browse/EDGORDERS-15) - POST /orders/validate timesout with invalid body content
+
 ## 2.0.0 - Released
 
 Major changes for this release include conforming to the new API Key format changed in edge-common and creating a new /validate API to support both GET and POST Http 
