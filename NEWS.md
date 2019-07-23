@@ -1,5 +1,11 @@
 ### 2.0.1 - Released
 
+This release includes updating of login interface version because of breaking change in mod-login
+
+[Full Changelog](https://github.com/folio-org/edge-orders/compare/v2.0.1...v2.0.2)
+
+### 2.0.1 - Released
+
 This release includes a bug fix to handle a timeout in POST endpoint which contains body
 
 [Full Changelog](https://github.com/folio-org/edge-orders/compare/v2.0.0...v2.0.1)
