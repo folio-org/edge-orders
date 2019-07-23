@@ -1,4 +1,4 @@
-### 2.0.1 - Released
+### 2.0.2 - Released
 
 This release includes updating of login interface version because of breaking change in mod-login
 
