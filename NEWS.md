@@ -1,10 +1,22 @@
-### 2.0.2 - Released
+## 2.2.0 - Unreleased
+
+## 2.1.0 - Released
+
+This release includes tuning environment settings
+
+[Full Changelog](https://github.com/folio-org/edge-orders/compare/v2.0.2...v2.1.0)
+
+### Stories
+* [EDGEORDERS-20](https://issues.folio.org/browse/EDGORDERS-20) - Use JVM features to manage container memory
+* [FOLIO-2235](https://issues.folio.org/browse/FOLIO-2235) - Add LaunchDescriptor settings to each backend non-core module repository
+
+## 2.0.2 - Released
 
 This release includes updating of login interface version because of breaking change in mod-login
 
 [Full Changelog](https://github.com/folio-org/edge-orders/compare/v2.0.1...v2.0.2)
 
-### 2.0.1 - Released
+## 2.0.1 - Released
 
 This release includes a bug fix to handle a timeout in POST endpoint which contains body
 
