@@ -1,4 +1,10 @@
-## 2.2.0 - Unreleased
+## 2.3.0 - Unreleased
+
+## 2.2.0 - Released
+
+This release includes updating of GOBI interface version because of changes in mod-gobi
+
+[Full Changelog](https://github.com/folio-org/edge-orders/compare/v2.1.0...v2.2.0)
 
 ## 2.1.0 - Released
 
