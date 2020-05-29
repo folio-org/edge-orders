@@ -13,6 +13,7 @@ import static org.folio.edge.core.Constants.SYS_SECURE_STORE_PROP_FILE;
 import static org.folio.edge.core.Constants.TEXT_PLAIN;
 import static org.folio.edge.core.utils.test.MockOkapi.X_DURATION;
 import static org.folio.edge.core.utils.test.MockOkapi.X_ECHO_STATUS;
+import static org.folio.edge.orders.Constants.API_CONFIGURATION_PROPERTY_NAME;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.spy;
@@ -85,6 +86,7 @@ public class MainVerticleTest {
     System.setProperty(SYS_PORT, String.valueOf(serverPort));
     System.setProperty(SYS_OKAPI_URL, "http://localhost:" + okapiPort);
     System.setProperty(SYS_SECURE_STORE_PROP_FILE, "src/main/resources/ephemeral.properties");
+    System.setProperty(API_CONFIGURATION_PROPERTY_NAME, "src/main/resources/api_configuration.json");
     System.setProperty(SYS_LOG_LEVEL, "TRACE");
     System.setProperty(SYS_REQUEST_TIMEOUT_MS, String.valueOf(requestTimeoutMs));
 
@@ -179,7 +181,7 @@ public class MainVerticleTest {
 
     String PO = "118279";
     String body = mockRequests.get(PO);
-    
+
     RestAssured
     .with().body(body)
       .post("/orders/validate?type=GOBI&apiKey=" + apiKey)
@@ -188,7 +190,7 @@ public class MainVerticleTest {
       .assertThat()
       .body(containsString("<test>POST - OK</test>"));
   }
-  
+
   @Test
   public void testPostValidateSuccess(TestContext context) {
     logger.info("=== Test POST validate w/ valid key ===");
@@ -394,6 +396,19 @@ public class MainVerticleTest {
     ResponseWrapper respBody = new ResponseWrapper(
         new ErrorWrapper(ErrorCodes.API_KEY_INVALID.name(), MSG_INVALID_API_KEY + ": "));
     assertEquals(respBody.toXml(), resp.body().asString());
+  }
+
+  @Test
+  public void testNonExistingEndpoint(TestContext context) throws JsonProcessingException {
+    logger.info("=== Test non existing endpoint ===");
+
+    RestAssured
+      .with()
+      .post("/test" + unknownTenantApiKey)
+      .then()
+      .statusCode(404)
+      .extract()
+      .response();
   }
 
   @Test
