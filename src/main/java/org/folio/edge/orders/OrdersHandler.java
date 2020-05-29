@@ -8,14 +8,13 @@ import static org.folio.edge.core.Constants.MSG_REQUEST_TIMEOUT;
 import static org.folio.edge.orders.Constants.PARAM_TYPE;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 import org.folio.edge.core.Handler;
 import org.folio.edge.core.security.SecureStore;
 import org.folio.edge.core.utils.OkapiClient;
 import org.folio.edge.orders.Constants.ErrorCodes;
-import org.folio.edge.orders.Constants.PurchasingSystems;
 import org.folio.edge.orders.model.ErrorWrapper;
 import org.folio.edge.orders.model.ResponseWrapper;
 import org.folio.edge.orders.utils.OrdersOkapiClient;
@@ -24,11 +23,14 @@ import org.folio.edge.orders.utils.OrdersOkapiClientFactory;
 import io.vertx.core.http.HttpClientResponse;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.ext.web.RoutingContext;
+import org.folio.rest.mappings.model.Routing;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class OrdersHandler extends Handler {
 
   private static final String VALIDATE_SUCCESS = "(?i:<test>(GET|POST) - ok<\\/test>)";
-  private static final Logger logger = Logger.getLogger(OrdersHandler.class);
+  private static final Logger logger = LoggerFactory.getLogger(OrdersHandler.class);
 
   public OrdersHandler(SecureStore secureStore, OrdersOkapiClientFactory ocf) {
     super(secureStore, ocf);
@@ -50,11 +52,6 @@ public class OrdersHandler extends Handler {
       return;
     }
 
-    if (PurchasingSystems.fromValue(type) == null) {
-      badRequest(ctx, "Unknown Purchasing System Specified: " + type);
-      return;
-    }
-
     super.handleCommon(ctx, requiredParams, optionalParams, (client, params) -> {
       final OrdersOkapiClient ordersClient = new OrdersOkapiClient(client);
 
@@ -63,27 +60,35 @@ public class OrdersHandler extends Handler {
     });
   }
 
-  protected void handle(RoutingContext ctx) {
-    handleCommon(ctx, new String[] {}, new String[] {}, (client, params) -> {
-      PurchasingSystems ps = PurchasingSystems.fromValue(params.get(PARAM_TYPE));
-      logger.info("Request is from purchasing system: " + ps.toString());
-      ((OrdersOkapiClient) client).placeOrder(ps, ctx.getBodyAsString(), ctx.request()
-          .headers(), resp -> handleProxyResponse(ps, ctx, resp), t -> handleProxyException(ctx, t));
+  protected void handle(RoutingContext ctx, List<Routing> routingMapping) {
+    handleCommon(ctx, new String[]{}, new String[]{}, (client, params) -> {
+      String type = params.get(PARAM_TYPE);
+
+      Routing routing;
+      String requestPath = ctx.normalisedPath();
+      String requestMethod = ctx.request().rawMethod();
+
+      try {
+        routing = routingMapping.stream()
+          .filter(r -> r.getType().equals(type)
+            && r.getMethod().equals(requestMethod)
+            && r.getPathPattern().equals(requestPath))
+          .findFirst()
+          .orElseThrow(Exception::new);
+      } catch (Exception e) {
+        logger.error("API configuration doesn't exist for type={} method={} pathPattern={}", type, requestMethod, requestPath);
+        badRequest(ctx, "Unknown Purchasing System Specified: " + type);
+        return;
+      }
+
+      logger.info("Request is from purchasing system: {}", type);
+      ((OrdersOkapiClient) client).send(routing, ctx.getBodyAsString(), ctx.request().headers(),
+        resp -> handleResponse(ctx, resp),
+        t -> handleProxyException(ctx, t));
     });
   }
 
-  protected void handleProxyResponse(PurchasingSystems ps, RoutingContext ctx, HttpClientResponse resp) {
-    if (PurchasingSystems.GOBI == ps) {
-      handleGobiResponse(ctx, resp);
-    } else {
-      // Should never get here... Only GOBI is supported so far.
-      // OrdersOkapiClient will throw a NotImplementedException for
-      // anything else, and the request will be handled by the exception
-      // handler.
-    }
-  }
-
-  protected void handleGobiResponse(RoutingContext ctx, HttpClientResponse resp) {
+  protected void handleResponse(RoutingContext ctx, HttpClientResponse resp) {
     final StringBuilder body = new StringBuilder();
     resp.handler(buf -> {
 

@@ -22,6 +22,41 @@ Institutional users should be granted the following permissions in order to use 
 
 See [edge-common](https://github.com/folio-org/edge-common) for a description of how configuration works.
 
+Api configuration can be specified by `api_config` system property as URL or path.
+
+By default `/reources/api_configuration.json` will be used.
+
+Api Configuration format:
+
+Property               | Example           | Description
+---------------------- | ----------------- | -------------
+type                   |  GOBI             | Type of the system 
+pathPattern            |  /orders/validate | URL Path for mapping
+method                 |  POST             | HTTP method for mapping
+proxyMehtod            |  POST             | HTTP method for proxy 
+proxyPath              |  /gobi/validate   | Path for proxy
+
+Example of api mapping content:
+```json
+{
+  "routing": [
+    {
+      "type": "GOBI",
+      "method": "POST",
+      "pathPattern": "/orders/validate",
+      "proxyPath": "/gobi/validate"
+    },
+    {
+      "type": "GOBI",
+      "method": "GET",
+      "pathPattern": "/orders/validate",
+      "proxyMethod": "POST",
+      "proxyPath": "/gobi/validate"
+    }
+  ]
+}
+```  
+
 ## Additional information
 
 ### Issue tracker
