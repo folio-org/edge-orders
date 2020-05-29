@@ -407,8 +407,8 @@ public class MainVerticleTest {
       .post("/test" + unknownTenantApiKey)
       .then()
       .statusCode(404)
-      .extract()
-      .response();
+      .assertThat()
+      .body(containsString("Resource not found"));
   }
 
   @Test

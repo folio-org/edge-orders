@@ -93,7 +93,7 @@ public class OrdersHandler extends Handler {
     resp.handler(buf -> {
 
       if (logger.isTraceEnabled()) {
-        logger.trace("read bytes: " + buf.toString());
+        logger.trace("read bytes: {}", buf);
       }
 
       body.append(buf);
@@ -106,7 +106,7 @@ public class OrdersHandler extends Handler {
             String respBody = body.toString();
 
             if (logger.isDebugEnabled()) {
-              logger.debug("status: " + resp.statusCode() + " response: " + respBody);
+              logger.debug("status: {} response: {}", + resp.statusCode(), respBody);
             }
 
             try {
