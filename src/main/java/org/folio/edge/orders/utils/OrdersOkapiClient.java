@@ -2,16 +2,14 @@ package org.folio.edge.orders.utils;
 
 import static org.folio.edge.core.Constants.XML_OR_TEXT;
 
-import org.apache.commons.lang3.NotImplementedException;
-import org.folio.edge.core.utils.OkapiClient;
-import org.folio.edge.orders.Constants.PurchasingSystems;
-
 import io.vertx.core.Handler;
 import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpClientResponse;
 import io.vertx.core.http.HttpHeaders;
-import io.vertx.core.http.HttpMethod;
+import org.apache.commons.lang3.StringUtils;
+import org.folio.edge.core.utils.OkapiClient;
+import org.folio.rest.mappings.model.Routing;
 
 public class OrdersOkapiClient extends OkapiClient {
 
@@ -29,60 +27,26 @@ public class OrdersOkapiClient extends OkapiClient {
     defaultHeaders.set(HttpHeaders.ACCEPT, XML_OR_TEXT);
   }
 
-  public void validate(HttpMethod method, PurchasingSystems ps, MultiMap headers, Handler<HttpClientResponse> responseHandler,
-      Handler<Throwable> exceptionHandler) {
-    if (PurchasingSystems.GOBI == ps) {
-      validateGobi(method, headers, responseHandler, exceptionHandler);
-    } else {
-      exceptionHandler
-        .handle(new NotImplementedException("validate(...) for " + ps + " is not supported yet"));
-    }
-  }
+  public void send(Routing routing, String payload, MultiMap headers, Handler<HttpClientResponse> responseHandler,
+    Handler<Throwable> exceptionHandler) {
 
-  public void placeOrder(PurchasingSystems ps, String payload, MultiMap headers,
-      Handler<HttpClientResponse> responseHandler,
-      Handler<Throwable> exceptionHandler) {
-    if (PurchasingSystems.GOBI == ps) {
-      placeGobiOrder(payload, headers, responseHandler, exceptionHandler);
-    } else {
-      exceptionHandler.handle(new NotImplementedException("placeOrder(...) for " + ps + " is not supported yet"));
-    }
-  }
+    final String method = routing.getProxyMethod() == null ? routing.getMethod() : routing.getProxyMethod();
 
-  public void placeGobiOrder(String payload, Handler<HttpClientResponse> responseHandler,
-      Handler<Throwable> exceptionHandler) {
-    placeGobiOrder(payload, null, responseHandler, exceptionHandler);
-  }
-
-  public void placeGobiOrder(String payload, MultiMap headers, Handler<HttpClientResponse> responseHandler,
-      Handler<Throwable> exceptionHandler) {
-    post(
-        String.format("%s/gobi/orders", okapiURL),
-        tenant,
-        payload,
-        combineHeadersWithDefaults(headers),
-        responseHandler,
-        exceptionHandler);
-  }
-
-  public void validateGobi(HttpMethod method, MultiMap headers, Handler<HttpClientResponse> responseHandler,
-      Handler<Throwable> exceptionHandler) {
-    if(HttpMethod.GET.equals(method)) {
-     get(
-        String.format("%s/gobi/validate", okapiURL),
-        tenant,
-        combineHeadersWithDefaults(headers),
-        responseHandler,
-        exceptionHandler);
-    }
-    else {
+    if (method.equals("POST")) {
       post(
-          String.format("%s/gobi/validate", okapiURL),
-          null,
-          tenant,
-          combineHeadersWithDefaults(headers),
-          responseHandler,
-          exceptionHandler);
+        okapiURL + routing.getProxyPath(),
+        tenant,
+        StringUtils.isEmpty(payload)? null : payload,
+        combineHeadersWithDefaults(headers),
+        responseHandler,
+        exceptionHandler);
+    } else if (method.equals("GET")) {
+      get(
+        okapiURL + routing.getProxyPath(),
+        tenant,
+        combineHeadersWithDefaults(headers),
+        responseHandler,
+        exceptionHandler);
     }
   }
 }
