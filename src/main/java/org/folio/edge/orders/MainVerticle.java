@@ -10,6 +10,7 @@ import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.BodyHandler;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
@@ -67,7 +68,7 @@ public class MainVerticle extends EdgeVerticle {
     return router;
   }
 
-  private List<Routing> initApiConfiguration(String apiConfigurationPropFile) throws Exception {
+  private List<Routing> initApiConfiguration(String apiConfigurationPropFile) throws IOException {
 
     ApiConfiguration apiConfiguration = null;
     final Pattern isURL = Pattern.compile("(?i)^http[s]?://.*");
