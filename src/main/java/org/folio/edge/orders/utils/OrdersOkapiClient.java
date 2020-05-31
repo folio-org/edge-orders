@@ -7,6 +7,7 @@ import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpClientResponse;
 import io.vertx.core.http.HttpHeaders;
+import org.apache.commons.lang3.StringUtils;
 import org.folio.edge.core.utils.OkapiClient;
 import org.folio.rest.mappings.model.Routing;
 
@@ -35,7 +36,7 @@ public class OrdersOkapiClient extends OkapiClient {
       post(
         okapiURL + routing.getProxyPath(),
         tenant,
-        payload.isEmpty() ? null : payload,
+        StringUtils.isEmpty(payload)? null : payload,
         combineHeadersWithDefaults(headers),
         responseHandler,
         exceptionHandler);
