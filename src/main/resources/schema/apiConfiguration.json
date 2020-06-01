@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "API Configuration mapping",
+  "type": "object",
+  "properties": {
+    "routing": {
+      "id": "routing",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "description": "Type of system",
+            "type": "string"
+          },
+          "method": {
+            "description": "HTTP methods GET, POST, PUT, DELETE",
+            "type": "string"
+          },
+          "pathPattern": {
+            "description": "Uri path for mapping",
+            "type": "string"
+          },
+          "proxyMethod": {
+            "description": "HTTP proxy methods",
+            "type": "string"
+          },
+          "proxyPath": {
+            "description": "URI for proxy forwarding",
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "type",
+          "method",
+          "pathPattern",
+          "proxyPath"
+        ]
+      }
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "routing"
+  ]
+}

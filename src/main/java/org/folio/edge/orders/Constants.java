@@ -6,6 +6,8 @@ import java.util.Map;
 public class Constants {
 
   public static final String PARAM_TYPE = "type";
+  public static final String API_CONFIGURATION_PROPERTY_NAME = "api_config";
+  public static final String API_CONFIGURATION_DEFAULT = "api_configuration.json";
 
   public enum ErrorCodes {
 
@@ -27,7 +29,7 @@ public class Constants {
       }
     }
 
-    private ErrorCodes(Integer value) {
+    ErrorCodes(Integer value) {
       this.value = value;
     }
 
@@ -38,32 +40,6 @@ public class Constants {
 
     public static ErrorCodes fromValue(Integer value) {
       return CONSTANTS.get(value);
-    }
-  }
-
-  public enum PurchasingSystems {
-
-    GOBI("GOBI");
-    private final String value;
-    private static final Map<String, PurchasingSystems> CONSTANTS = new HashMap<>();
-
-    static {
-      for (PurchasingSystems c : values()) {
-        CONSTANTS.put(c.value, c);
-      }
-    }
-
-    private PurchasingSystems(String value) {
-      this.value = value;
-    }
-
-    @Override
-    public String toString() {
-      return this.value;
-    }
-
-    public static PurchasingSystems fromValue(String value) {
-      return CONSTANTS.get(value.toUpperCase());
     }
   }
 
