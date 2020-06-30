@@ -1,4 +1,13 @@
-## 2.2.0 - Unreleased
+## 2.3.0 - Unreleased
+## 2.2.0 - Released
+
+This release includes upgrade RMB and configuration based routing
+
+[Full Changelog](https://github.com/folio-org/edge-orders/compare/v2.1.0...v2.2.0)
+
+### Stories
+* [EDGEORDERS-24](https://issues.folio.org/browse/EDGORDERS-24) - edge-orders: Update to RMB v30.0.1
+* [EDGEORDERS-22](https://issues.folio.org/browse/EDGORDERS-22) - Configuration based request routing
 
 ## 2.1.0 - Released
 
