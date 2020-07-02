@@ -14,6 +14,9 @@ import static org.folio.edge.core.Constants.TEXT_PLAIN;
 import static org.folio.edge.core.utils.test.MockOkapi.X_DURATION;
 import static org.folio.edge.core.utils.test.MockOkapi.X_ECHO_STATUS;
 import static org.folio.edge.orders.Constants.API_CONFIGURATION_PROPERTY_NAME;
+import static org.folio.edge.orders.Constants.ErrorCodes.INTERNAL_SERVER_ERROR;
+import static org.folio.edge.orders.utils.OrdersMockOkapi.BODY_REQUEST_FOR_EXCEPTION;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.spy;
@@ -28,6 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.log4j.Logger;
 import org.folio.edge.core.cache.TokenCache;
@@ -53,7 +57,6 @@ import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-import static org.hamcrest.Matchers.containsString;
 
 @RunWith(VertxUnitRunner.class)
 public class MainVerticleTest {
@@ -477,5 +480,35 @@ public class MainVerticleTest {
     ResponseWrapper respBody = new ResponseWrapper(
         new ErrorWrapper("REQUEST_TIMEOUT", MSG_REQUEST_TIMEOUT));
     assertEquals(respBody.toXml(), resp.body().asString());
+  }
+
+  @Test
+  public void testShouldReturnEmptyResponseIfResponseFromVendorIsEmpty(TestContext context) throws JsonProcessingException {
+    String body = StringUtils.EMPTY;
+
+    final Response resp = RestAssured
+      .with()
+      .body(body)
+      .post("/orders?type=GOBI&apiKey=" + apiKey)
+      .then()
+      .statusCode(201)
+      .extract()
+      .response();
+
+    assertEquals(StringUtils.EMPTY, resp.body().asString());
+  }
+
+  @Test
+  public void testShouldCatchExceptionIfVendorResponsInvalide(TestContext context) throws JsonProcessingException {
+    String body = BODY_REQUEST_FOR_EXCEPTION;
+
+    final Response resp = RestAssured
+      .with()
+      .body(body)
+      .post("/orders?type=GOBI&apiKey=" + apiKey)
+      .then()
+      .statusCode(500)
+      .extract()
+      .response();
   }
 }
