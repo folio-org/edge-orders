@@ -15,38 +15,41 @@ types:
        200:
         description: Success
         body:
-          application/xml:
-            example: "<test>GET - OK</test>"
-          application/json:
-            example: "{test : POST - OK}"
+         application/xml:
+          example: "<test>GET - OK</test>"
+         application/json:
+          example: |
+            {
+              "test" : "POST - OK"
+            }
        400:
         description: Bad Request.
         body:
-          application/xml:
-            example: !include examples/error.xml
-          application/json:
-             example: !include examples/error.json
+         application/xml:
+          example: !include examples/error.xml
+         application/json:
+          example: !include examples/error.json
        401:
         description: Access Denied.
         body:
           application/xml:
             example: !include examples/error.xml
           application/json:
-             example: !include examples/error.json
+            example: !include examples/error.json
        408:
         description: Request Timeout.
         body:
           application/xml:
             example: !include examples/error.xml
           application/json:
-             example: !include examples/error.json
+            example: !include examples/error.json
        500:
         description: Internal Server Error.
         body:
           application/xml:
             example: !include examples/error.xml
           application/json:
-             example: !include examples/error.json
+            example: !include examples/error.json
     queryParameters:
       type:
         description: purchasing system type
@@ -60,10 +63,13 @@ types:
        200:
         description: Success
         body:
-          application/xml:
-            example: "<test>POST - OK</test>"
-          application/json:
-            example: "{test : POST - OK}"
+         application/xml:
+          example: "<test>GET - OK</test>"
+         application/json:
+          example: |
+            {
+              "test" : "POST - OK"
+            }
        400:
         description: Bad Request
         body:
@@ -77,21 +83,21 @@ types:
           application/xml:
             example: !include examples/error.xml
           application/json:
-             example: !include examples/error.json
+            example: !include examples/error.json
        408:
         description: Request Timeout
         body:
           application/xml:
             example: !include examples/error.xml
           application/json:
-             example: !include examples/error.json
+            example: !include examples/error.json
        500:
         description: Internal Server Error
         body:
           application/xml:
             example: !include examples/error.xml
           application/json:
-             example: !include examples/error.json
+            example: !include examples/error.json
     queryParameters:
       type:
         description: purchasing system type
@@ -123,7 +129,7 @@ types:
           application/xml:
             example: !include examples/error.xml
           application/json:
-             example: !include examples/error.json
+            example: !include examples/error.json
        401:
         description: Access Denied
         body:
