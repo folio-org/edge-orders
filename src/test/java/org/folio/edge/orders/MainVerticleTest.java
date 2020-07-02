@@ -319,8 +319,28 @@ public class MainVerticleTest {
 
     final Response resp = RestAssured
       .with()
-      .accept(APPLICATION_JSON) // note this gets passed through to OKAPI, but
-                                // we still get XML back.
+      .accept(APPLICATION_JSON)
+      .body(body)
+      .post("/orders?type=GOBI&apiKey=" + apiKey)
+      .then()
+      .contentType(APPLICATION_JSON)
+      .statusCode(201)
+      .extract()
+      .response();
+
+    assertEquals(new ResponseWrapper("PO-" + PO).toJson(), resp.body().asString());
+  }
+
+  @Test
+  public void testPlaceOrderXml(TestContext context) throws JsonProcessingException {
+    logger.info("=== Test place order - Success (JSON) ===");
+
+    String PO = "118279";
+    String body = mockRequests.get(PO);
+
+    final Response resp = RestAssured
+      .with()
+      .accept(APPLICATION_XML)
       .body(body)
       .post("/orders?type=GOBI&apiKey=" + apiKey)
       .then()

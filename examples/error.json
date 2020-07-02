@@ -1,0 +1,6 @@
+{
+  "Error": {
+    "Code": "BAD_REQUEST",
+    "Message": "Accept header must be [\"application/xml\",\"text/plain\"] for this request, but it is \"application/json\", can not send */*"
+  }
+}

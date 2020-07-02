@@ -10,7 +10,6 @@ import static org.folio.edge.orders.Constants.PARAM_TYPE;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.lang3.StringUtils;
 import org.folio.edge.core.Handler;
 import org.folio.edge.core.security.SecureStore;
 import org.folio.edge.core.utils.OkapiClient;
@@ -29,7 +28,7 @@ import org.slf4j.LoggerFactory;
 
 public class OrdersHandler extends Handler {
 
-  private static final String VALIDATE_SUCCESS = "(?i:<test>(GET|POST) - ok<\\/test>)";
+  private static final String VALIDATE_GOBI_XML_SUCCESS = "(?i:<test>(GET|POST) - ok<\\/test>)";
   private static final Logger logger = LoggerFactory.getLogger(OrdersHandler.class);
 
   public OrdersHandler(SecureStore secureStore, OrdersOkapiClientFactory ocf) {
@@ -83,12 +82,12 @@ public class OrdersHandler extends Handler {
 
       logger.info("Request is from purchasing system: {}", type);
       ((OrdersOkapiClient) client).send(routing, ctx.getBodyAsString(), ctx.request().headers(),
-        resp -> handleResponse(ctx, resp),
+        resp -> handleResponseWithBody(ctx, resp),
         t -> handleProxyException(ctx, t));
     });
   }
 
-  protected void handleResponse(RoutingContext ctx, HttpClientResponse resp) {
+  protected void handleResponseWithBody(RoutingContext ctx, HttpClientResponse resp) {
     final StringBuilder body = new StringBuilder();
     resp.handler(buf -> {
 
@@ -99,72 +98,63 @@ public class OrdersHandler extends Handler {
       body.append(buf);
     })
         .endHandler(v -> {
-          ctx.response()
-              .setStatusCode(resp.statusCode());
+          ctx.response().setStatusCode(resp.statusCode());
 
           if (body.length() > 0) {
             String respBody = body.toString();
-
+            try {
+              if (respBody.matches(VALIDATE_GOBI_XML_SUCCESS)) {
+                ctx.response()
+                  .putHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_XML)
+                  .end(respBody);
+              } else {
+                ResponseWrapper responseWrapper = parseVendorResponse(resp, respBody);
+                handleResponseWithBody(ctx, resp.statusCode(), responseWrapper);
+              }
+            } catch (IOException e) {
+              logger.error("Exception marshalling", e);
+              internalServerError(ctx, "Failed to process vendor response");
+            }
             if (logger.isDebugEnabled()) {
               logger.debug("status: {} response: {}", + resp.statusCode(), respBody);
             }
 
-            try {
-              String xml = StringUtils.EMPTY;
-              if (respBody.matches(VALIDATE_SUCCESS)) {
-                xml = respBody;
-              } else {
-                xml = parseResponse(resp, respBody).toXml();
-              }
-
-              ctx.response()
-                  .putHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_XML)
-                  .end(xml);
-            } catch (Exception e) {
-              logger.error("Failed to convert FOLIO response to XML", e);
-              internalServerError(ctx, "Failed to convert FOLIO response to XML");
-            }
           } else {
-            ctx.response()
-                .end();
+            ctx.response().end();
           }
         });
   }
 
-  private ResponseWrapper parseResponse(HttpClientResponse resp, String respBody) throws IOException {
+  private ResponseWrapper parseVendorResponse(HttpClientResponse resp, String vendorResponseBody) throws IOException {
     ResponseWrapper wrapper;
-
     String contentType = resp.getHeader(HttpHeaders.CONTENT_TYPE);
-
     if (APPLICATION_XML.equals(contentType)) {
-      wrapper = ResponseWrapper.fromXml(respBody);
+      wrapper = ResponseWrapper.fromXml(vendorResponseBody);
     } else if (APPLICATION_JSON.equals(contentType)) {
-      wrapper = ResponseWrapper.fromJson(respBody);
+      wrapper = ResponseWrapper.fromJson(vendorResponseBody);
     } else {
-      String code = ErrorCodes.fromValue(resp.statusCode())
-          .toString();
-      wrapper = new ResponseWrapper(new ErrorWrapper(code, respBody));
+      String code = ErrorCodes.fromValue(resp.statusCode()).toString();
+      wrapper = new ResponseWrapper(new ErrorWrapper(code, vendorResponseBody));
     }
     return wrapper;
   }
 
-  private void handleError(RoutingContext ctx, int status, ResponseWrapper respBody) {
-    String xml = null;
+  private void handleResponseWithBody(RoutingContext ctx, int status, ResponseWrapper responseWrapper) {
+    String acceptHeader = ctx.request().getHeader(HttpHeaders.ACCEPT);
+    ctx.response().setStatusCode(status);
     try {
-      xml = respBody.toXml();
-    } catch (Exception e) {
-      logger.error("Exception marshalling XML", e);
-    }
-    ctx.response()
-        .setStatusCode(status);
-
-    if (xml != null) {
-      ctx.response()
+      if (APPLICATION_JSON.equals(acceptHeader)) {
+        ctx.response()
+          .putHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON)
+          .end(responseWrapper.toJson());
+      } else {
+        ctx.response()
           .putHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_XML)
-          .end(xml);
-    } else {
-      ctx.response()
-          .end();
+          .end(responseWrapper.toXml());
+      }
+    } catch (Exception e) {
+      logger.error("Exception marshalling", e);
+      internalServerError(ctx, "Failed to convert FOLIO response to " + acceptHeader);
     }
   }
 
@@ -172,26 +162,26 @@ public class OrdersHandler extends Handler {
   protected void invalidApiKey(RoutingContext ctx, String key) {
     ResponseWrapper resp = new ResponseWrapper(
         new ErrorWrapper(ErrorCodes.API_KEY_INVALID.name(), MSG_INVALID_API_KEY + ": " + key));
-    handleError(ctx, 401, resp);
+    handleResponseWithBody(ctx, 401, resp);
   }
 
   @Override
   protected void accessDenied(RoutingContext ctx, String msg) {
     ResponseWrapper resp = new ResponseWrapper(new ErrorWrapper(ErrorCodes.ACCESS_DENIED.name(), MSG_ACCESS_DENIED));
-    handleError(ctx, 401, resp);
+    handleResponseWithBody(ctx, 401, resp);
   }
 
   @Override
   protected void badRequest(RoutingContext ctx, String body) {
     ResponseWrapper resp = new ResponseWrapper(new ErrorWrapper(ErrorCodes.BAD_REQUEST.name(), body));
-    handleError(ctx, 400, resp);
+    handleResponseWithBody(ctx, 400, resp);
   }
 
   @Override
   protected void requestTimeout(RoutingContext ctx, String msg) {
     ResponseWrapper resp = new ResponseWrapper(
         new ErrorWrapper(ErrorCodes.REQUEST_TIMEOUT.name(), MSG_REQUEST_TIMEOUT));
-    handleError(ctx, 408, resp);
+    handleResponseWithBody(ctx, 408, resp);
   }
 
   @Override
@@ -199,7 +189,7 @@ public class OrdersHandler extends Handler {
     Thread.dumpStack();
     if (!ctx.response().ended()) {
       ResponseWrapper resp = new ResponseWrapper(new ErrorWrapper(ErrorCodes.INTERNAL_SERVER_ERROR.name(), msg));
-      handleError(ctx, 500, resp);
+      handleResponseWithBody(ctx, 500, resp);
     }
   }
 }
