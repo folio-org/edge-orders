@@ -483,7 +483,7 @@ public class MainVerticleTest {
   }
 
   @Test
-  public void testShouldReturnEmptyResponseIfResponseFromVendorIsEmpty(TestContext context) throws JsonProcessingException {
+  public void testShouldReturnEmptyResponseIfResponseFromVendorIsEmpty() {
     String body = StringUtils.EMPTY;
 
     final Response resp = RestAssured
@@ -499,7 +499,7 @@ public class MainVerticleTest {
   }
 
   @Test
-  public void testShouldCatchExceptionIfVendorResponsInvalide(TestContext context) throws JsonProcessingException {
+  public void testShouldReturn500IfVendorResponsInvalide() {
     String body = BODY_REQUEST_FOR_EXCEPTION;
 
     final Response resp = RestAssured

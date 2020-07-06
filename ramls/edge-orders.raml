@@ -10,18 +10,10 @@ types:
 /orders/validate:
   displayName: Validate
   get:
-    description: Validate that the API Key provided can be used to place an order. The response body depends on the Vendor (GOBI or other)
+    description: Validate that the API Key provided can be used to place an order.
     responses:
        200:
-        description: Success
-        body:
-         application/xml:
-          example: "<test>GET - OK</test>"
-         application/json:
-          example: |
-            {
-              "test" : "POST - OK"
-            }
+        description: Success. The response body depends on the "type" query argument in the request (GOBI or other).
        400:
         description: Bad Request.
         body:
@@ -29,6 +21,7 @@ types:
           example: !include examples/error.xml
          application/json:
           example: !include examples/error.json
+         text/plain:
        401:
         description: Access Denied.
         body:
@@ -36,6 +29,7 @@ types:
             example: !include examples/error.xml
           application/json:
             example: !include examples/error.json
+          text/plain:
        408:
         description: Request Timeout.
         body:
@@ -43,6 +37,7 @@ types:
             example: !include examples/error.xml
           application/json:
             example: !include examples/error.json
+          text/plain:
        500:
         description: Internal Server Error.
         body:
@@ -50,6 +45,8 @@ types:
             example: !include examples/error.xml
           application/json:
             example: !include examples/error.json
+          text/plain:
+            example: "Internal server error"
     queryParameters:
       type:
         description: purchasing system type
@@ -58,18 +55,10 @@ types:
         description: API Key
         type: string
   post:
-    description: Validate that the API Key provided can be used to place an order. The response body depends on the Vendor (GOBI or other)
+    description: Validate that the API Key provided can be used to place an order.
     responses:
        200:
-        description: Success
-        body:
-         application/xml:
-          example: "<test>GET - OK</test>"
-         application/json:
-          example: |
-            {
-              "test" : "POST - OK"
-            }
+        description: Success. The response body depends on the "type" query argument in the request (GOBI or other).
        400:
         description: Bad Request
         body:
@@ -77,6 +66,7 @@ types:
             example: !include examples/error.xml
           application/json:
              example: !include examples/error.json
+          text/plain:
        401:
         description: Access Denied
         body:
@@ -84,6 +74,7 @@ types:
             example: !include examples/error.xml
           application/json:
             example: !include examples/error.json
+          text/plain:
        408:
         description: Request Timeout
         body:
@@ -91,6 +82,7 @@ types:
             example: !include examples/error.xml
           application/json:
             example: !include examples/error.json
+          text/plain:
        500:
         description: Internal Server Error
         body:
@@ -98,6 +90,8 @@ types:
             example: !include examples/error.xml
           application/json:
             example: !include examples/error.json
+          text/plain:
+            example: "Internal server error"
     queryParameters:
       type:
         description: purchasing system type
@@ -108,21 +102,16 @@ types:
 /orders:
   displayName: Place Order
   post:
-    description: Place an order. The response body depends on the Vendor (GOBI or other)
+    description: Place an order.
     headers:
       Accept:
         displayName: Accept
-        description: either application/xml or application/json
+        description: Any valid accept header for third party Vendor
         type: string
         required: false
     responses:
        201:
-        description: Success
-        body:
-          application/xml:
-            type: string
-          application/json:
-            type: string
+        description: Success.  The response body depends on the "type" query argument in the request (GOBI or other).
        400:
         description: Bad Request
         body:
@@ -136,7 +125,8 @@ types:
           application/xml:
             example: !include examples/error.xml
           application/json:
-             example: !include examples/error.json
+            example: !include examples/error.json
+          text/plain:
        408:
         description: Request Timeout
         body:
@@ -144,6 +134,7 @@ types:
             example: !include examples/error.xml
           application/json:
             example: !include examples/error.json
+          text/plain:
        500:
         description: Internal Server Error
         body:
@@ -151,6 +142,8 @@ types:
             example: !include examples/error.xml
           application/json:
             example: !include examples/error.json
+          text/plain:
+            example: "Internal server error"
     queryParameters:
       type:
         description: purchasing system type
