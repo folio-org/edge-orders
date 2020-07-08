@@ -5,7 +5,6 @@ import static org.folio.edge.core.Constants.APPLICATION_XML;
 import static org.folio.edge.core.Constants.MSG_ACCESS_DENIED;
 import static org.folio.edge.core.Constants.MSG_INVALID_API_KEY;
 import static org.folio.edge.core.Constants.MSG_REQUEST_TIMEOUT;
-import static org.folio.edge.core.Constants.TEXT_PLAIN;
 import static org.folio.edge.orders.Constants.PARAM_TYPE;
 
 import java.util.List;
@@ -152,22 +151,26 @@ public class OrdersHandler extends Handler {
         .setStatusCode(status)
         .end(respBody);
     } else {
-      String acceptHeader = ctx.request().getHeader(HttpHeaders.ACCEPT);
-      if (contentType.equals(acceptHeader)) {
-        ctx.response()
-          .putHeader(HttpHeaders.CONTENT_TYPE, acceptHeader)
-          .setStatusCode(status)
-          .end(respBody);
-      } else {
-        ErrorCodes errorCode = Optional.ofNullable(ErrorCodes.fromValue(status)).orElse(ErrorCodes.INTERNAL_SERVER_ERROR);
-        ResponseWrapper resp = new ResponseWrapper(new ErrorWrapper(errorCode.name(), respBody));
-        handleErrorResponse(ctx, status, resp);
-      }
+      processErrorResponse(ctx, respBody, contentType, status);
+    }
+  }
+
+  private void processErrorResponse(RoutingContext ctx, String respBody, String contentType, int status) {
+    String acceptHeader = ctx.request().getHeader(HttpHeaders.ACCEPT);
+    if (contentType.equals(acceptHeader)) {
+      ctx.response()
+        .putHeader(HttpHeaders.CONTENT_TYPE, acceptHeader)
+        .setStatusCode(status)
+        .end(respBody);
+    } else {
+      ErrorCodes errorCode = Optional.ofNullable(ErrorCodes.fromValue(status)).orElse(ErrorCodes.INTERNAL_SERVER_ERROR);
+      ResponseWrapper resp = new ResponseWrapper(new ErrorWrapper(errorCode.name(), respBody));
+      handleErrorResponse(ctx, status, resp);
     }
   }
 
   private boolean isSuccessStatus(int status) {
-    return status == 200 || status == 201 || status == 204;
+    return status == 200 || status == 201;
   }
 
   private void handleErrorResponse(RoutingContext ctx, int status, ResponseWrapper responseWrapper) {

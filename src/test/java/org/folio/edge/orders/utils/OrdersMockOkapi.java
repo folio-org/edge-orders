@@ -31,7 +31,7 @@ import io.vertx.ext.web.RoutingContext;
 public class OrdersMockOkapi extends MockOkapi {
 
   private static final Logger logger = Logger.getLogger(OrdersMockOkapi.class);
-  public static final String BODY_REQUEST_FOR_EXCEPTION = "{Body request for exception}";
+  public static final String BODY_REQUEST_FOR_HEADER_INCONSISTENCY = "{Body request for exception}";
 
   public OrdersMockOkapi(int port, List<String> knownTenants) throws IOException {
     super(port, knownTenants);
@@ -83,6 +83,12 @@ public class OrdersMockOkapi extends MockOkapi {
         .setStatusCode(403)
         .putHeader(HttpHeaders.CONTENT_TYPE, TEXT_PLAIN)
         .end("Access requires permission: gobi.order.post");
+    }
+    else if (BODY_REQUEST_FOR_HEADER_INCONSISTENCY.equals(ctx.getBodyAsString())) {
+      ctx.response()
+        .putHeader(HttpHeaders.CONTENT_TYPE, TEXT_PLAIN)
+        .setStatusCode(400)
+        .end("Bad request");
     }
     else if (StringUtils.EMPTY.equals(ctx.getBodyAsString())) {
       ctx.response()
