@@ -485,7 +485,6 @@ public class MainVerticleTest {
   @Test
   public void testShouldReturnEmptyResponseIfResponseFromVendorIsEmpty() {
     String body = StringUtils.EMPTY;
-
     final Response resp = RestAssured
       .with()
       .body(body)
@@ -500,8 +499,7 @@ public class MainVerticleTest {
 
   @Test
   public void testShouldReturnErrorWithInternalFormatIfAcceptAndContentHeaderAreDifferent() {
-    logger.info("=== Test place order - Success (JSON) ===");
-    final Response resp = RestAssured
+    RestAssured
       .with()
       .accept(APPLICATION_JSON)
       .body(BODY_REQUEST_FOR_HEADER_INCONSISTENCY)
@@ -515,7 +513,6 @@ public class MainVerticleTest {
 
   @Test
   public void testShouldReturnXMLErrorWithInternalFormatIfAcceptHeaderIsXML() {
-    logger.info("=== Test place order - Success (JSON) ===");
     final Response resp = RestAssured
       .with()
       .accept(APPLICATION_XML)
@@ -533,7 +530,6 @@ public class MainVerticleTest {
 
   @Test
   public void testShouldReturnJSONErrorWithInternalFormatIfAcceptHeaderIsJSON() {
-    logger.info("=== Test place order - Success (JSON) ===");
     final Response resp = RestAssured
       .with()
       .accept(APPLICATION_JSON)
@@ -551,8 +547,7 @@ public class MainVerticleTest {
 
   @Test
   public void testShouldReturnTextErrorWithInternalFormatIfAcceptHeaderIsText() {
-    logger.info("=== Test place order - Success (JSON) ===");
-    final Response resp = RestAssured
+    RestAssured
       .with()
       .accept(TEXT_PLAIN)
       .body(BODY_REQUEST_FOR_HEADER_INCONSISTENCY)
@@ -566,7 +561,6 @@ public class MainVerticleTest {
 
   @Test
   public void testShouldReturnXMLErrorWithInternalFormatIfAcceptHeaderIsAny() {
-    logger.info("=== Test place order - Success (JSON) ===");
     final Response resp = RestAssured
       .with()
       .accept("*/*")
@@ -584,7 +578,6 @@ public class MainVerticleTest {
 
   @Test
   public void testShouldReturnXMLErrorWithInternalFormatIfAcceptHeaderIsEmpty() {
-    logger.info("=== Test place order - Success (JSON) ===");
     final Response resp = RestAssured
       .with()
       .body(BODY_REQUEST_FOR_HEADER_INCONSISTENCY)
@@ -601,7 +594,6 @@ public class MainVerticleTest {
 
   @Test
   public void testShouldReturnJSONErrorWithInternalFormatIfAcceptHeaderIsJSONAndXML() {
-    logger.info("=== Test place order - Success (JSON) ===");
     final Response resp = RestAssured
       .with()
       .accept(APPLICATION_JSON+","+APPLICATION_XML)
@@ -619,7 +611,6 @@ public class MainVerticleTest {
 
   @Test
   public void testShouldReturnXMLErrorWithInternalFormatIfAcceptHeaderIsNotIndefined() {
-    logger.info("=== Test place order - Success (JSON) ===");
     final Response resp = RestAssured
       .with()
       .accept("text/xml")

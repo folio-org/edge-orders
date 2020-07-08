@@ -65,7 +65,7 @@ default : application/xml
 
 Examples:
 
-Accept Header     | Error Format 
+Accept Header                    | Error Format 
 ---------------------------------| ---------------- 
 application/json                 | application/json  
 application/xml                  | application/xml   
