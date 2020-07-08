@@ -17,6 +17,7 @@ import static org.folio.edge.orders.Constants.API_CONFIGURATION_PROPERTY_NAME;
 import static org.folio.edge.orders.utils.OrdersMockOkapi.BODY_REQUEST_FOR_HEADER_INCONSISTENCY;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.spy;
 
@@ -500,10 +501,6 @@ public class MainVerticleTest {
   @Test
   public void testShouldReturnErrorWithInternalFormatIfAcceptAndContentHeaderAreDifferent() {
     logger.info("=== Test place order - Success (JSON) ===");
-
-    String PO = "118279";
-    String body = mockRequests.get(PO);
-
     final Response resp = RestAssured
       .with()
       .accept(APPLICATION_JSON)
@@ -514,5 +511,127 @@ public class MainVerticleTest {
       .statusCode(400)
       .extract()
       .response();
+  }
+
+  @Test
+  public void testShouldReturnXMLErrorWithInternalFormatIfAcceptHeaderIsXML() {
+    logger.info("=== Test place order - Success (JSON) ===");
+    final Response resp = RestAssured
+      .with()
+      .accept(APPLICATION_XML)
+      .body(BODY_REQUEST_FOR_HEADER_INCONSISTENCY)
+      .post("/orders?type=GOBI&apiKey=" + apiKey)
+      .then()
+      .contentType(APPLICATION_XML)
+      .statusCode(400)
+      .extract()
+      .response();
+    Object error = resp.path("Error");
+
+    assertNotNull(error);
+  }
+
+  @Test
+  public void testShouldReturnJSONErrorWithInternalFormatIfAcceptHeaderIsJSON() {
+    logger.info("=== Test place order - Success (JSON) ===");
+    final Response resp = RestAssured
+      .with()
+      .accept(APPLICATION_JSON)
+      .body(BODY_REQUEST_FOR_HEADER_INCONSISTENCY)
+      .post("/orders?type=GOBI&apiKey=" + apiKey)
+      .then()
+      .contentType(APPLICATION_JSON)
+      .statusCode(400)
+      .extract()
+      .response();
+    Object error = resp.path("Error");
+
+    assertNotNull(error);
+  }
+
+  @Test
+  public void testShouldReturnTextErrorWithInternalFormatIfAcceptHeaderIsText() {
+    logger.info("=== Test place order - Success (JSON) ===");
+    final Response resp = RestAssured
+      .with()
+      .accept(TEXT_PLAIN)
+      .body(BODY_REQUEST_FOR_HEADER_INCONSISTENCY)
+      .post("/orders?type=GOBI&apiKey=" + apiKey)
+      .then()
+      .contentType(TEXT_PLAIN)
+      .statusCode(400)
+      .extract()
+      .response();
+  }
+
+  @Test
+  public void testShouldReturnXMLErrorWithInternalFormatIfAcceptHeaderIsAny() {
+    logger.info("=== Test place order - Success (JSON) ===");
+    final Response resp = RestAssured
+      .with()
+      .accept("*/*")
+      .body(BODY_REQUEST_FOR_HEADER_INCONSISTENCY)
+      .post("/orders?type=GOBI&apiKey=" + apiKey)
+      .then()
+      .contentType(APPLICATION_XML)
+      .statusCode(400)
+      .extract()
+      .response();
+    Object error = resp.path("Error");
+
+    assertNotNull(error);
+  }
+
+  @Test
+  public void testShouldReturnXMLErrorWithInternalFormatIfAcceptHeaderIsEmpty() {
+    logger.info("=== Test place order - Success (JSON) ===");
+    final Response resp = RestAssured
+      .with()
+      .body(BODY_REQUEST_FOR_HEADER_INCONSISTENCY)
+      .post("/orders?type=GOBI&apiKey=" + apiKey)
+      .then()
+      .contentType(APPLICATION_XML)
+      .statusCode(400)
+      .extract()
+      .response();
+    Object error = resp.path("Error");
+
+    assertNotNull(error);
+  }
+
+  @Test
+  public void testShouldReturnJSONErrorWithInternalFormatIfAcceptHeaderIsJSONAndXML() {
+    logger.info("=== Test place order - Success (JSON) ===");
+    final Response resp = RestAssured
+      .with()
+      .accept(APPLICATION_JSON+","+APPLICATION_XML)
+      .body(BODY_REQUEST_FOR_HEADER_INCONSISTENCY)
+      .post("/orders?type=GOBI&apiKey=" + apiKey)
+      .then()
+      .contentType(APPLICATION_JSON)
+      .statusCode(400)
+      .extract()
+      .response();
+    Object error = resp.path("Error");
+
+    assertNotNull(error);
+  }
+
+  @Test
+  public void testShouldReturnXMLErrorWithInternalFormatIfAcceptHeaderIsNotIndefined() {
+    logger.info("=== Test place order - Success (JSON) ===");
+    final Response resp = RestAssured
+      .with()
+      .accept("text/xml")
+      .body(BODY_REQUEST_FOR_HEADER_INCONSISTENCY)
+      .post("/orders?type=GOBI&apiKey=" + apiKey)
+      .then()
+      .contentType(APPLICATION_XML)
+      .statusCode(400)
+      .extract()
+      .response();
+    Object error = resp.path("Error");
+
+    assertNotNull(error);
   }
 }

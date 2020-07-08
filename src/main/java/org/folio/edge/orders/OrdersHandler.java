@@ -169,18 +169,18 @@ public class OrdersHandler extends Handler {
     }
   }
 
-  private boolean isSuccessStatus(int status) {
-    return status == 200 || status == 201;
-  }
-
   private void handleErrorResponse(RoutingContext ctx, int status, ResponseWrapper responseWrapper) {
-    String acceptHeader = ctx.request().getHeader(HttpHeaders.ACCEPT);
+    String acceptHeaders = Optional.ofNullable(ctx.request().getHeader(HttpHeaders.ACCEPT)).orElse(APPLICATION_XML);
     ctx.response().setStatusCode(status);
     try {
-      if (APPLICATION_JSON.equals(acceptHeader)) {
+      if (acceptHeaders.contains(APPLICATION_JSON)) {
         ctx.response()
           .putHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON)
           .end(responseWrapper.toJson());
+      } else if (acceptHeaders.contains(APPLICATION_XML)){
+        ctx.response()
+          .putHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_XML)
+          .end(responseWrapper.toXml());
       } else {
         ctx.response()
           .putHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_XML)
@@ -188,7 +188,11 @@ public class OrdersHandler extends Handler {
       }
     } catch (Exception e) {
       logger.error("Exception marshalling", e);
-      internalServerError(ctx, "Failed to convert FOLIO response to " + acceptHeader);
+      internalServerError(ctx, "Failed to convert FOLIO response to " + acceptHeaders);
     }
+  }
+
+  private boolean isSuccessStatus(int statusCode) {
+    return statusCode >= 200 && statusCode <= 299;
   }
 }
