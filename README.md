@@ -56,6 +56,26 @@ Example of api mapping content:
   ]
 }
 ```  
+## Error processing
+Priority of return types if the client accepts more than one type:
+1. application/json
+2. application/xml 
+3. text/plain 
+default : application/xml
+
+Examples:
+
+Accept Header                    | Error Format 
+---------------------------------| ---------------- 
+application/json                 | application/json  
+application/xml                  | application/xml   
+text/plain                       | text/plain
+*/*                              | application/xml   
+text/plain,application/json      | application/json
+application/json,application/xml | application/json
+application/xml,application/json | application/json
+text/plain,application/xml       | application/xml               
+other                            | application/xml  
 
 ## Additional information
 

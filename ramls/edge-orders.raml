@@ -5,38 +5,46 @@ version: v2
 documentation:
   - title: Edge API - Orders
     content: Edge API to interface with FOLIO for 3rd party purchasing systems for placing orders
-types:
-    orders: !include orders.xsd
 /orders/validate:
   displayName: Validate
   get:
-    description: Validate that the API Key provided can be used to place an order
+    description: Validate that the API Key provided can be used to place an order.
     responses:
        200:
-        description: Success
-        body:
-          application/xml:
-           example: "<test>GET - OK</test>"
+        description: Success. The response body depends on the "type" query argument in the request (GOBI or other).
        400:
-        description: Bad Request
+        description: Bad Request.
         body:
-          application/xml:
-            type: orders
+         application/xml:
+          example: !include examples/error.xml
+         application/json:
+          example: !include examples/error.json
+         text/plain:
        401:
-        description: Access Denied
+        description: Access Denied.
         body:
           application/xml:
-            type: orders
+            example: !include examples/error.xml
+          application/json:
+            example: !include examples/error.json
+          text/plain:
        408:
-        description: Request Timeout
+        description: Request Timeout.
         body:
           application/xml:
-            type: orders
+            example: !include examples/error.xml
+          application/json:
+            example: !include examples/error.json
+          text/plain:
        500:
-        description: Internal Server Error
+        description: Internal Server Error.
         body:
           application/xml:
-            type: orders
+            example: !include examples/error.xml
+          application/json:
+            example: !include examples/error.json
+          text/plain:
+            example: "Internal server error"
     queryParameters:
       type:
         description: purchasing system type
@@ -45,70 +53,95 @@ types:
         description: API Key
         type: string
   post:
-    description: Validate that the API Key provided can be used to place an order
+    description: Validate that the API Key provided can be used to place an order.
     responses:
        200:
-        description: Success
-        body:
-          application/xml:
-           example: "<test>POST - OK</test>"
+        description: Success. The response body depends on the "type" query argument in the request (GOBI or other).
        400:
         description: Bad Request
         body:
           application/xml:
-            type: orders
+            example: !include examples/error.xml
+          application/json:
+             example: !include examples/error.json
+          text/plain:
        401:
         description: Access Denied
         body:
           application/xml:
-            type: orders
+            example: !include examples/error.xml
+          application/json:
+            example: !include examples/error.json
+          text/plain:
        408:
         description: Request Timeout
         body:
           application/xml:
-            type: orders
+            example: !include examples/error.xml
+          application/json:
+            example: !include examples/error.json
+          text/plain:
        500:
         description: Internal Server Error
         body:
           application/xml:
-            type: orders
+            example: !include examples/error.xml
+          application/json:
+            example: !include examples/error.json
+          text/plain:
+            example: "Internal server error"
     queryParameters:
       type:
         description: purchasing system type
         type: string
       apikey:
         description: API Key
-        type: string     
+        type: string
 /orders:
   displayName: Place Order
   post:
-    description: Place an order
+    description: Place an order.
+    headers:
+      Accept:
+        displayName: Accept
+        description: Any valid accept header for third party Vendor
+        type: string
+        required: false
     responses:
        201:
-        description: Success
-        body:
-          application/xml:
-            type: orders
+        description: Success.  The response body depends on the "type" query argument in the request (GOBI or other).
        400:
         description: Bad Request
         body:
           application/xml:
-            type: orders
+            example: !include examples/error.xml
+          application/json:
+            example: !include examples/error.json
        401:
         description: Access Denied
         body:
           application/xml:
-            type: orders
+            example: !include examples/error.xml
+          application/json:
+            example: !include examples/error.json
+          text/plain:
        408:
         description: Request Timeout
         body:
           application/xml:
-            type: orders
+            example: !include examples/error.xml
+          application/json:
+            example: !include examples/error.json
+          text/plain:
        500:
         description: Internal Server Error
         body:
           application/xml:
-            type: orders
+            example: !include examples/error.xml
+          application/json:
+            example: !include examples/error.json
+          text/plain:
+            example: "Internal server error"
     queryParameters:
       type:
         description: purchasing system type

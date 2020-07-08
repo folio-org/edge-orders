@@ -13,6 +13,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.folio.edge.core.utils.Mappers;
 import org.folio.edge.core.utils.test.MockOkapi;
@@ -30,6 +31,7 @@ import io.vertx.ext.web.RoutingContext;
 public class OrdersMockOkapi extends MockOkapi {
 
   private static final Logger logger = Logger.getLogger(OrdersMockOkapi.class);
+  public static final String BODY_REQUEST_FOR_HEADER_INCONSISTENCY = "{Body request for exception}";
 
   public OrdersMockOkapi(int port, List<String> knownTenants) throws IOException {
     super(port, knownTenants);
@@ -81,6 +83,17 @@ public class OrdersMockOkapi extends MockOkapi {
         .setStatusCode(403)
         .putHeader(HttpHeaders.CONTENT_TYPE, TEXT_PLAIN)
         .end("Access requires permission: gobi.order.post");
+    }
+    else if (BODY_REQUEST_FOR_HEADER_INCONSISTENCY.equals(ctx.getBodyAsString())) {
+      ctx.response()
+        .putHeader(HttpHeaders.CONTENT_TYPE, TEXT_PLAIN)
+        .setStatusCode(400)
+        .end("Bad request");
+    }
+    else if (StringUtils.EMPTY.equals(ctx.getBodyAsString())) {
+      ctx.response()
+        .setStatusCode(201)
+        .end(StringUtils.EMPTY);
     } else {
       String id = null;
       try {

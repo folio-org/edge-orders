@@ -14,7 +14,10 @@ import static org.folio.edge.core.Constants.TEXT_PLAIN;
 import static org.folio.edge.core.utils.test.MockOkapi.X_DURATION;
 import static org.folio.edge.core.utils.test.MockOkapi.X_ECHO_STATUS;
 import static org.folio.edge.orders.Constants.API_CONFIGURATION_PROPERTY_NAME;
+import static org.folio.edge.orders.utils.OrdersMockOkapi.BODY_REQUEST_FOR_HEADER_INCONSISTENCY;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.spy;
 
@@ -28,6 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.log4j.Logger;
 import org.folio.edge.core.cache.TokenCache;
@@ -53,7 +57,6 @@ import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-import static org.hamcrest.Matchers.containsString;
 
 @RunWith(VertxUnitRunner.class)
 public class MainVerticleTest {
@@ -133,7 +136,7 @@ public class MainVerticleTest {
   }
 
   @Test
-  public void testAdminHealth(TestContext context) {
+  public void testAdminHealth() {
     logger.info("=== Test the health check endpoint ===");
 
     final Response resp = RestAssured
@@ -149,7 +152,7 @@ public class MainVerticleTest {
   }
 
   @Test
-  public void testGetValidateSuccess(TestContext context) {
+  public void testGetValidateSuccess() {
     logger.info("=== Test GET validate w/ valid key ===");
 
     RestAssured
@@ -161,7 +164,7 @@ public class MainVerticleTest {
   }
 
   @Test
-  public void testGetValidateSuccessWithEncoding(TestContext context) {
+  public void testGetValidateSuccessWithEncoding() {
     logger.info("=== Test GET validate w/ valid key and Accept Encoding header===");
 
     RestAssured
@@ -175,7 +178,7 @@ public class MainVerticleTest {
   }
 
   @Test
-  public void testPostValidateSuccessIgnoreBody(TestContext context) {
+  public void testPostValidateSuccessIgnoreBody() {
   	// EDGORDERS-15 - Ignore processing request body
     logger.info("=== Test POST validate w/ valid key and ignore processing request body ===");
 
@@ -192,7 +195,7 @@ public class MainVerticleTest {
   }
 
   @Test
-  public void testPostValidateSuccess(TestContext context) {
+  public void testPostValidateSuccess() {
     logger.info("=== Test POST validate w/ valid key ===");
 
     RestAssured
@@ -204,7 +207,7 @@ public class MainVerticleTest {
   }
 
   @Test
-  public void testValidateNotFound(TestContext context) throws JsonProcessingException {
+  public void testValidateNotFound() throws JsonProcessingException {
     logger.info("=== Test validate w/ module not found ===");
 
     final Response resp = RestAssured
@@ -223,7 +226,7 @@ public class MainVerticleTest {
   }
 
   @Test
-  public void testValidateFailedToParse(TestContext context) throws JsonProcessingException {
+  public void testValidateFailedToParse() throws JsonProcessingException {
     logger.info("=== Test validate w/ invalid key ===");
 
     final Response resp = RestAssured
@@ -240,7 +243,7 @@ public class MainVerticleTest {
   }
 
   @Test
-  public void testValidateBadType(TestContext context) throws JsonProcessingException {
+  public void testValidateBadType() throws JsonProcessingException {
     logger.info("=== Test validate w/ bad type ===");
 
     final Response resp = RestAssured
@@ -257,7 +260,7 @@ public class MainVerticleTest {
   }
 
   @Test
-  public void testValidateMissingType(TestContext context) throws JsonProcessingException {
+  public void testValidateMissingType() throws JsonProcessingException {
     logger.info("=== Test validate w/ missing type ===");
 
     final Response resp = RestAssured
@@ -274,7 +277,7 @@ public class MainVerticleTest {
   }
 
   @Test
-  public void testValidateEmptyType(TestContext context) throws JsonProcessingException {
+  public void testValidateEmptyType() throws JsonProcessingException {
     logger.info("=== Test validate w/ empty type ===");
 
     final Response resp = RestAssured
@@ -291,7 +294,7 @@ public class MainVerticleTest {
   }
 
   @Test
-  public void testPlaceOrderSuccess(TestContext context) throws JsonProcessingException {
+  public void testPlaceOrderSuccess() throws JsonProcessingException {
     logger.info("=== Test place order - Success (XML) ===");
 
     String PO = "118279";
@@ -311,7 +314,7 @@ public class MainVerticleTest {
   }
 
   @Test
-  public void testPlaceOrderJson(TestContext context) throws JsonProcessingException {
+  public void testPlaceOrderJson() throws JsonProcessingException {
     logger.info("=== Test place order - Success (JSON) ===");
 
     String PO = "118279";
@@ -319,8 +322,28 @@ public class MainVerticleTest {
 
     final Response resp = RestAssured
       .with()
-      .accept(APPLICATION_JSON) // note this gets passed through to OKAPI, but
-                                // we still get XML back.
+      .accept(APPLICATION_JSON)
+      .body(body)
+      .post("/orders?type=GOBI&apiKey=" + apiKey)
+      .then()
+      .contentType(APPLICATION_JSON)
+      .statusCode(201)
+      .extract()
+      .response();
+
+    assertEquals(new ResponseWrapper("PO-" + PO).toJson(), resp.body().asString());
+  }
+
+  @Test
+  public void testPlaceOrderXml() throws JsonProcessingException {
+    logger.info("=== Test place order - Success (JSON) ===");
+
+    String PO = "118279";
+    String body = mockRequests.get(PO);
+
+    final Response resp = RestAssured
+      .with()
+      .accept(APPLICATION_XML)
       .body(body)
       .post("/orders?type=GOBI&apiKey=" + apiKey)
       .then()
@@ -333,7 +356,7 @@ public class MainVerticleTest {
   }
 
   @Test
-  public void testPlaceOrderBadType(TestContext context) throws JsonProcessingException {
+  public void testPlaceOrderBadType() throws JsonProcessingException {
     logger.info("=== Test place order - bad type argument ===");
 
     String PO = "118279";
@@ -355,7 +378,7 @@ public class MainVerticleTest {
   }
 
   @Test
-  public void testPlaceOrderBadApiKey(TestContext context) throws JsonProcessingException {
+  public void testPlaceOrderBadApiKey() throws JsonProcessingException {
     logger.info("=== Test place order - Bad API Key ===");
 
     String PO = "118279";
@@ -377,7 +400,7 @@ public class MainVerticleTest {
   }
 
   @Test
-  public void testPlaceOrderMissingApiKey(TestContext context) throws JsonProcessingException {
+  public void testPlaceOrderMissingApiKey() throws JsonProcessingException {
     logger.info("=== Test place order - Missing API Key ===");
 
     String PO = "118279";
@@ -412,7 +435,7 @@ public class MainVerticleTest {
   }
 
   @Test
-  public void testPlaceOrderUnknownTenant(TestContext context) throws JsonProcessingException {
+  public void testPlaceOrderUnknownTenant() throws JsonProcessingException {
     logger.info("=== Test place order - Unknown Tenant ===");
 
     String PO = "118279";
@@ -457,5 +480,149 @@ public class MainVerticleTest {
     ResponseWrapper respBody = new ResponseWrapper(
         new ErrorWrapper("REQUEST_TIMEOUT", MSG_REQUEST_TIMEOUT));
     assertEquals(respBody.toXml(), resp.body().asString());
+  }
+
+  @Test
+  public void testShouldReturnEmptyResponseIfResponseFromVendorIsEmpty() {
+    String body = StringUtils.EMPTY;
+    final Response resp = RestAssured
+      .with()
+      .body(body)
+      .post("/orders?type=GOBI&apiKey=" + apiKey)
+      .then()
+      .statusCode(201)
+      .extract()
+      .response();
+
+    assertEquals(StringUtils.EMPTY, resp.body().asString());
+  }
+
+  @Test
+  public void testShouldReturnErrorWithInternalFormatIfAcceptAndContentHeaderAreDifferent() {
+    RestAssured
+      .with()
+      .accept(APPLICATION_JSON)
+      .body(BODY_REQUEST_FOR_HEADER_INCONSISTENCY)
+      .post("/orders?type=GOBI&apiKey=" + apiKey)
+      .then()
+      .contentType(APPLICATION_JSON)
+      .statusCode(400)
+      .extract()
+      .response();
+  }
+
+  @Test
+  public void testShouldReturnXMLErrorWithInternalFormatIfAcceptHeaderIsXML() {
+    final Response resp = RestAssured
+      .with()
+      .accept(APPLICATION_XML)
+      .body(BODY_REQUEST_FOR_HEADER_INCONSISTENCY)
+      .post("/orders?type=GOBI&apiKey=" + apiKey)
+      .then()
+      .contentType(APPLICATION_XML)
+      .statusCode(400)
+      .extract()
+      .response();
+    Object error = resp.path("Error");
+
+    assertNotNull(error);
+  }
+
+  @Test
+  public void testShouldReturnJSONErrorWithInternalFormatIfAcceptHeaderIsJSON() {
+    final Response resp = RestAssured
+      .with()
+      .accept(APPLICATION_JSON)
+      .body(BODY_REQUEST_FOR_HEADER_INCONSISTENCY)
+      .post("/orders?type=GOBI&apiKey=" + apiKey)
+      .then()
+      .contentType(APPLICATION_JSON)
+      .statusCode(400)
+      .extract()
+      .response();
+    Object error = resp.path("Error");
+
+    assertNotNull(error);
+  }
+
+  @Test
+  public void testShouldReturnTextErrorWithInternalFormatIfAcceptHeaderIsText() {
+    RestAssured
+      .with()
+      .accept(TEXT_PLAIN)
+      .body(BODY_REQUEST_FOR_HEADER_INCONSISTENCY)
+      .post("/orders?type=GOBI&apiKey=" + apiKey)
+      .then()
+      .contentType(TEXT_PLAIN)
+      .statusCode(400)
+      .extract()
+      .response();
+  }
+
+  @Test
+  public void testShouldReturnXMLErrorWithInternalFormatIfAcceptHeaderIsAny() {
+    final Response resp = RestAssured
+      .with()
+      .accept("*/*")
+      .body(BODY_REQUEST_FOR_HEADER_INCONSISTENCY)
+      .post("/orders?type=GOBI&apiKey=" + apiKey)
+      .then()
+      .contentType(APPLICATION_XML)
+      .statusCode(400)
+      .extract()
+      .response();
+    Object error = resp.path("Error");
+
+    assertNotNull(error);
+  }
+
+  @Test
+  public void testShouldReturnXMLErrorWithInternalFormatIfAcceptHeaderIsEmpty() {
+    final Response resp = RestAssured
+      .with()
+      .body(BODY_REQUEST_FOR_HEADER_INCONSISTENCY)
+      .post("/orders?type=GOBI&apiKey=" + apiKey)
+      .then()
+      .contentType(APPLICATION_XML)
+      .statusCode(400)
+      .extract()
+      .response();
+    Object error = resp.path("Error");
+
+    assertNotNull(error);
+  }
+
+  @Test
+  public void testShouldReturnJSONErrorWithInternalFormatIfAcceptHeaderIsJSONAndXML() {
+    final Response resp = RestAssured
+      .with()
+      .accept(APPLICATION_JSON+","+APPLICATION_XML)
+      .body(BODY_REQUEST_FOR_HEADER_INCONSISTENCY)
+      .post("/orders?type=GOBI&apiKey=" + apiKey)
+      .then()
+      .contentType(APPLICATION_JSON)
+      .statusCode(400)
+      .extract()
+      .response();
+    Object error = resp.path("Error");
+
+    assertNotNull(error);
+  }
+
+  @Test
+  public void testShouldReturnXMLErrorWithInternalFormatIfAcceptHeaderIsNotIndefined() {
+    final Response resp = RestAssured
+      .with()
+      .accept("text/xml")
+      .body(BODY_REQUEST_FOR_HEADER_INCONSISTENCY)
+      .post("/orders?type=GOBI&apiKey=" + apiKey)
+      .then()
+      .contentType(APPLICATION_XML)
+      .statusCode(400)
+      .extract()
+      .response();
+    Object error = resp.path("Error");
+
+    assertNotNull(error);
   }
 }

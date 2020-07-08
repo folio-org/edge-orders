@@ -31,7 +31,7 @@ public final class ResponseWrapper {
   }
 
   private ResponseWrapper(@JsonProperty("PoLineNumber") String poLineNumber,
-      @JsonProperty("Error") ErrorWrapper error) {
+                          @JsonProperty("Error") ErrorWrapper error) {
     this.poLineNumber = poLineNumber;
     this.error = error;
   }
