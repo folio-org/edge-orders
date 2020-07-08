@@ -14,7 +14,6 @@ import static org.folio.edge.core.Constants.TEXT_PLAIN;
 import static org.folio.edge.core.utils.test.MockOkapi.X_DURATION;
 import static org.folio.edge.core.utils.test.MockOkapi.X_ECHO_STATUS;
 import static org.folio.edge.orders.Constants.API_CONFIGURATION_PROPERTY_NAME;
-import static org.folio.edge.orders.Constants.ErrorCodes.INTERNAL_SERVER_ERROR;
 import static org.folio.edge.orders.utils.OrdersMockOkapi.BODY_REQUEST_FOR_EXCEPTION;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
@@ -496,19 +495,5 @@ public class MainVerticleTest {
       .response();
 
     assertEquals(StringUtils.EMPTY, resp.body().asString());
-  }
-
-  @Test
-  public void testShouldReturn500IfVendorResponsInvalide() {
-    String body = BODY_REQUEST_FOR_EXCEPTION;
-
-    final Response resp = RestAssured
-      .with()
-      .body(body)
-      .post("/orders?type=GOBI&apiKey=" + apiKey)
-      .then()
-      .statusCode(500)
-      .extract()
-      .response();
   }
 }
