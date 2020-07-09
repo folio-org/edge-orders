@@ -38,6 +38,8 @@
 
     <!-- the main class -->
     <exec.mainClass>org.folio.edge.orders.MainVerticle</exec.mainClass>
+    <sonar.exclusions>**/models/**.java</sonar.exclusions>
+    <sonar.test.exclusions>**/*Test.java</sonar.test.exclusions>
   </properties>
 
   <dependencyManagement>

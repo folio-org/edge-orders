@@ -18,7 +18,7 @@ public class Constants {
     FORBIDDEN(403),
     NOT_FOUND(404),
     REQUEST_TIMEOUT(408),
-    INTERNAL_SERVER_ERROR(null);
+    INTERNAL_SERVER_ERROR(500);
 
     private final Integer value;
     private static final Map<Integer, ErrorCodes> CONSTANTS = new HashMap<>();
