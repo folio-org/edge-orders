@@ -1,4 +1,13 @@
 ## 2.3.0 - Unreleased
+## 2.2.1 - Released
+
+This bugfix release includes includes changes regarding to processing Accept header
+
+[Full Changelog](https://github.com/folio-org/edge-orders/compare/v2.2.0...v2.2.1)
+
+### Bugs
+* [EDGEORDERS-27](https://issues.folio.org/browse/EDGORDERS-27) - Honor Accept header
+
 ## 2.2.0 - Released
 
 This release includes upgrade RMB and configuration based routing
