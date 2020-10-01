@@ -31,6 +31,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.restassured.RestAssured;
+import io.restassured.http.Header;
+import io.restassured.response.Response;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.log4j.Logger;
@@ -49,9 +52,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.jayway.restassured.RestAssured;
-import com.jayway.restassured.response.Header;
-import com.jayway.restassured.response.Response;
 
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
@@ -105,12 +105,12 @@ public class MainVerticleTest {
     File folder = new File("src/test/resources/requests");
     File[] listOfFiles = folder.listFiles();
 
-    for (int i = 0; i < listOfFiles.length; i++) {
-      String filename = listOfFiles[i].getName();
+    for (File listOfFile : listOfFiles) {
+      String filename = listOfFile.getName();
       String woExt = filename.substring(0, filename.lastIndexOf("."));
       StringBuilder sb = new StringBuilder();
       try {
-        Files.lines(Paths.get(listOfFiles[i].toURI()), StandardCharsets.UTF_8)
+        Files.lines(Paths.get(listOfFile.toURI()), StandardCharsets.UTF_8)
           .forEachOrdered(value -> sb.append(value).append('\n'));
         mockRequests.put(woExt, sb.toString());
       } catch (IOException e) {
@@ -422,7 +422,7 @@ public class MainVerticleTest {
   }
 
   @Test
-  public void testNonExistingEndpoint(TestContext context) throws JsonProcessingException {
+  public void testNonExistingEndpoint() {
     logger.info("=== Test non existing endpoint ===");
 
     RestAssured
