@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.folio</groupId>
   <artifactId>edge-orders</artifactId>
-  <version>2.3.0-SNAPSHOT</version>
+  <version>2.3.0</version>
   <packaging>jar</packaging>
 
   <name>Edge API - Order Placement</name>
@@ -17,7 +17,7 @@
     <url>https://github.com/folio-org/edge-orders.git</url>
     <connection>scm:git:git://github.com/folio-org/edge-orders.git</connection>
     <developerConnection>scm:git:git@github.com:folio-org/edge-orders.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>v2.3.0</tag>
   </scm>
 
   <licenses>
@@ -38,7 +38,7 @@
     <exec.mainClass>org.folio.edge.orders.MainVerticle</exec.mainClass>
     <sonar.exclusions>**/models/**.java</sonar.exclusions>
     <sonar.test.exclusions>**/*Test.java</sonar.test.exclusions>
-    <argLine/>
+    <argLine />
   </properties>
 
   <dependencyManagement>
