@@ -1,4 +1,13 @@
-## 2.3.0 - Unreleased
+## 2.4.0 - Unreleased
+## 2.3.0 - Released
+
+This release has focussed on upgrade to JDK 11
+
+[Full Changelog](https://github.com/folio-org/edge-orders/compare/v2.2.1...v2.3.0)
+
+### Stories
+* [EDGEORDERS-30](https://issues.folio.org/browse/EDGORDERS-30) - Migrate edge-orders to JDK 11
+
 ## 2.2.1 - Released
 
 This bugfix release includes includes changes regarding to processing Accept header
