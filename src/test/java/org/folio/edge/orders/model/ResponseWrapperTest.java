@@ -4,14 +4,15 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 
 public class ResponseWrapperTest {
-  private static final Logger logger = Logger.getLogger(ResponseWrapperTest.class);
+  private static final Logger logger = LogManager.getLogger(ResponseWrapperTest.class);
   private ResponseWrapper respError;
   private ResponseWrapper respSuccess;
 
