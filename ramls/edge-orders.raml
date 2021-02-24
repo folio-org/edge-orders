@@ -2,6 +2,10 @@
 title: Edge API - Orders
 baseUri: https://github.com/folio-org/edge-orders
 version: v2
+
+traits:
+  errors: !include traits/errors.raml
+
 documentation:
   - title: Edge API - Orders
     content: Edge API to interface with FOLIO for 3rd party purchasing systems for placing orders
@@ -149,6 +153,38 @@ documentation:
       apikey:
         description: API Key
         type: string
+  /order-lines:
+    /{id}:
+      uriParameters:
+        id:
+          description: poLine number for orders
+          type: string
+      get:
+        description: Get order line by id
+        queryParameters:
+          type:
+            description: purchasing system type
+            type: string
+          apikey:
+            description: API Key
+            type: string
+        is: [errors]
+        responses:
+         200:
+          description: Success. The response body depends on the "type" query argument in the request
+      put:
+        description: Update order line
+        queryParameters:
+          type:
+            description: purchasing system type
+            type: string
+          apikey:
+            description: API Key
+            type: string
+        is: [errors]
+        responses:
+           204:
+            description: Success update
 /admin/health:
   displayName: Health Check
   get:
