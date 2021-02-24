@@ -7,6 +7,9 @@ import static org.folio.edge.core.Constants.MSG_INVALID_API_KEY;
 import static org.folio.edge.core.Constants.MSG_REQUEST_TIMEOUT;
 import static org.folio.edge.orders.Constants.PARAM_TYPE;
 
+import io.vertx.core.http.HttpClientResponse;
+import io.vertx.core.http.HttpHeaders;
+import io.vertx.ext.web.RoutingContext;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -18,10 +21,6 @@ import org.folio.edge.orders.model.ErrorWrapper;
 import org.folio.edge.orders.model.ResponseWrapper;
 import org.folio.edge.orders.utils.OrdersOkapiClient;
 import org.folio.edge.orders.utils.OrdersOkapiClientFactory;
-
-import io.vertx.core.http.HttpClientResponse;
-import io.vertx.core.http.HttpHeaders;
-import io.vertx.ext.web.RoutingContext;
 import org.folio.rest.mappings.model.Routing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,24 +61,25 @@ public class OrdersHandler extends Handler {
       String type = params.get(PARAM_TYPE);
 
       Routing routing;
-      String requestPath = ctx.normalisedPath();
+      String currentPath = ctx.currentRoute().getPath();
+      String requestNormalisedPath = ctx.normalisedPath();
       String requestMethod = ctx.request().rawMethod();
 
       try {
         routing = routingMapping.stream()
           .filter(r -> r.getType().equals(type)
             && r.getMethod().equals(requestMethod)
-            && r.getPathPattern().equals(requestPath))
+            && r.getPathPattern().equals(currentPath))
           .findFirst()
           .orElseThrow(Exception::new);
       } catch (Exception e) {
-        logger.error("API configuration doesn't exist for type={} method={} pathPattern={}", type, requestMethod, requestPath);
+        logger.error("API configuration doesn't exist for type={} method={} pathPattern={}", type, requestMethod, requestNormalisedPath);
         badRequest(ctx, "Unknown Purchasing System Specified: " + type);
         return;
       }
 
       logger.info("Request is from purchasing system: {}", type);
-      ((OrdersOkapiClient) client).send(routing, ctx.getBodyAsString(), ctx.request().headers(),
+      ((OrdersOkapiClient) client).send(routing, ctx.getBodyAsString(), ctx.request().params(), ctx.request().headers(),
         resp -> handleResponse(ctx, resp),
         t -> handleProxyException(ctx, t));
     });

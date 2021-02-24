@@ -2,6 +2,8 @@ package org.folio.edge.orders.utils;
 
 import static org.folio.edge.core.utils.test.MockOkapi.MOCK_TOKEN;
 
+import io.vertx.core.MultiMap;
+import io.vertx.core.http.impl.headers.VertxHttpHeaders;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -12,7 +14,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.folio.edge.core.utils.test.TestUtils;
 import org.folio.rest.mappings.model.Routing;
 import org.junit.After;
@@ -28,7 +31,7 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 @RunWith(VertxUnitRunner.class)
 public class OrdersOkapiClientTest {
 
-  private static final Logger logger = Logger.getLogger(OrdersOkapiClientTest.class);
+  private static final Logger logger = LogManager.getLogger(OrdersOkapiClientTest.class);
 
   private static final String tenant = "diku";
   private static final long reqTimeout = 3000L;
@@ -73,7 +76,7 @@ public class OrdersOkapiClientTest {
 
   @After
   public void tearDown(TestContext context) {
-    client.close();
+    client.client.close();
     mockOkapi.close(context);
   }
 
@@ -92,7 +95,7 @@ public class OrdersOkapiClientTest {
       routing.setProxyPath("/gobi/validate");
 
       client.send(routing,
-        "",null,
+        "",null,null,
         resp -> {
           context.assertEquals(200, resp.statusCode());
           async.complete();
@@ -117,7 +120,7 @@ public class OrdersOkapiClientTest {
       routing.setProxyPath("/gobi/validate");
 
       client.send(routing,
-          "",null,
+          "",null, null,
           resp -> {
             context.assertEquals(200, resp.statusCode());
             async.complete();
@@ -125,6 +128,31 @@ public class OrdersOkapiClientTest {
           t -> {
             context.fail(t.getMessage());
           });
+    });
+  }
+  @Test
+  public void testPutEbsconetSuccess(TestContext context) {
+    logger.info("=== Test successful PUT ebsconet order-line with id===");
+
+    Async async = context.async();
+    client.login("admin", "password").thenAcceptAsync(v -> {
+      context.assertEquals(MOCK_TOKEN, client.getToken());
+      Routing routing = new Routing();
+      routing.setMethod("PUT");
+      routing.setPathPattern("/orders/order-lines/:id");
+      routing.setProxyPath("/ebsconet/order-lines/:id");
+      MultiMap entries = new VertxHttpHeaders();
+      entries.add("id", "123");
+
+      client.send(routing,
+        "",entries, null,
+        resp -> resp.bodyHandler(rs -> {
+          context.assertEquals(204, resp.statusCode());
+          async.complete();
+        }),
+        t -> {
+          context.fail(t.getMessage());
+        });
     });
   }
 }

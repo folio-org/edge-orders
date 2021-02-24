@@ -14,7 +14,8 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.folio.edge.core.utils.Mappers;
 import org.folio.edge.core.utils.test.MockOkapi;
 import org.folio.edge.orders.model.ResponseWrapper;
@@ -30,7 +31,7 @@ import io.vertx.ext.web.RoutingContext;
 
 public class OrdersMockOkapi extends MockOkapi {
 
-  private static final Logger logger = Logger.getLogger(OrdersMockOkapi.class);
+  private static final Logger logger = LogManager.getLogger(OrdersMockOkapi.class);
   public static final String BODY_REQUEST_FOR_HEADER_INCONSISTENCY = "{Body request for exception}";
 
   public OrdersMockOkapi(int port, List<String> knownTenants) throws IOException {
@@ -42,6 +43,7 @@ public class OrdersMockOkapi extends MockOkapi {
     Router router = super.defineRoutes();
     router.route(HttpMethod.GET, "/gobi/validate").method(HttpMethod.POST).handler(this::validateHandler);
     router.route(HttpMethod.POST, "/gobi/orders").handler(this::placeOrdersHandler);
+    router.route(HttpMethod.PUT, "/ebsconet/order-lines/:id").handler(this::putOrderLinesHandler);
     return router;
   }
 
@@ -72,6 +74,22 @@ public class OrdersMockOkapi extends MockOkapi {
             .setStatusCode(200)
             .end("<test>POST - OK</test>");
       }
+    }
+  }
+
+  public void putOrderLinesHandler(RoutingContext ctx) {
+    String token = ctx.request().getHeader(X_OKAPI_TOKEN);
+    if (token == null || !token.equals(MOCK_TOKEN)) {
+      ctx.response()
+        .setStatusCode(403)
+        .putHeader(HttpHeaders.CONTENT_TYPE, TEXT_PLAIN)
+        .end("Access requires permission: gobi.order.post");
+    }
+    else if (StringUtils.EMPTY.equals(ctx.getBodyAsString())) {
+      ctx.response()
+        .setStatusCode(204)
+        .putHeader(HttpHeaders.CONTENT_TYPE, TEXT_PLAIN)
+        .end(ctx.request().getParam("id"));
     }
   }
 

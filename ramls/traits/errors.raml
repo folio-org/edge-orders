@@ -1,0 +1,34 @@
+#%RAML 1.0 Trait
+responses:
+   400:
+    description: Bad Request
+    body:
+      application/xml:
+        example: !include ../examples/error.xml
+      application/json:
+        example: !include ../examples/error.json
+   401:
+    description: Access Denied
+    body:
+      application/xml:
+        example: !include ../examples/error.xml
+      application/json:
+        example: !include ../examples/error.json
+      text/plain:
+   408:
+    description: Request Timeout
+    body:
+      application/xml:
+        example: !include ../examples/error.xml
+      application/json:
+        example: !include ../examples/error.json
+      text/plain:
+   500:
+    description: Internal Server Error
+    body:
+      application/xml:
+        example: !include ../examples/error.xml
+      application/json:
+        example: !include ../examples/error.json
+      text/plain:
+        example: "Internal server error"

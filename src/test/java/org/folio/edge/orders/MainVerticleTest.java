@@ -36,7 +36,8 @@ import io.restassured.http.Header;
 import io.restassured.response.Response;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.folio.edge.core.cache.TokenCache;
 import org.folio.edge.core.model.ClientInfo;
 import org.folio.edge.core.utils.ApiKeyUtils;
@@ -61,7 +62,7 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 @RunWith(VertxUnitRunner.class)
 public class MainVerticleTest {
 
-  private static final Logger logger = Logger.getLogger(MainVerticleTest.class);
+  private static final Logger logger = LogManager.getLogger(MainVerticleTest.class);
 
   private static final String apiKey = ApiKeyUtils.generateApiKey(10, "diku", "diku");
   private static final String badApiKey = apiKey + "0000";
