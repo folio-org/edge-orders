@@ -22,13 +22,13 @@
       "type": "EBSCONET",
       "method": "GET",
       "pathPattern": "/orders/order-lines/:id",
-      "proxyPath": "/ebsconet/order-lines/:id"
+      "proxyPath": "/ebsconet/orders/order-lines/:id"
     },
     {
       "type": "EBSCONET",
       "method": "PUT",
       "pathPattern": "/orders/order-lines/:id",
-      "proxyPath": "/ebsconet/order-lines/:id"
+      "proxyPath": "/ebsconet/orders/order-lines/:id"
     }
   ]
 }
