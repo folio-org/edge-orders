@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.folio</groupId>
   <artifactId>edge-orders</artifactId>
-  <version>2.3.0-SNAPSHOT</version>
+  <version>2.4.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>Edge API - Order Placement</name>
@@ -38,7 +38,7 @@
     <exec.mainClass>org.folio.edge.orders.MainVerticle</exec.mainClass>
     <sonar.exclusions>**/models/**.java</sonar.exclusions>
     <sonar.test.exclusions>**/*Test.java</sonar.test.exclusions>
-    <argLine/>
+    <argLine />
   </properties>
 
   <dependencyManagement>
@@ -85,7 +85,7 @@
     <dependency>
       <groupId>org.folio</groupId>
       <artifactId>edge-common</artifactId>
-      <version>2.0.0</version>
+      <version>3.1.0</version>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
@@ -117,17 +117,17 @@
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-api</artifactId>
-      <version>2.13.3</version>
+      <version>2.14.0</version>
     </dependency>
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-core</artifactId>
-      <version>2.13.3</version>
+      <version>2.14.0</version>
     </dependency>
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-slf4j-impl</artifactId>
-      <version>2.13.3</version>
+      <version>2.14.0</version>
     </dependency>
 
     <!-- Test dependencies -->
@@ -145,7 +145,7 @@
     <dependency>
       <groupId>nl.jqno.equalsverifier</groupId>
       <artifactId>equalsverifier</artifactId>
-      <version>3.4.3</version>
+      <version>3.5.4</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -162,14 +162,8 @@
     <dependency>
       <groupId>io.rest-assured</groupId>
       <artifactId>rest-assured</artifactId>
-      <version>4.3.0</version>
+      <version>4.3.2</version>
       <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
   </dependencies>
