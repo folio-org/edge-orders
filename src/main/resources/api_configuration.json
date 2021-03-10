@@ -29,6 +29,12 @@
       "method": "PUT",
       "pathPattern": "/orders/order-lines/:id",
       "proxyPath": "/ebsconet/orders/order-lines/:id"
+    },
+    {
+      "type": "EBSCONET",
+      "method": "GET",
+      "pathPattern": "/orders/validate",
+      "proxyPath": "/ebsconet/validate"
     }
   ]
 }
