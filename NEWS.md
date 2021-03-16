@@ -1,4 +1,17 @@
-## 2.4.0 - Unreleased
+## 2.5.0 - Unreleased
+## 2.4.0 - Released
+
+This release has focussed on add routing configuration and personal data disclosure
+
+[Full Changelog](https://github.com/folio-org/edge-orders/compare/v2.3.0...v2.4.0)
+
+### Stories
+* [EDGEORDERS-40](https://issues.folio.org/browse/EDGORDERS-40) - Add routing definition to mod-ebsconet
+* [EDGEORDERS-37](https://issues.folio.org/browse/EDGORDERS-37) - Add personal data disclosure form
+
+### Bugs
+* [EDGEORDERS-34](https://issues.folio.org/browse/EDGORDERS-34) - Type parameter needs to be case-insensitive
+
 ## 2.3.0 - Released
 
 This release has focussed on upgrade to JDK 11
