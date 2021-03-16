@@ -67,7 +67,7 @@ public class OrdersHandler extends Handler {
 
       try {
         routing = routingMapping.stream()
-          .filter(r -> r.getType().equals(type)
+          .filter(r -> r.getType().equalsIgnoreCase(type)
             && r.getMethod().equals(requestMethod)
             && r.getPathPattern().equals(currentPath))
           .findFirst()
