@@ -3,7 +3,7 @@
 ## 2.4.0 - Released
 This release contains updates regarding integration with mod-ebsconet module. Added personal data disclosure form
 
-[Full Changelog](https://github.com/folio-org/edge-orders/compare/v2.2.1...v2.3.0)
+[Full Changelog](https://github.com/folio-org/edge-orders/compare/v2.3.0...v2.4.0)
 
 ### Stories
 * [EDGEORDERS-40](https://issues.folio.org/browse/EDGORDERS-40) - Add routing definition to mod-ebsconet
