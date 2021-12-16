@@ -1,5 +1,12 @@
 ## 2.5.0 - Unreleased
 
+## 2.4.1 - Released
+This bugfix release focused on fixing Log4j vulnerability
+[Full Changelog](https://github.com/folio-org/edge-orders/compare/v2.4.0...v2.4.1)
+
+### Bugfixes
+* [EDGEORDERS-45](https://issues.folio.org/browse/EDGORDERS-45) - Kiwi R3 2021 - Log4j vulnerability verification and correction
+
 ## 2.4.0 - Released
 This release contains updates regarding integration with mod-ebsconet module. Added personal data disclosure form
 
