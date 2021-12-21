@@ -1,4 +1,12 @@
-## 2.4.2 - Unreleased
+## 2.4.3 - Unreleased
+
+## 2.4.2 - Released
+Update Log4j to 2.17.0
+
+[Full Changelog](https://github.com/folio-org/edge-orders/compare/v2.4.1...v2.4.2)
+
+### Bugfixes
+* [EDGEORDERS-50](https://issues.folio.org/browse/EDGORDERS-50) - Kiwi R3 2021 - Log4j edge- modules 2.17.0 upgrade
 
 ## 2.4.1 - Released
 This bugfix release focused on fixing Log4j vulnerability
