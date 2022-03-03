@@ -1,4 +1,12 @@
-## 2.5.0 - Unreleased
+## 2.6.0 - Unreleased
+
+## 2.5.0 - Released
+This release focused on log4j security fix
+
+[Full Changelog](https://github.com/folio-org/edge-orders/compare/v2.4.0...v2.5.0)
+
+### Stories
+* [EDGORDERS-50](https://issues.folio.org/browse/EDGORDERS-50) - Log4j edge- modules 2.17.0 upgrade
 
 ## 2.4.0 - Released
 This release contains updates regarding integration with mod-ebsconet module. Added personal data disclosure form
