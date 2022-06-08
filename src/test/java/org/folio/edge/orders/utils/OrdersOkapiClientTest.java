@@ -1,9 +1,20 @@
 package org.folio.edge.orders.utils;
 
-import static org.folio.edge.core.utils.test.MockOkapi.MOCK_TOKEN;
-
 import io.vertx.core.MultiMap;
-import io.vertx.core.http.impl.headers.VertxHttpHeaders;
+import io.vertx.core.Vertx;
+import io.vertx.core.http.impl.headers.HeadersMultiMap;
+import io.vertx.ext.unit.Async;
+import io.vertx.ext.unit.TestContext;
+import io.vertx.ext.unit.junit.VertxUnitRunner;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.folio.edge.core.utils.test.TestUtils;
+import org.folio.rest.mappings.model.Routing;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -14,19 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.folio.edge.core.utils.test.TestUtils;
-import org.folio.rest.mappings.model.Routing;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import io.vertx.core.Vertx;
-import io.vertx.ext.unit.Async;
-import io.vertx.ext.unit.TestContext;
-import io.vertx.ext.unit.junit.VertxUnitRunner;
+import static org.folio.edge.core.utils.test.MockOkapi.MOCK_TOKEN;
 
 @RunWith(VertxUnitRunner.class)
 public class OrdersOkapiClientTest {
@@ -34,7 +33,7 @@ public class OrdersOkapiClientTest {
   private static final Logger logger = LogManager.getLogger(OrdersOkapiClientTest.class);
 
   private static final String tenant = "diku";
-  private static final long reqTimeout = 3000L;
+  private static final int reqTimeout = 3000;
 
   private static Map<String, String> mockRequests;
 
@@ -100,9 +99,7 @@ public class OrdersOkapiClientTest {
           context.assertEquals(200, resp.statusCode());
           async.complete();
         },
-        t -> {
-          context.fail(t.getMessage());
-        });
+        t -> context.fail(t.getMessage()));
     });
   }
 
@@ -125,9 +122,7 @@ public class OrdersOkapiClientTest {
             context.assertEquals(200, resp.statusCode());
             async.complete();
           },
-          t -> {
-            context.fail(t.getMessage());
-          });
+          t -> context.fail(t.getMessage()));
     });
   }
   @Test
@@ -141,18 +136,14 @@ public class OrdersOkapiClientTest {
       routing.setMethod("PUT");
       routing.setPathPattern("/orders/order-lines/:id");
       routing.setProxyPath("/ebsconet/order-lines/:id");
-      MultiMap entries = new VertxHttpHeaders();
+      MultiMap entries = new HeadersMultiMap();
       entries.add("id", "123");
 
-      client.send(routing,
-        "",entries, null,
-        resp -> resp.bodyHandler(rs -> {
+      client.send(routing, "", entries, null, resp -> {
           context.assertEquals(204, resp.statusCode());
           async.complete();
-        }),
-        t -> {
-          context.fail(t.getMessage());
-        });
+        },
+        t -> context.fail(t.getMessage()));
     });
   }
 }

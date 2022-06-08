@@ -5,7 +5,6 @@ import static org.folio.edge.core.Constants.APPLICATION_XML;
 import static org.folio.edge.core.Constants.TEXT_PLAIN;
 import static org.folio.edge.core.Constants.X_OKAPI_TOKEN;
 
-import java.io.IOException;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -34,7 +33,7 @@ public class OrdersMockOkapi extends MockOkapi {
   private static final Logger logger = LogManager.getLogger(OrdersMockOkapi.class);
   public static final String BODY_REQUEST_FOR_HEADER_INCONSISTENCY = "{Body request for exception}";
 
-  public OrdersMockOkapi(int port, List<String> knownTenants) throws IOException {
+  public OrdersMockOkapi(int port, List<String> knownTenants) {
     super(port, knownTenants);
   }
 
@@ -58,7 +57,7 @@ public class OrdersMockOkapi extends MockOkapi {
           .end("Access requires permission: gobi.order.post");
     } else if (status != null && !status.isEmpty()) {
       ctx.response()
-          .setStatusCode(Integer.valueOf(status))
+          .setStatusCode(Integer.parseInt(status))
           .putHeader(HttpHeaders.CONTENT_TYPE, TEXT_PLAIN)
           .end("No suitable module found for path /gobi/validate");
     } else {
@@ -108,16 +107,16 @@ public class OrdersMockOkapi extends MockOkapi {
         .setStatusCode(400)
         .end("Bad request");
     }
-    else if (StringUtils.EMPTY.equals(ctx.getBodyAsString())) {
+    else if (StringUtils.isEmpty(ctx.body().asString())) {
       ctx.response()
         .setStatusCode(201)
-        .end(StringUtils.EMPTY);
+        .end();
     } else {
-      String id = null;
+      String id;
       try {
         DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = builderFactory.newDocumentBuilder();
-        Document xmlDocument = builder.parse(new StringInputStream(ctx.getBodyAsString()));
+        Document xmlDocument = builder.parse(new StringInputStream(ctx.body().asString()));
         XPath xPath = XPathFactory.newInstance().newXPath();
         String expression = "//ItemPONumber";
         id = xPath.compile(expression).evaluate(xmlDocument);
