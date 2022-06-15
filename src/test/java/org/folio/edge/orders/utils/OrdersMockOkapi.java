@@ -84,7 +84,7 @@ public class OrdersMockOkapi extends MockOkapi {
         .putHeader(HttpHeaders.CONTENT_TYPE, TEXT_PLAIN)
         .end("Access requires permission: gobi.order.post");
     }
-    else if (StringUtils.EMPTY.equals(ctx.getBodyAsString())) {
+    else if (ctx.body().isEmpty()) {
       ctx.response()
         .setStatusCode(204)
         .putHeader(HttpHeaders.CONTENT_TYPE, TEXT_PLAIN)

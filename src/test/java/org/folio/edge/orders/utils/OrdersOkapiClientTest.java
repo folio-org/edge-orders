@@ -2,6 +2,7 @@ package org.folio.edge.orders.utils;
 
 import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
+import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.impl.headers.HeadersMultiMap;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;

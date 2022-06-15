@@ -1,24 +1,23 @@
 package org.folio.edge.orders.utils;
 
 import static org.folio.edge.core.Constants.XML_OR_TEXT;
-
-import io.vertx.core.*;
-import io.vertx.core.buffer.Buffer;
-import io.vertx.core.http.HttpClientRequest;
-import io.vertx.core.http.HttpClientResponse;
-import io.vertx.core.http.HttpHeaders;
+import static org.folio.edge.core.Constants.X_OKAPI_TOKEN;
 
 import java.util.Optional;
 
-import io.vertx.core.http.HttpMethod;
-import io.vertx.ext.web.client.HttpRequest;
-import io.vertx.ext.web.client.HttpResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.folio.edge.core.Constants;
 import org.folio.edge.core.utils.OkapiClient;
 import org.folio.rest.mappings.model.Routing;
+
+import io.vertx.core.Handler;
+import io.vertx.core.MultiMap;
+import io.vertx.core.Vertx;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.http.HttpHeaders;
+import io.vertx.ext.web.client.HttpRequest;
+import io.vertx.ext.web.client.HttpResponse;
 
 public class OrdersOkapiClient extends OkapiClient {
 
@@ -70,17 +69,17 @@ public class OrdersOkapiClient extends OkapiClient {
           okapiURL + resultPath,
           tenant,
           StringUtils.isEmpty(payload) ? null : payload,
-          combineHeadersWithDefaults(headers),
+          defaultHeaders,
           responseHandler,
           exceptionHandler);
         break;
     }
   }
 
-  public void put(String url, String tenant, String payload, MultiMap headers,
-                  Handler<HttpResponse<Buffer>> responseHandler, Handler<Throwable> exceptionHandler) {
+  public void put(String url, String tenant, String payload, MultiMap headers, Handler<HttpResponse<Buffer>> responseHandler,
+      Handler<Throwable> exceptionHandler) {
 
-    final HttpRequest<Buffer> request = client.request(HttpMethod.PUT,url);
+    HttpRequest<Buffer> request = client.putAbs(url);
 
     if (headers != null) {
       request.headers().setAll(combineHeadersWithDefaults(headers));
@@ -88,12 +87,20 @@ public class OrdersOkapiClient extends OkapiClient {
       request.headers().setAll(defaultHeaders);
     }
 
-    logger.info(String.format("PUT %s tenant: %s token: %s", url, tenant, request.headers().get(Constants.X_OKAPI_TOKEN)));
+    logger.info("PUT {} tenant: {} token: {}", () -> url, () -> tenant, () -> request.headers()
+      .get(X_OKAPI_TOKEN));
 
-    request.timeout(reqTimeout)
-      .sendBuffer(Buffer.buffer(payload))
-      .onSuccess(responseHandler)
-      .onFailure(exceptionHandler);
+    request.timeout(reqTimeout);
+    if (StringUtils.isEmpty(payload)) {
+      request.send()
+        .onSuccess(responseHandler)
+        .onFailure(exceptionHandler);
+
+    } else {
+      request.sendBuffer(Buffer.buffer(payload))
+        .onSuccess(responseHandler)
+        .onFailure(exceptionHandler);
+    }
 
   }
 }
