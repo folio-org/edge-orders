@@ -12,12 +12,12 @@ import io.vertx.core.Vertx;
 
 public class OrdersOkapiClientFactoryTest {
 
-  private static final long reqTimeout = 5000L;
+  private static final int reqTimeout = 5000;
 
   private OrdersOkapiClientFactory ocf;
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
 
     Vertx vertx = Vertx.vertx();
     ocf = new OrdersOkapiClientFactory(vertx, "http://mocked.okapi:9130", reqTimeout);

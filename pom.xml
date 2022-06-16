@@ -47,14 +47,14 @@
       <dependency>
         <groupId>io.vertx</groupId>
         <artifactId>vertx-stack-depchain</artifactId>
-        <version>3.9.3</version>
+        <version>4.3.1</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson</groupId>
         <artifactId>jackson-bom</artifactId>
-        <version>2.11.1</version>
+        <version>2.13.2</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -93,19 +93,19 @@
     <dependency>
       <groupId>org.folio</groupId>
       <artifactId>edge-common</artifactId>
-      <version>3.1.0</version>
+      <version>4.3.0</version>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
-      <version>3.9</version>
+      <version>3.12.0</version>
     </dependency>
 
     <!-- Only needed for AwsParamStore -->
     <dependency>
       <groupId>com.amazonaws</groupId>
       <artifactId>aws-java-sdk-ssm</artifactId>
-      <version>1.11.313</version>
+      <version>1.12.221</version>
       <exclusions>
         <exclusion>
           <groupId>commons-logging</groupId>
@@ -139,6 +139,7 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
+      <version>4.13.2</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -150,7 +151,7 @@
     <dependency>
       <groupId>nl.jqno.equalsverifier</groupId>
       <artifactId>equalsverifier</artifactId>
-      <version>3.5.4</version>
+      <version>3.10</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -167,7 +168,7 @@
     <dependency>
       <groupId>io.rest-assured</groupId>
       <artifactId>rest-assured</artifactId>
-      <version>4.3.2</version>
+      <version>5.1.0</version>
       <scope>test</scope>
     </dependency>
 
@@ -246,6 +247,7 @@
               <goal>generate</goal>
             </goals>
             <configuration>
+              <includes>*.json</includes>
               <sourceDirectory>${basedir}/src/main/resources/schema</sourceDirectory>
               <targetPackage>org.folio.rest.mappings.model</targetPackage>
             </configuration>

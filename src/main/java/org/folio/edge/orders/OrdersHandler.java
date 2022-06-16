@@ -7,12 +7,10 @@ import static org.folio.edge.core.Constants.MSG_INVALID_API_KEY;
 import static org.folio.edge.core.Constants.MSG_REQUEST_TIMEOUT;
 import static org.folio.edge.orders.Constants.PARAM_TYPE;
 
-import io.vertx.core.http.HttpClientResponse;
-import io.vertx.core.http.HttpHeaders;
-import io.vertx.ext.web.RoutingContext;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
 import org.folio.edge.core.Handler;
 import org.folio.edge.core.security.SecureStore;
 import org.folio.edge.core.utils.OkapiClient;
@@ -24,6 +22,11 @@ import org.folio.edge.orders.utils.OrdersOkapiClientFactory;
 import org.folio.rest.mappings.model.Routing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.http.HttpHeaders;
+import io.vertx.ext.web.RoutingContext;
+import io.vertx.ext.web.client.HttpResponse;
 
 public class OrdersHandler extends Handler {
   private static final Logger logger = LoggerFactory.getLogger(OrdersHandler.class);
@@ -62,8 +65,8 @@ public class OrdersHandler extends Handler {
 
       Routing routing;
       String currentPath = ctx.currentRoute().getPath();
-      String requestNormalisedPath = ctx.normalisedPath();
-      String requestMethod = ctx.request().rawMethod();
+      String requestNormalisedPath = ctx.normalizedPath();
+      String requestMethod = ctx.request().method().name();
 
       try {
         routing = routingMapping.stream()
@@ -85,26 +88,27 @@ public class OrdersHandler extends Handler {
     });
   }
 
-  protected void handleResponse(RoutingContext ctx, HttpClientResponse resp) {
+  protected void handleResponse(RoutingContext ctx, HttpResponse<Buffer> resp) {
     final StringBuilder body = new StringBuilder();
-    resp.handler(buf -> {
-          if (logger.isTraceEnabled()) {
-            logger.trace("read bytes: {}", buf);
-          }
-          body.append(buf);
-        })
-        .endHandler(v -> {
-          ctx.response().setStatusCode(resp.statusCode());
-          if (body.length() > 0) {
-            String respBody = body.toString();
-            handleResponseWithBody(ctx, resp, respBody);
-            if (logger.isDebugEnabled()) {
-              logger.debug("status: {} response: {}", + resp.statusCode(), respBody);
-            }
-          } else {
-            ctx.response().end();
-          }
-        });
+    var buf = resp.body();
+
+    if (logger.isTraceEnabled()) {
+      logger.trace("read bytes: {}", buf);
+    }
+    if (buf != null) {
+      body.append(buf);
+    }
+
+    ctx.response().setStatusCode(resp.statusCode());
+    if (body.length() > 0) {
+      String respBody = body.toString();
+      handleResponseWithBody(ctx, resp, respBody);
+      if (logger.isDebugEnabled()) {
+        logger.debug("status: {} response: {}", + resp.statusCode(), respBody);
+      }
+    } else {
+      ctx.response().end();
+    }
   }
 
   @Override
@@ -142,7 +146,7 @@ public class OrdersHandler extends Handler {
     }
   }
 
-  private void handleResponseWithBody(RoutingContext ctx, HttpClientResponse response, String respBody) {
+  private void handleResponseWithBody(RoutingContext ctx, HttpResponse<Buffer> response, String respBody) {
     String contentType = response.headers().get(HttpHeaders.CONTENT_TYPE);
     int status = response.statusCode();
     if (isSuccessStatus(status)) {

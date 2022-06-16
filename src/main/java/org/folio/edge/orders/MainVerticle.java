@@ -1,14 +1,16 @@
 package org.folio.edge.orders;
 
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toSet;
-import static org.folio.edge.orders.Constants.API_CONFIGURATION_DEFAULT;
-import static org.folio.edge.orders.Constants.API_CONFIGURATION_PROPERTY_NAME;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.BodyHandler;
+import org.folio.edge.core.EdgeVerticleHttp;
+import org.folio.edge.orders.utils.OrdersOkapiClientFactory;
+import org.folio.rest.mappings.model.ApiConfiguration;
+import org.folio.rest.mappings.model.Routing;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,14 +20,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
-import org.folio.edge.core.EdgeVerticle;
-import org.folio.edge.orders.utils.OrdersOkapiClientFactory;
-import org.folio.rest.mappings.model.ApiConfiguration;
-import org.folio.rest.mappings.model.Routing;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-public class MainVerticle extends EdgeVerticle {
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toSet;
+import static org.folio.edge.orders.Constants.API_CONFIGURATION_DEFAULT;
+import static org.folio.edge.orders.Constants.API_CONFIGURATION_PROPERTY_NAME;
+
+public class MainVerticle extends EdgeVerticleHttp {
 
   private static final Logger logger = LoggerFactory.getLogger(MainVerticle.class);
 
@@ -35,7 +36,8 @@ public class MainVerticle extends EdgeVerticle {
 
   @Override
   public Router defineRoutes() {
-    OrdersOkapiClientFactory ocf = new OrdersOkapiClientFactory(vertx, okapiURL, reqTimeoutMs);
+    OrdersOkapiClientFactory ocf = new OrdersOkapiClientFactory(vertx, config().getString(org.folio.edge.core.Constants.SYS_OKAPI_URL),
+      config().getInteger(org.folio.edge.core.Constants.SYS_REQUEST_TIMEOUT_MS));
 
     OrdersHandler ordersHandler = new OrdersHandler(secureStore, ocf);
 
@@ -60,7 +62,7 @@ public class MainVerticle extends EdgeVerticle {
     }
 
     router.route().handler(ctx -> {
-      String path = ctx.normalisedPath();
+      String path = ctx.normalizedPath();
       logger.warn("Current path {} is missing from API configuration", path);
       ctx.next();
     });
