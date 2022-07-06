@@ -1,4 +1,15 @@
-## 2.6.0 - Unreleased
+## 2.7.0 - Unreleased
+
+## 2.6.0 Morning Glory R2 2022 - Released
+This release focused on upgrading Vertx to 43.1 and tenant header injection fix
+
+[Full Changelog](https://github.com/folio-org/edge-orders/compare/v2.5.0...v2.6.0)
+
+### Stories
+* [EDGORDERS-57](https://issues.folio.org/browse/EDGORDERS-57) - Edge-orders - Morning Glory 2022 R2 - Vert.x 3.9.3/v4 upgrade
+
+### Bugfixes
+* [EDGEORDERS-60](https://issues.folio.org/browse/EDGORDERS-60) - Edge-common 4.3.0 fixing tenant header injection
 
 ## 2.5.0 - Released
 This release focused on log4j security fix
