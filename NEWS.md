@@ -1,5 +1,14 @@
 ## 2.7.0 - Unreleased
 
+## 2.6.1 (Bug Fix) - Released
+This release focused on updating contract for required mod-ebsconet module to support fix of issue when renewal note is blank after update
+
+[Full Changelog](https://github.com/folio-org/edge-orders/compare/v2.6.0...v2.6.1)
+
+### Bug Fixes
+* [MODEBSNET-39](https://issues.folio.org/browse/MODEBSNET-39) - Renewal note is blank after update
+
+
 ## 2.6.0 Morning Glory R2 2022 - Released
 This release focused on upgrading Vertx to 43.1 and tenant header injection fix
 
