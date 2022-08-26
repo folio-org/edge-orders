@@ -1,5 +1,11 @@
 ## 2.7.0 - Unreleased
 
+## 2.6.2 (Bug Fix) - Released
+This release focused on fixing a bug in a Vert.x dependency.
+
+### Bug Fixes
+* [EDGORDERS-63](https://issues.folio.org/browse/EDGORDERS-63) - edge-common 4.4.1 fixing disabled SSL in Vert.x WebClient
+
 ## 2.6.1 (Bug Fix) - Released
 This release focused on updating contract for required mod-ebsconet module to support fix of issue when renewal note is blank after update
 
