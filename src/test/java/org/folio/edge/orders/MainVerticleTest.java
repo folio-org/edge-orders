@@ -18,9 +18,7 @@ import static org.folio.edge.orders.utils.OrdersMockOkapi.BODY_REQUEST_FOR_HEADE
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.mockito.Mockito.spy;
 
 import java.io.File;
@@ -86,7 +84,7 @@ public class MainVerticleTest {
     knownTenants.add(ApiKeyUtils.parseApiKey(apiKey).tenantId);
 
     mockOkapi = spy(new OrdersMockOkapi(okapiPort, knownTenants));
-    mockOkapi.start(context);
+    mockOkapi.start().onComplete(context.asyncAssertSuccess());
 
     vertx = Vertx.vertx();
     System.setProperty(SYS_PORT, String.valueOf(serverPort));
@@ -125,17 +123,7 @@ public class MainVerticleTest {
   @AfterClass
   public static void tearDownOnce(TestContext context) {
     logger.info("Shutting down server");
-    vertx.close(res -> {
-      if (res.failed()) {
-        logger.error("Failed to shut down edge-orders server", res.cause());
-        fail(res.cause().getMessage());
-      } else {
-        logger.info("Successfully shut down edge-orders server");
-      }
-
-      logger.info("Shutting down mock Okapi");
-      mockOkapi.close(context);
-    });
+    mockOkapi.close().onComplete(context.asyncAssertSuccess());
   }
 
   @Test
