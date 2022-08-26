@@ -2,7 +2,6 @@ package org.folio.edge.orders.utils;
 
 import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
-import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.impl.headers.HeadersMultiMap;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
@@ -49,7 +48,7 @@ public class OrdersOkapiClientTest {
     knownTenants.add(tenant);
 
     mockOkapi = new OrdersMockOkapi(okapiPort, knownTenants);
-    mockOkapi.start(context);
+    mockOkapi.start().onComplete(context.asyncAssertSuccess());
 
     client = new OrdersOkapiClientFactory(Vertx.vertx(),
         "http://localhost:" + okapiPort, reqTimeout)
@@ -77,7 +76,7 @@ public class OrdersOkapiClientTest {
   @After
   public void tearDown(TestContext context) {
     client.client.close();
-    mockOkapi.close(context);
+    mockOkapi.close().onComplete(context.asyncAssertSuccess());
   }
 
   @Test
