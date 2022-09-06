@@ -1,6 +1,8 @@
 package org.folio.edge.orders.utils;
 
-import static org.folio.edge.core.Constants.XML_OR_TEXT;
+import static org.folio.edge.core.Constants.APPLICATION_JSON;
+import static org.folio.edge.core.Constants.APPLICATION_XML;
+import static org.folio.edge.core.Constants.TEXT_PLAIN;
 import static org.folio.edge.core.Constants.X_OKAPI_TOKEN;
 
 import java.util.Optional;
@@ -34,7 +36,7 @@ public class OrdersOkapiClient extends OkapiClient {
   @Override
   protected void initDefaultHeaders() {
     super.initDefaultHeaders();
-    defaultHeaders.set(HttpHeaders.ACCEPT, XML_OR_TEXT);
+    defaultHeaders.set(HttpHeaders.ACCEPT, String.format("%s, %s, %s",APPLICATION_JSON, APPLICATION_XML, TEXT_PLAIN));
   }
 
   public void send(Routing routing, String payload, MultiMap params, MultiMap headers, Handler<HttpResponse<Buffer>> responseHandler,
@@ -95,7 +97,6 @@ public class OrdersOkapiClient extends OkapiClient {
       request.send()
         .onSuccess(responseHandler)
         .onFailure(exceptionHandler);
-
     } else {
       request.sendBuffer(Buffer.buffer(payload))
         .onSuccess(responseHandler)
@@ -103,4 +104,5 @@ public class OrdersOkapiClient extends OkapiClient {
     }
 
   }
+  
 }
