@@ -1,6 +1,8 @@
 package org.folio.edge.orders.utils;
 
-import static org.folio.edge.core.Constants.XML_OR_TEXT;
+import static org.folio.edge.core.Constants.APPLICATION_JSON;
+import static org.folio.edge.core.Constants.APPLICATION_XML;
+import static org.folio.edge.core.Constants.TEXT_PLAIN;
 import static org.folio.edge.core.Constants.X_OKAPI_TOKEN;
 
 import java.util.Optional;
@@ -11,6 +13,7 @@ import org.apache.logging.log4j.Logger;
 import org.folio.edge.core.utils.OkapiClient;
 import org.folio.rest.mappings.model.Routing;
 
+import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
@@ -18,6 +21,7 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.ext.web.client.HttpRequest;
 import io.vertx.ext.web.client.HttpResponse;
+import io.vertx.ext.web.handler.HttpException;
 
 public class OrdersOkapiClient extends OkapiClient {
 
@@ -34,7 +38,7 @@ public class OrdersOkapiClient extends OkapiClient {
   @Override
   protected void initDefaultHeaders() {
     super.initDefaultHeaders();
-    defaultHeaders.set(HttpHeaders.ACCEPT, XML_OR_TEXT);
+    defaultHeaders.set(HttpHeaders.ACCEPT, String.format("%s, %s, %s",APPLICATION_JSON, APPLICATION_XML, TEXT_PLAIN));
   }
 
   public void send(Routing routing, String payload, MultiMap params, MultiMap headers, Handler<HttpResponse<Buffer>> responseHandler,
@@ -93,14 +97,27 @@ public class OrdersOkapiClient extends OkapiClient {
     request.timeout(reqTimeout);
     if (StringUtils.isEmpty(payload)) {
       request.send()
-        .onSuccess(responseHandler)
-        .onFailure(exceptionHandler);
-
-    } else {
+          .onComplete(handlePutResponse(responseHandler, exceptionHandler));
+    }
+    else {
       request.sendBuffer(Buffer.buffer(payload))
-        .onSuccess(responseHandler)
-        .onFailure(exceptionHandler);
+          .onComplete(handlePutResponse(responseHandler, exceptionHandler));
     }
 
+  }
+
+  private Handler<AsyncResult<HttpResponse<Buffer>>> handlePutResponse(Handler<HttpResponse<Buffer>> responseHandler,
+      Handler<Throwable> exceptionHandler) {
+    return response -> {
+      if (response.failed()) {
+        exceptionHandler.handle(response.cause());
+      } else {
+        var result = response.result();
+        if (response.result().statusCode() != 204) {
+          exceptionHandler.handle(new HttpException(result.statusCode(), result.bodyAsString()));
+        }
+        responseHandler.handle(result);
+      }
+    };
   }
 }
