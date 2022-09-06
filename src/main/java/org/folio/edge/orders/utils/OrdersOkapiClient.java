@@ -7,15 +7,12 @@ import static org.folio.edge.core.Constants.X_OKAPI_TOKEN;
 
 import java.util.Optional;
 
-import io.vertx.ext.web.client.predicate.ResponsePredicate;
-import io.vertx.ext.web.client.predicate.ResponsePredicateResult;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.folio.edge.core.utils.OkapiClient;
 import org.folio.rest.mappings.model.Routing;
 
-import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
@@ -23,7 +20,6 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.ext.web.client.HttpRequest;
 import io.vertx.ext.web.client.HttpResponse;
-import io.vertx.ext.web.handler.HttpException;
 
 public class OrdersOkapiClient extends OkapiClient {
 
@@ -99,27 +95,14 @@ public class OrdersOkapiClient extends OkapiClient {
     request.timeout(reqTimeout);
     if (StringUtils.isEmpty(payload)) {
       request.send()
-          .onComplete(handlePutResponse(responseHandler, exceptionHandler));
-    }
-    else {
+        .onSuccess(responseHandler)
+        .onFailure(exceptionHandler);
+    } else {
       request.sendBuffer(Buffer.buffer(payload))
-          .onComplete(handlePutResponse(responseHandler, exceptionHandler));
+        .onSuccess(responseHandler)
+        .onFailure(exceptionHandler);
     }
 
   }
-
-  private Handler<AsyncResult<HttpResponse<Buffer>>> handlePutResponse(Handler<HttpResponse<Buffer>> responseHandler,
-      Handler<Throwable> exceptionHandler) {
-    return response -> {
-      if (response.failed()) {
-        exceptionHandler.handle(response.cause());
-      } else {
-        var result = response.result();
-        if (response.result().statusCode() != 204) {
-          exceptionHandler.handle(new HttpException(result.statusCode(), result.bodyAsString()));
-        }
-        responseHandler.handle(result);
-      }
-    };
-  }
+  
 }
