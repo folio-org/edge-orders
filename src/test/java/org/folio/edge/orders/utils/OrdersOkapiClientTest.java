@@ -6,6 +6,7 @@ import io.vertx.core.http.impl.headers.HeadersMultiMap;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
+import io.vertx.ext.web.handler.HttpException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.folio.edge.core.utils.test.TestUtils;
@@ -145,5 +146,31 @@ public class OrdersOkapiClientTest {
         },
         t -> context.fail(t.getMessage()));
     });
+  }
+
+  @Test
+  public void testPutEbsconetFail(TestContext context) {
+    logger.info("=== Test successful PUT ebsconet order-line with id===");
+
+    Async async = context.async();
+    client.login("admin", "password")
+      .thenAcceptAsync(v -> {
+        context.assertEquals(MOCK_TOKEN, client.getToken());
+        Routing routing = new Routing();
+        routing.setMethod("PUT");
+        routing.setPathPattern("/orders/order-lines/:id");
+        routing.setProxyPath("/ebsconet/order-lines/:id");
+        MultiMap entries = new HeadersMultiMap();
+        entries.add("id", "123");
+        client.setToken(null);
+
+        client.send(routing, "", entries, null, resp -> {
+          context.fail("Response shouldn't be successful");
+        }, t -> {
+          context.assertEquals(403, ((HttpException) t).getStatusCode());
+          async.complete();
+        });
+      });
+
   }
 }
