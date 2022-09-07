@@ -1,5 +1,13 @@
 ## 2.7.0 - Unreleased
 
+## 2.6.3 (Morning Glory R2 Bug Fix) - Released
+This release focused on fixing a bug related to updating orders via Ebsconet.
+
+[Full Changelog](https://github.com/folio-org/edge-orders/compare/v2.6.2...v2.6.3)
+
+### Bug Fixes
+* [EDGORDERS-65](https://issues.folio.org/browse/EDGORDERS-65) - Order line updates via ebsconet throws 406
+
 ## 2.6.2 (Bug Fix) - Released
 This release focused on fixing a bug in a Vert.x dependency.
 
