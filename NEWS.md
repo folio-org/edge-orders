@@ -1,4 +1,12 @@
-## 2.7.0 - Unreleased
+## 2.8.0 - Unreleased
+
+## 2.7.0 Nolana R3 2022 - Released
+This release focused on order line updates fix
+
+[Full Changelog](https://github.com/folio-org/edge-orders/compare/v2.6.0...v2.7.0)
+
+### Bugfixes
+* [EDGORDERS-65](https://issues.folio.org/browse/EDGORDERS-65) Order line updates via ebsconet throws 406
 
 ## 2.6.0 Morning Glory R2 2022 - Released
 This release focused on upgrading Vertx to 43.1 and tenant header injection fix
