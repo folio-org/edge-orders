@@ -64,7 +64,7 @@ public class MainVerticle extends EdgeVerticleHttp {
 
     router.route().handler(ctx -> {
       String path = ctx.normalizedPath();
-      logger.warn("Current path '{}'' is missing from API configuration", path);
+      logger.warn("Current path '{}' is missing from API configuration", path);
       ctx.next();
     });
 
@@ -90,10 +90,10 @@ public class MainVerticle extends EdgeVerticleHttp {
           logger.info("initApiConfiguration:: ApiConfiguration has been loaded from file {}", apiConfigurationPropFile);
         }
       } catch (Exception e) {
-        logger.warn("Failed to load ApiConfiguration from {}", apiConfigurationPropFile, e);
+        logger.warn("Failed to load ApiConfiguration from '{}'", apiConfigurationPropFile, e);
       }
     } else {
-      logger.warn("No api configuration file specified. Using default {}", API_CONFIGURATION_DEFAULT);
+      logger.warn("No api configuration file specified. Using default '{}'", API_CONFIGURATION_DEFAULT);
       apiConfiguration = mapper
         .readValue(ClassLoader.getSystemClassLoader().getResource(API_CONFIGURATION_DEFAULT), ApiConfiguration.class);
     }

@@ -108,5 +108,4 @@ public class OrdersOkapiClient extends OkapiClient {
     }
 
   }
-
 }
