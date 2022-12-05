@@ -38,7 +38,7 @@ public class OrdersHandler extends Handler {
   @Override
   protected void handleCommon(RoutingContext ctx, String[] requiredParams, String[] optionalParams,
       TwoParamVoidFunction<OkapiClient, Map<String, String>> action) {
-
+    logger.debug("handleCommon:: Trying to handle request with required params: {}, optional params: {}", requiredParams, optionalParams);
     // the responses are short, we can safely drop the encoding header if passed
     if (null != ctx.request().getHeader(HttpHeaders.ACCEPT_ENCODING)) {
       ctx.request().headers().remove(HttpHeaders.ACCEPT_ENCODING);
@@ -47,6 +47,7 @@ public class OrdersHandler extends Handler {
     String type = ctx.request()
         .getParam(PARAM_TYPE);
     if (type == null || type.isEmpty()) {
+      logger.warn("handleCommon:: Type is not specified");
       badRequest(ctx, "Missing required parameter: " + PARAM_TYPE);
       return;
     }
@@ -68,6 +69,7 @@ public class OrdersHandler extends Handler {
       String requestNormalisedPath = ctx.normalizedPath();
       String requestMethod = ctx.request().method().name();
 
+      logger.debug("handle:: Trying to find routing for path: {}, method: {}", requestNormalisedPath, requestMethod);
       try {
         routing = routingMapping.stream()
           .filter(r -> r.getType().equalsIgnoreCase(type)
@@ -76,12 +78,12 @@ public class OrdersHandler extends Handler {
           .findFirst()
           .orElseThrow(Exception::new);
       } catch (Exception e) {
-        logger.error("API configuration doesn't exist for type={} method={} pathPattern={}", type, requestMethod, requestNormalisedPath);
+        logger.error("API configuration doesn't exist for type: {} method: {} pathPattern: {}", type, requestMethod, requestNormalisedPath);
         badRequest(ctx, "Unknown Purchasing System Specified: " + type);
         return;
       }
 
-      logger.info("Request is from purchasing system: {}", type);
+      logger.info("handle:: Request is from purchasing system: {}", type);
       ((OrdersOkapiClient) client).send(routing, ctx.getBodyAsString(), ctx.request().params(), ctx.request().headers(),
         resp -> handleResponse(ctx, resp),
         t -> handleProxyException(ctx, t));
@@ -89,6 +91,7 @@ public class OrdersHandler extends Handler {
   }
 
   protected void handleResponse(RoutingContext ctx, HttpResponse<Buffer> resp) {
+    logger.debug("handleResponse:: Trying to handle response");
     final StringBuilder body = new StringBuilder();
     var buf = resp.body();
 
@@ -104,7 +107,7 @@ public class OrdersHandler extends Handler {
       String respBody = body.toString();
       handleResponseWithBody(ctx, resp, respBody);
       if (logger.isDebugEnabled()) {
-        logger.debug("status: {} response: {}", + resp.statusCode(), respBody);
+        logger.debug("handleResponse:: Response status: {}, body: {}", resp.statusCode(), respBody);
       }
     } else {
       ctx.response().end();
@@ -147,6 +150,7 @@ public class OrdersHandler extends Handler {
   }
 
   private void handleResponseWithBody(RoutingContext ctx, HttpResponse<Buffer> response, String respBody) {
+    logger.debug("handleResponseWithBody:: Trying to handle response with body: {}", respBody);
     String contentType = response.headers().get(HttpHeaders.CONTENT_TYPE);
     int status = response.statusCode();
     if (isSuccessStatus(status)) {
@@ -155,6 +159,7 @@ public class OrdersHandler extends Handler {
         .setStatusCode(status)
         .end(respBody);
     } else {
+      logger.error("handleResponseWithBody:: Response status: {}, body: {}", status, respBody);
       processErrorResponse(ctx, respBody, contentType, status);
     }
   }
@@ -174,6 +179,7 @@ public class OrdersHandler extends Handler {
   }
 
   private void handleErrorResponse(RoutingContext ctx, int status, ResponseWrapper responseWrapper) {
+    logger.debug("handleErrorResponse:: Trying to handle error response with status: {}", status);
     String acceptHeaders = Optional.ofNullable(ctx.request().getHeader(HttpHeaders.ACCEPT)).orElse(APPLICATION_XML);
     ctx.response().setStatusCode(status);
     try {

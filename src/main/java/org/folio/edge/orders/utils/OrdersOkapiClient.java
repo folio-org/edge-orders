@@ -41,15 +41,16 @@ public class OrdersOkapiClient extends OkapiClient {
 
   public void send(Routing routing, String payload, MultiMap params, MultiMap headers, Handler<HttpResponse<Buffer>> responseHandler,
                    Handler<Throwable> exceptionHandler) {
-
+    logger.debug("send:: Trying to send request to Okapi with routing: {}, payload: {}", routing, payload);
     final String method = routing.getProxyMethod() == null ? routing.getMethod() : routing.getProxyMethod();
 
     String resultPath = Optional.ofNullable(params)
       .map(it -> it.names().stream().reduce(routing.getProxyPath(), (acc, item) -> acc.replace(":" + item, params.get(item))))
       .orElse(routing.getProxyPath());
-
+    logger.info("send:: resultPath: {}", resultPath);
     switch (method) {
       case "POST":
+        logger.info("send:: Sending POST request to Okapi");
         post(
           okapiURL + resultPath,
           tenant,
@@ -59,6 +60,7 @@ public class OrdersOkapiClient extends OkapiClient {
           exceptionHandler);
         break;
       case "GET":
+        logger.info("send:: sending GET request to Okapi");
         get(
           okapiURL + resultPath,
           tenant,
@@ -67,6 +69,7 @@ public class OrdersOkapiClient extends OkapiClient {
           exceptionHandler);
         break;
       case "PUT":
+        logger.info("send:: Sending PUT request to Okapi");
         put(
           okapiURL + resultPath,
           tenant,
@@ -80,7 +83,7 @@ public class OrdersOkapiClient extends OkapiClient {
 
   public void put(String url, String tenant, String payload, MultiMap headers, Handler<HttpResponse<Buffer>> responseHandler,
       Handler<Throwable> exceptionHandler) {
-
+    logger.debug("put:: Trying to send request to Okapi with url: {}, payload: {}, tenant: {}", url, payload, tenant);
     HttpRequest<Buffer> request = client.putAbs(url);
 
     if (headers != null) {
@@ -94,6 +97,7 @@ public class OrdersOkapiClient extends OkapiClient {
 
     request.timeout(reqTimeout);
     if (StringUtils.isEmpty(payload)) {
+      logger.info("put:: Payload is empty");
       request.send()
         .onSuccess(responseHandler)
         .onFailure(exceptionHandler);
@@ -104,5 +108,5 @@ public class OrdersOkapiClient extends OkapiClient {
     }
 
   }
-  
+
 }
