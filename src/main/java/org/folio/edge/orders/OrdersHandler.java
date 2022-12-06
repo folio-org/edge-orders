@@ -179,7 +179,7 @@ public class OrdersHandler extends Handler {
   }
 
   private void handleErrorResponse(RoutingContext ctx, int status, ResponseWrapper responseWrapper) {
-    logger.debug("handleErrorResponse:: Trying to handle error response with status: {}", status);
+    logger.warn("handleErrorResponse:: Trying to handle error response with status: {}, responseWrapper: {}", status, responseWrapper);
     String acceptHeaders = Optional.ofNullable(ctx.request().getHeader(HttpHeaders.ACCEPT)).orElse(APPLICATION_XML);
     ctx.response().setStatusCode(status);
     try {

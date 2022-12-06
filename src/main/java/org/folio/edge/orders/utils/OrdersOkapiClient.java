@@ -47,10 +47,9 @@ public class OrdersOkapiClient extends OkapiClient {
     String resultPath = Optional.ofNullable(params)
       .map(it -> it.names().stream().reduce(routing.getProxyPath(), (acc, item) -> acc.replace(":" + item, params.get(item))))
       .orElse(routing.getProxyPath());
-    logger.info("send:: resultPath: {}", resultPath);
     switch (method) {
       case "POST":
-        logger.info("send:: Sending POST request to Okapi");
+        logger.info("Sending POST request to Okapi with routing: {}, payload: {}, resultPath: {}", routing, payload, resultPath);
         post(
           okapiURL + resultPath,
           tenant,
@@ -60,7 +59,7 @@ public class OrdersOkapiClient extends OkapiClient {
           exceptionHandler);
         break;
       case "GET":
-        logger.info("send:: sending GET request to Okapi");
+      logger.info("Sending GET request to Okapi with routing: {}, payload: {}, resultPath: {}", routing, payload, resultPath);
         get(
           okapiURL + resultPath,
           tenant,
@@ -69,7 +68,7 @@ public class OrdersOkapiClient extends OkapiClient {
           exceptionHandler);
         break;
       case "PUT":
-        logger.info("send:: Sending PUT request to Okapi");
+      logger.info("Sending PUT request to Okapi with routing: {}, payload: {}, resultPath: {}", routing, payload, resultPath);
         put(
           okapiURL + resultPath,
           tenant,
@@ -92,7 +91,7 @@ public class OrdersOkapiClient extends OkapiClient {
       request.headers().setAll(defaultHeaders);
     }
 
-    logger.info("PUT {} tenant: {} token: {}", () -> url, () -> tenant, () -> request.headers()
+    logger.info("PUT '{}' tenant: {} token: {}", () -> url, () -> tenant, () -> request.headers()
       .get(X_OKAPI_TOKEN));
 
     request.timeout(reqTimeout);
