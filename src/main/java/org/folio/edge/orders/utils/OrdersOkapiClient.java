@@ -59,7 +59,7 @@ public class OrdersOkapiClient extends OkapiClient {
           exceptionHandler);
         break;
       case "GET":
-      logger.info("Sending GET request to Okapi with routing: {}, payload: {}, resultPath: {}", routing, payload, resultPath);
+        logger.info("Sending GET request to Okapi with routing: {}, payload: {}, resultPath: {}", routing, payload, resultPath);
         get(
           okapiURL + resultPath,
           tenant,
@@ -68,7 +68,7 @@ public class OrdersOkapiClient extends OkapiClient {
           exceptionHandler);
         break;
       case "PUT":
-      logger.info("Sending PUT request to Okapi with routing: {}, payload: {}, resultPath: {}", routing, payload, resultPath);
+        logger.info("Sending PUT request to Okapi with routing: {}, payload: {}, resultPath: {}", routing, payload, resultPath);
         put(
           okapiURL + resultPath,
           tenant,
