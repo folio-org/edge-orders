@@ -50,4 +50,11 @@ public final class ErrorWrapper {
     return true;
   }
 
+  @Override
+  public String toString() {
+    return "ErrorWrapper{" +
+      "code='" + code + '\'' +
+      ", message='" + message + '\'' +
+      '}';
+  }
 }

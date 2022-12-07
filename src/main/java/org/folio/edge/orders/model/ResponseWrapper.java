@@ -74,6 +74,14 @@ public final class ResponseWrapper {
     return true;
   }
 
+  @Override
+  public String toString() {
+    return "ResponseWrapper{" +
+      "poLineNumber='" + poLineNumber + '\'' +
+      ", error=" + error +
+      '}';
+  }
+
   public String toXml() throws JsonProcessingException {
     return Mappers.XML_PROLOG + Mappers.xmlMapper.writeValueAsString(this);
   }

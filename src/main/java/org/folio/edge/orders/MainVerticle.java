@@ -36,6 +36,7 @@ public class MainVerticle extends EdgeVerticleHttp {
 
   @Override
   public Router defineRoutes() {
+    logger.debug("defineRoutes:: Trying to define routes");
     OrdersOkapiClientFactory ocf = new OrdersOkapiClientFactory(vertx, config().getString(org.folio.edge.core.Constants.SYS_OKAPI_URL),
       config().getInteger(org.folio.edge.core.Constants.SYS_REQUEST_TIMEOUT_MS));
 
@@ -63,7 +64,7 @@ public class MainVerticle extends EdgeVerticleHttp {
 
     router.route().handler(ctx -> {
       String path = ctx.normalizedPath();
-      logger.warn("Current path {} is missing from API configuration", path);
+      logger.warn("Current path '{}' is missing from API configuration", path);
       ctx.next();
     });
 
@@ -71,7 +72,7 @@ public class MainVerticle extends EdgeVerticleHttp {
   }
 
   private List<Routing> initApiConfiguration(String apiConfigurationPropFile) throws IOException {
-
+    logger.debug("initApiConfiguration:: Initializing API configuration: {}", apiConfigurationPropFile);
     ApiConfiguration apiConfiguration = null;
     final Pattern isURL = Pattern.compile("(?i)^http[s]?://.*");
     ObjectMapper mapper = new ObjectMapper();
@@ -86,13 +87,13 @@ public class MainVerticle extends EdgeVerticleHttp {
         try (InputStream in = url == null ? new FileInputStream(apiConfigurationPropFile) : url.openStream()) {
 
           apiConfiguration = mapper.readValue(in, ApiConfiguration.class);
-          logger.info("ApiConfiguration has been loaded from file {}", apiConfigurationPropFile);
+          logger.info("initApiConfiguration:: ApiConfiguration has been loaded from file {}", apiConfigurationPropFile);
         }
       } catch (Exception e) {
-        logger.warn("Failed to load ApiConfiguration from {}", apiConfigurationPropFile, e);
+        logger.warn("Failed to load ApiConfiguration from '{}'", apiConfigurationPropFile, e);
       }
     } else {
-      logger.warn("No api configuration file specified. Using default {}", API_CONFIGURATION_DEFAULT);
+      logger.warn("No api configuration file specified. Using default '{}'", API_CONFIGURATION_DEFAULT);
       apiConfiguration = mapper
         .readValue(ClassLoader.getSystemClassLoader().getResource(API_CONFIGURATION_DEFAULT), ApiConfiguration.class);
     }

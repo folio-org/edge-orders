@@ -41,15 +41,15 @@ public class OrdersOkapiClient extends OkapiClient {
 
   public void send(Routing routing, String payload, MultiMap params, MultiMap headers, Handler<HttpResponse<Buffer>> responseHandler,
                    Handler<Throwable> exceptionHandler) {
-
+    logger.debug("send:: Trying to send request to Okapi with routing: {}, payload: {}", routing, payload);
     final String method = routing.getProxyMethod() == null ? routing.getMethod() : routing.getProxyMethod();
 
     String resultPath = Optional.ofNullable(params)
       .map(it -> it.names().stream().reduce(routing.getProxyPath(), (acc, item) -> acc.replace(":" + item, params.get(item))))
       .orElse(routing.getProxyPath());
-
     switch (method) {
       case "POST":
+        logger.info("Sending POST request to Okapi with routing: {}, payload: {}, resultPath: {}", routing, payload, resultPath);
         post(
           okapiURL + resultPath,
           tenant,
@@ -59,6 +59,7 @@ public class OrdersOkapiClient extends OkapiClient {
           exceptionHandler);
         break;
       case "GET":
+        logger.info("Sending GET request to Okapi with routing: {}, payload: {}, resultPath: {}", routing, payload, resultPath);
         get(
           okapiURL + resultPath,
           tenant,
@@ -67,6 +68,7 @@ public class OrdersOkapiClient extends OkapiClient {
           exceptionHandler);
         break;
       case "PUT":
+        logger.info("Sending PUT request to Okapi with routing: {}, payload: {}, resultPath: {}", routing, payload, resultPath);
         put(
           okapiURL + resultPath,
           tenant,
@@ -80,7 +82,7 @@ public class OrdersOkapiClient extends OkapiClient {
 
   public void put(String url, String tenant, String payload, MultiMap headers, Handler<HttpResponse<Buffer>> responseHandler,
       Handler<Throwable> exceptionHandler) {
-
+    logger.debug("put:: Trying to send request to Okapi with url: {}, payload: {}, tenant: {}", url, payload, tenant);
     HttpRequest<Buffer> request = client.putAbs(url);
 
     if (headers != null) {
@@ -89,11 +91,12 @@ public class OrdersOkapiClient extends OkapiClient {
       request.headers().setAll(defaultHeaders);
     }
 
-    logger.info("PUT {} tenant: {} token: {}", () -> url, () -> tenant, () -> request.headers()
+    logger.info("PUT '{}' tenant: {} token: {}", () -> url, () -> tenant, () -> request.headers()
       .get(X_OKAPI_TOKEN));
 
     request.timeout(reqTimeout);
     if (StringUtils.isEmpty(payload)) {
+      logger.info("put:: Payload is empty");
       request.send()
         .onSuccess(responseHandler)
         .onFailure(exceptionHandler);
@@ -104,5 +107,4 @@ public class OrdersOkapiClient extends OkapiClient {
     }
 
   }
-  
 }
