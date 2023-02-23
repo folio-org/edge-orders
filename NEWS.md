@@ -1,4 +1,13 @@
-## 2.8.0 - Unreleased
+## 2.9.0 - Unreleased
+
+## 2.8.0 - Released (Orchid R1 2023)
+The primary focus of this release was to improvement logging
+
+[Full Changelog](https://github.com/folio-org/edge-orders/compare/v2.7.0...v2.8.0)
+
+### Stories
+* [EDGORDERS-70](https://issues.folio.org/browse/EDGORDERS-70) Logging improvement - Configuration
+* [EDGORDERS-55](https://issues.folio.org/browse/EDGORDERS-55) Logging improvement
 
 ## 2.7.0 Nolana R3 2022 - Released
 This release focused on order line updates fix
