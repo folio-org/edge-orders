@@ -1,5 +1,12 @@
 ## 2.9.0 - Unreleased
 
+## 2.8.1 - Released (Orchid R1 2023 Bug Fix)
+This release upgrades dependencies.
+
+* [EDGORDERS-72](https://issues.folio.org/browse/EDGORDERS-72) Patch Jackson, Vert.x, Aws and Alpine
+
+[Full Changelog](https://github.com/folio-org/edge-orders/compare/v2.8.0...v2.8.1)
+
 ## 2.8.0 - Released (Orchid R1 2023)
 The primary focus of this release was to improvement logging
 
