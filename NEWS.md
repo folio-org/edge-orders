@@ -1,4 +1,15 @@
-## 2.9.0 - Unreleased
+## 2.10.0 - Unreleased
+
+## 2.9.0 - Released (Poppy R2 2023)
+The primary focus of this release was to update to Java 17
+
+[Full Changelog](https://github.com/folio-org/edge-orders/compare/v2.8.0...v2.9.0)
+
+### Stories
+* [EDGORDERS-76](https://issues.folio.org/browse/EDGORDERS-76) Update to Java 17 edge-orders
+
+### Dependencies
+* Bump `java version` from `11` to `17`
 
 ## 2.8.0 - Released (Orchid R1 2023)
 The primary focus of this release was to improvement logging
