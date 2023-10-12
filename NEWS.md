@@ -8,6 +8,9 @@ The primary focus of this release was to update to Java 17
 ### Stories
 * [EDGORDERS-76](https://issues.folio.org/browse/EDGORDERS-76) Update to Java 17 edge-orders
 
+### Bugfixes
+* [EDGORDERS-72](https://issues.folio.org/browse/EDGORDERS-72) Patch Jackson, Vert.x, Aws and Alpine
+
 ### Dependencies
 * Bump `java version` from `11` to `17`
 
