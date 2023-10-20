@@ -24,7 +24,7 @@ See [edge-common](https://github.com/folio-org/edge-common) for a description of
 
 Api configuration can be specified by `api_config` system property as URL or path.
 
-By default `/reources/api_configuration.json` will be used.
+By default `/resources/api_configuration.json` will be used.
 
 Api Configuration format:
 
