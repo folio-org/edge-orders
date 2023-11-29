@@ -38,10 +38,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.folio.edge.core.cache.TokenCache;
-import org.folio.edge.core.model.ClientInfo;
 import org.folio.edge.core.utils.ApiKeyUtils;
-import org.folio.edge.core.utils.ApiKeyUtils.MalformedApiKeyException;
 import org.folio.edge.core.utils.test.TestUtils;
 import org.folio.edge.orders.Constants.ErrorCodes;
 import org.folio.edge.orders.model.ErrorWrapper;
@@ -448,14 +445,11 @@ public class MainVerticleTest {
   }
 
   @Test
-  public void testPlaceOrderTimeout(TestContext context) throws MalformedApiKeyException, JsonProcessingException {
+  public void testPlaceOrderTimeout(TestContext context) throws JsonProcessingException {
     logger.info("=== Test place order - Timeout ===");
 
     String PO = "118279";
     String body = mockRequests.get(PO);
-
-    ClientInfo clientInfo = ApiKeyUtils.parseApiKey(apiKey);
-    TokenCache.getInstance().put(clientInfo.salt, clientInfo.tenantId, clientInfo.username, null);
 
     final Response resp = RestAssured
       .with()
