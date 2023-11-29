@@ -8,8 +8,8 @@ import org.folio.edge.core.EdgeVerticleHttp;
 import org.folio.edge.orders.utils.OrdersOkapiClientFactory;
 import org.folio.rest.mappings.model.ApiConfiguration;
 import org.folio.rest.mappings.model.Routing;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -28,7 +28,7 @@ import static org.folio.edge.orders.Constants.API_CONFIGURATION_PROPERTY_NAME;
 
 public class MainVerticle extends EdgeVerticleHttp {
 
-  private static final Logger logger = LoggerFactory.getLogger(MainVerticle.class);
+  private static final Logger logger = LogManager.getLogger(MainVerticle.class);
 
   public MainVerticle() {
     super();

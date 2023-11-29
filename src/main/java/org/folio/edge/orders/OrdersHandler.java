@@ -20,8 +20,8 @@ import org.folio.edge.orders.model.ResponseWrapper;
 import org.folio.edge.orders.utils.OrdersOkapiClient;
 import org.folio.edge.orders.utils.OrdersOkapiClientFactory;
 import org.folio.rest.mappings.model.Routing;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpHeaders;
@@ -29,7 +29,7 @@ import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.client.HttpResponse;
 
 public class OrdersHandler extends Handler {
-  private static final Logger logger = LoggerFactory.getLogger(OrdersHandler.class);
+  private static final Logger logger = LogManager.getLogger(OrdersHandler.class);
 
   public OrdersHandler(SecureStore secureStore, OrdersOkapiClientFactory ocf) {
     super(secureStore, ocf);
