@@ -1,5 +1,13 @@
 ## 2.10.0 - Unreleased
 
+## 2.9.1 - Released (Poppy R2 2023 Bug Fix)
+The primary focus of this release was to upgrade edge-orders to the newest version of edge-common to support RTR
+
+[Full Changelog](https://github.com/folio-org/edge-orders/compare/v2.9.0...v2.9.1)
+
+### Stories
+* [EDGORDERS-78](https://issues.folio.org/browse/EDGORDERS-78) Upgrade edge-orders to the newest version of edge-common
+
 ## 2.9.0 - Released (Poppy R2 2023)
 The primary focus of this release was to update to Java 17
 
