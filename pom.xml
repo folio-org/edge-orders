@@ -29,8 +29,9 @@
   </licenses>
 
   <properties>
+    <!--Project properties-->
+    <java.version>17</java.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
     <generated_sources_dir>${project.build.directory}/generated-sources</generated_sources_dir>
     <jsonschema2pojo_output_dir>${generated_sources_dir}/jsonschema2pojo</jsonschema2pojo_output_dir>
 
@@ -38,11 +39,35 @@
     <exec.mainClass>org.folio.edge.orders.MainVerticle</exec.mainClass>
     <sonar.exclusions>**/models/**.java</sonar.exclusions>
     <sonar.test.exclusions>**/*Test.java</sonar.test.exclusions>
-    <vertx.version>4.4.6</vertx.version>
+
+    <!--Dependency Management Properties-->
     <log4j.version>2.20.0</log4j.version>
+    <vertx.version>4.5.0</vertx.version>
+
+    <!--Dependency properties-->
     <edge-common.version>4.5.2</edge-common.version>
-    <aws.sdk.ssm.version>1.12.562</aws.sdk.ssm.version>
+    <aws.sdk.ssm.version>1.12.623</aws.sdk.ssm.version>
     <vault.java.driver.version>5.1.0</vault.java.driver.version>
+    <jjwt.version>0.12.3</jjwt.version>
+    <commons-lang3.version>3.14.0</commons-lang3.version>
+
+    <!--Test dependencies-->
+    <juni.version>4.13.2</juni.version>
+    <awaitility.version>4.2.0</awaitility.version>
+    <equalsverifier.version>3.15.4</equalsverifier.version>
+    <mockito-core.version>5.8.0</mockito-core.version>
+    <rest-assured.version>5.4.0</rest-assured.version>
+
+    <!--Maven plugin properties-->
+    <maven-compiler-plugin.version>3.12.0</maven-compiler-plugin.version>
+    <maven-surefire-plugin.version>3.2.3</maven-surefire-plugin.version>
+    <maven-shade-plugin.version>3.5.1</maven-shade-plugin.version>
+    <jsonschema2pojo-maven-plugin.version>1.2.1</jsonschema2pojo-maven-plugin.version>
+    <exec-maven-plugin.version>3.1.1</exec-maven-plugin.version>
+    <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
+    <copy-rename-maven-plugin.version>1.0.1</copy-rename-maven-plugin.version>
+    <maven-release-plugin.version>3.0.1</maven-release-plugin.version>
+
     <argLine />
   </properties>
 
@@ -77,7 +102,7 @@
     <dependency>
       <groupId>io.jsonwebtoken</groupId>
       <artifactId>jjwt</artifactId>
-      <version>0.6.0</version>
+      <version>${jjwt.version}</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
@@ -95,7 +120,7 @@
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
-      <version>3.12.0</version>
+      <version>${commons-lang3.version}</version>
     </dependency>
 
     <!-- Only needed for AwsParamStore -->
@@ -136,19 +161,19 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.13.2</version>
+      <version>${juni.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.awaitility</groupId>
       <artifactId>awaitility</artifactId>
-      <version>4.2.0</version>
+      <version>${awaitility.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>nl.jqno.equalsverifier</groupId>
       <artifactId>equalsverifier</artifactId>
-      <version>3.15.2</version>
+      <version>${equalsverifier.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -159,13 +184,13 @@
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
-      <version>5.5.0</version>
+      <version>${mockito-core.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>io.rest-assured</groupId>
       <artifactId>rest-assured</artifactId>
-      <version>5.3.2</version>
+      <version>${rest-assured.version}</version>
       <scope>test</scope>
     </dependency>
 
@@ -177,16 +202,16 @@
         Java 1.8 -->
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.11.0</version>
+        <version>${maven-compiler-plugin.version}</version>
         <configuration>
-          <release>17</release>
+          <release>${java.version}</release>
         </configuration>
       </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.1.2</version>
+        <version>${maven-surefire-plugin.version}</version>
       </plugin>
 
     <!-- You only need the part below if you want to build your application
@@ -195,7 +220,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
-        <version>3.5.0</version>
+        <version>${maven-shade-plugin.version}</version>
         <executions>
           <execution>
             <phase>package</phase>
@@ -224,7 +249,7 @@
       <plugin>
         <groupId>org.jsonschema2pojo</groupId>
         <artifactId>jsonschema2pojo-maven-plugin</artifactId>
-        <version>1.0.2</version>
+        <version>${jsonschema2pojo-maven-plugin.version}</version>
         <configuration>
           <includes>*.json</includes>
           <outputDirectory>${jsonschema2pojo_output_dir}</outputDirectory>
@@ -247,7 +272,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
-        <version>3.1.0</version>
+        <version>${exec-maven-plugin.version}</version>
         <executions>
           <execution>
             <!-- run the application using the fat jar -->
@@ -268,7 +293,7 @@
 
       <plugin>
         <artifactId>maven-resources-plugin</artifactId>
-        <version>3.3.1</version>
+        <version>${maven-resources-plugin.version}</version>
         <executions>
           <execution>
             <id>filter-descriptor-inputs</id>
@@ -293,7 +318,7 @@
       <plugin>
         <groupId>com.coderplus.maven.plugins</groupId>
         <artifactId>copy-rename-maven-plugin</artifactId>
-        <version>1.0.1</version>
+        <version>${copy-rename-maven-plugin.version}</version>
         <executions>
           <execution>
             <id>rename-descriptor-outputs</id>
@@ -320,7 +345,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-release-plugin</artifactId>
-        <version>2.5.3</version>
+        <version>${maven-release-plugin.version}</version>
         <configuration>
           <preparationGoals>clean verify</preparationGoals>
           <tagNameFormat>v@{project.version}</tagNameFormat>
