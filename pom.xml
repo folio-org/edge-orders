@@ -45,7 +45,7 @@
     <vertx.version>4.5.4</vertx.version>
 
     <!--Dependency properties-->
-    <edge-common.version>4.5.3</edge-common.version>
+    <edge-common.version>4.6.0</edge-common.version>
     <aws.sdk.ssm.version>1.12.676</aws.sdk.ssm.version>
     <vault.java.driver.version>5.1.0</vault.java.driver.version>
     <jjwt.version>0.12.3</jjwt.version>
