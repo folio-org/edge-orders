@@ -1,4 +1,13 @@
-## 2.10.0 - Unreleased
+## 3.1.0 - Unreleased
+
+## 3.0.0 - Released (Quesnelia R1 2024)
+The primary focus of this release was to update vertx and edge-common versions
+
+[Full Changelog](https://github.com/folio-org/edge-orders/compare/v2.9.0...v3.0.0)
+
+### Dependencies
+* Bump `vertx` from `4.3.4` to `4.5.4`
+* Bump `edge-coommon` from `4.4.1` to `4.6.0`
 
 ## 2.9.0 - Released (Poppy R2 2023)
 The primary focus of this release was to update to Java 17
