@@ -8,6 +8,7 @@ import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.folio.edge.core.utils.OkapiClientFactory;
 import org.folio.edge.core.utils.test.TestUtils;
 import org.folio.rest.mappings.model.Routing;
 import org.junit.After;
@@ -41,7 +42,7 @@ public class OrdersOkapiClientTest {
   private OrdersMockOkapi mockOkapi;
 
   @Before
-  public void setUp(TestContext context) throws Exception {
+  public void setUp(TestContext context) {
     int okapiPort = TestUtils.getPort();
 
     List<String> knownTenants = new ArrayList<>();
@@ -50,9 +51,8 @@ public class OrdersOkapiClientTest {
     mockOkapi = new OrdersMockOkapi(okapiPort, knownTenants);
     mockOkapi.start().onComplete(context.asyncAssertSuccess());
 
-    client = new OrdersOkapiClientFactory(Vertx.vertx(),
-        "http://localhost:" + okapiPort, reqTimeout)
-          .getOrdersOkapiClient(tenant);
+    client = new OrdersOkapiClient(new OkapiClientFactory(Vertx.vertx(),
+      "http://localhost:" + okapiPort, reqTimeout).getOkapiClient(tenant));
 
     mockRequests = new HashMap<>();
 
