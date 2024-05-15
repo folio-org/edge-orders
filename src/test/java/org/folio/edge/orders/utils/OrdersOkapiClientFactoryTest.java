@@ -22,7 +22,7 @@ public class OrdersOkapiClientFactoryTest {
     JsonObject config = new JsonObject()
       .put(SYS_OKAPI_URL, "http://mocked.okapi:9130")
       .put(SYS_REQUEST_TIMEOUT_MS, reqTimeout)
-      .put(SYS_SSL_ENABLED, false);
+      .put(SYS_SSL_ENABLED, true);
     OkapiClientFactory ocf = OrdersOkapiClientFactory.createInstance(vertx, config);
     OkapiClient client = ocf.getOkapiClient("tenant");
     assertNotNull(client);
