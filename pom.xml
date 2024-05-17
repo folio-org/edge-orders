@@ -164,6 +164,16 @@
       <artifactId>bc-fips</artifactId>
       <version>${bc-fips.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcpkix-fips</artifactId>
+      <version>1.0.7</version>
+    </dependency>
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bctls-fips</artifactId>
+      <version>1.0.19</version>
+    </dependency>
 
     <!-- Test dependencies -->
     <dependency>
