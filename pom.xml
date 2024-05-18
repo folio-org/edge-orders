@@ -37,7 +37,7 @@
 
     <!-- the main class -->
     <exec.mainClass>org.folio.edge.orders.MainVerticle</exec.mainClass>
-    <sonar.exclusions>**/models/**.java</sonar.exclusions>
+    <sonar.exclusions>**/models/**.java, src/main/java/org/folio/edge/orders/OrdersLauncher.java</sonar.exclusions>
     <sonar.test.exclusions>**/*Test.java</sonar.test.exclusions>
 
     <!--Dependency Management Properties-->
@@ -51,6 +51,8 @@
     <jjwt.version>0.12.3</jjwt.version>
     <commons-lang3.version>3.14.0</commons-lang3.version>
     <bc-fips.version>1.0.2.5</bc-fips.version>
+    <bcpkix-fips.version>1.0.7</bcpkix-fips.version>
+    <bctls-fips.version>1.0.19</bctls-fips.version>
 
     <!--Test dependencies-->
     <juni.version>4.13.2</juni.version>
@@ -167,12 +169,12 @@
     <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcpkix-fips</artifactId>
-      <version>1.0.7</version>
+      <version>${bcpkix-fips.version}</version>
     </dependency>
     <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bctls-fips</artifactId>
-      <version>1.0.19</version>
+      <version>${bctls-fips.version}</version>
     </dependency>
 
     <!-- Test dependencies -->
