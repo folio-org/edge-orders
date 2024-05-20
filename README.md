@@ -55,22 +55,29 @@ Example of api mapping content:
     }
   ]
 }
-```  
+``` 
+
+Configuration information is specified in two forms:
+1. System Properties - General configuration
+2. Properties File - Configuration specific to the desired secure store
+
 ### System Properties
 
-| Property               | Default           | Description                                                             |
-|------------------------|-------------------|-------------------------------------------------------------------------|
-| `port`                 | `8081`            | Server port to listen on                                                |
-| `okapi_url`            | *required*        | Where to find Okapi (URL)                                               |
-| `request_timeout_ms`   | `30000`           | Request Timeout                                                         |
-| `log_level`            | `INFO`            | Log4j Log Level                                                         |
-| `token_cache_capacity` | `100`             | Max token cache size                                                    |
-| `token_cache_ttl_ms`   | `100`             | How long to cache JWTs, in milliseconds (ms)                            |
-| `secure_store`         | `Ephemeral`       | Type of secure store to use.  Valid: `Ephemeral`, `AwsSsm`, `Vault`     |
-| `secure_store_props`   | `NA`              | Path to a properties file specifying secure store configuration         |
+| Property                  | Default             | Description                                                               |
+|---------------------------|---------------------|---------------------------------------------------------------------------|
+| `port`                    | `8081`              | Server port to listen on                                                  |
+| `okapi_url`               | *required*          | Where to find Okapi (URL)                                                 |
+| `secure_store`            | `Ephemeral`         | Type of secure store to use.  Valid: `Ephemeral`, `AwsSsm`, `Vault`       |
+| `secure_store_props`      | `NA`                | Path to a properties file specifying secure store configuration           |
+| `token_cache_ttl_ms`      | `3600000`           | How long to cache JWTs, in milliseconds (ms)                              |
+| `null_token_cache_ttl_ms` | `30000`             | How long to cache login failure (null JWTs), in milliseconds (ms)         |
+| `token_cache_capacity`    | `100`               | Max token cache size                                                      |
+| `log_level`               | `INFO`              | Log4j Log Level                                                           |
+| `request_timeout_ms`      | `30000`             | Request Timeout                                                           |
+| `api_key_sources`         | `PARAM,HEADER,PATH` | Defines the sources (order of precendence) of the API key.                |
 
 ### System Properties for TLS configuration for Http server
-To configure Transport Layer Security (TLS) for HTTP server in edge module, the following configuration parameters should be used.
+To configure Transport Layer Security (TLS) for the HTTP server in an edge module, the following configuration parameters should be used.
 Parameters marked as Required are required only in case when ssl_enabled is set to true.
 
 | Property                          | Default           | Description                                                                                 |
@@ -81,22 +88,28 @@ Parameters marked as Required are required only in case when ssl_enabled is set 
 | `http-server.keystore_path`       | `NA`              | (Required). Set the location of the keystore file in the local file system                  |
 | `http-server.keystore_password`   | `NA`              | (Required). Set the password for the keystore                                               |
 | `http-server.key_alias`           | `NA`              | Set the alias of the key within the keystore.                                               |
-| `http-server.key_alias_password`  | `NA`              | Point to a password of `key_alias` if it is protected                                       |
+| `http-server.key_alias_password`  | `NA`              | Optional param that points to a password of `key_alias` if it protected                     |
 
 ### System Properties for TLS configuration for Web Client
 To configure Transport Layer Security (TLS) for Web clients in the edge module, you can use the following configuration parameters.
 Truststore parameters for configuring Web clients are optional even when ssl_enabled = true.
-If truststore parameters need to be populated - truststore_type, truststore_path, truststore_password - are required.
+If truststore parameters need to be populated, truststore_type, truststore_path and truststore_password are required.
 
-| Property                          | Default           | Description                                                                     |
-|-----------------------------------|-------------------|---------------------------------------------------------------------------------|
-| `web-client.ssl_enabled`          | `false`           | Set whether SSL/TLS is enabled for Vertx Http Server                            |
-| `web-client.truststore_type`      | `NA`              | Set the type of the keystore. Common types include `JKS`, `PKCS12`, and `BCFKS` |
-| `web-client.truststore_provider`  | `NA`              | Set the provider name of the key store                                          |
-| `web-client.truststore_path`      | `NA`              | Set the location of the keystore file in the local file system                  |
-| `web-client.truststore_password`  | `NA`              | Set the password for the keystore                                               |
-| `web-client.key_alias`            | `NA`              | Set the alias of the key within the keystore.                                   |
-| `web-client.key_alias_password`   | `NA`              | Point to a password of `key_alias` if it is protected                           |
+| Property                          | Default           | Description                                                                      |
+|-----------------------------------|-------------------|----------------------------------------------------------------------------------|
+| `web-client.ssl_enabled`          | `false`           | Set whether SSL/TLS is enabled for Vertx Http Server                             |
+| `web-client.truststore_type`      | `NA`              | Set the type of the keystore. Common types include `JKS`, `PKCS12`, and `BCFKS`  |
+| `web-client.truststore_provider`  | `NA`              | Set the provider name of the key store                                           |
+| `web-client.truststore_path`      | `NA`              | Set the location of the keystore file in the local file system                   |
+| `web-client.truststore_password`  | `NA`              | Set the password for the keystore                                                |
+| `web-client.key_alias`            | `NA`              | Set the alias of the key within the keystore.                                    |
+| `web-client.key_alias_password`   | `NA`              | Optional param that points to a password of `key_alias` if it protected          |
+
+
+## Additional information
+
+There will be a single instance of okapi client per OkapiClientFactory and per tenant, which means that this client should never be closed or else there will be runtime errors. To enforce this behaviour, method close() has been removed from OkapiClient class.
+
 
 ## Error processing
 Priority of return types if the client accepts more than one type:
