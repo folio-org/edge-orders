@@ -11,8 +11,10 @@ public class OrdersLauncher extends Launcher {
   private static final Logger logger = LogManager.getLogger(OrdersLauncher.class);
 
   public static void main(String[] args) {
-    Security.addProvider(new BouncyCastleFipsProvider());
-    logger.info("BouncyCastleFipsProvider has been added");
+    if (Security.getProvider(BouncyCastleFipsProvider.PROVIDER_NAME) == null) {
+      Security.addProvider(new BouncyCastleFipsProvider());
+      logger.info("BouncyCastleFipsProvider has been added");
+    }
     new OrdersLauncher().dispatch(args);
   }
 }
