@@ -57,6 +57,8 @@ Example of api mapping content:
 }
 ``` 
 
+## Security Configuration
+
 Configuration information is specified in two forms:
 1. System Properties - General configuration
 2. Properties File - Configuration specific to the desired secure store
@@ -105,11 +107,9 @@ If truststore parameters need to be populated, truststore_type, truststore_path 
 | `web-client.key_alias`            | `NA`              | Set the alias of the key within the keystore.                                    |
 | `web-client.key_alias_password`   | `NA`              | Optional param that points to a password of `key_alias` if it protected          |
 
-
 ## Additional information
 
 There will be a single instance of okapi client per OkapiClientFactory and per tenant, which means that this client should never be closed or else there will be runtime errors. To enforce this behaviour, method close() has been removed from OkapiClient class.
-
 
 ## Error processing
 Priority of return types if the client accepts more than one type:
