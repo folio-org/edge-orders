@@ -37,7 +37,7 @@
 
     <!-- the main class -->
     <exec.mainClass>org.folio.edge.orders.MainVerticle</exec.mainClass>
-    <sonar.exclusions>**/models/**.java, src/main/java/org/folio/edge/orders/OrdersLauncher.java</sonar.exclusions>
+    <sonar.exclusions>**/models/**.java</sonar.exclusions>
     <sonar.test.exclusions>**/*Test.java</sonar.test.exclusions>
 
     <!--Dependency Management Properties-->
@@ -50,9 +50,6 @@
     <vault.java.driver.version>5.1.0</vault.java.driver.version>
     <jjwt.version>0.12.3</jjwt.version>
     <commons-lang3.version>3.14.0</commons-lang3.version>
-    <bc-fips.version>1.0.2.5</bc-fips.version>
-    <bcpkix-fips.version>1.0.7</bcpkix-fips.version>
-    <bctls-fips.version>1.0.19</bctls-fips.version>
 
     <!--Test dependencies-->
     <juni.version>4.13.2</juni.version>
@@ -160,23 +157,6 @@
       <artifactId>log4j-slf4j-impl</artifactId>
     </dependency>
 
-    <!-- Library provides the basic cryptographic functionality complying with FIPS -->
-    <dependency>
-      <groupId>org.bouncycastle</groupId>
-      <artifactId>bc-fips</artifactId>
-      <version>${bc-fips.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.bouncycastle</groupId>
-      <artifactId>bcpkix-fips</artifactId>
-      <version>${bcpkix-fips.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.bouncycastle</groupId>
-      <artifactId>bctls-fips</artifactId>
-      <version>${bctls-fips.version}</version>
-    </dependency>
-
     <!-- Test dependencies -->
     <dependency>
       <groupId>junit</groupId>
@@ -251,7 +231,7 @@
               <transformers>
                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                   <manifestEntries>
-                    <Main-Class>org.folio.edge.orders.OrdersLauncher</Main-Class>
+                    <Main-Class>io.vertx.core.Launcher</Main-Class>
                     <Main-Verticle>${exec.mainClass}</Main-Verticle>
                   </manifestEntries>
                 </transformer>
