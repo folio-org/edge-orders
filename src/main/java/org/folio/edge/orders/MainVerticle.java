@@ -5,7 +5,8 @@ import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.BodyHandler;
 import org.folio.edge.core.EdgeVerticleHttp;
-import org.folio.edge.orders.utils.OrdersOkapiClientFactory;
+import org.folio.edge.core.utils.OkapiClientFactory;
+import org.folio.edge.core.utils.OkapiClientFactoryInitializer;
 import org.folio.rest.mappings.model.ApiConfiguration;
 import org.folio.rest.mappings.model.Routing;
 import org.apache.logging.log4j.Logger;
@@ -37,9 +38,7 @@ public class MainVerticle extends EdgeVerticleHttp {
   @Override
   public Router defineRoutes() {
     logger.debug("defineRoutes:: Trying to define routes");
-    OrdersOkapiClientFactory ocf = new OrdersOkapiClientFactory(vertx, config().getString(org.folio.edge.core.Constants.SYS_OKAPI_URL),
-      config().getInteger(org.folio.edge.core.Constants.SYS_REQUEST_TIMEOUT_MS));
-
+    OkapiClientFactory ocf = OkapiClientFactoryInitializer.createInstance(vertx, config());
     OrdersHandler ordersHandler = new OrdersHandler(secureStore, ocf);
 
     Router router = Router.router(vertx);
