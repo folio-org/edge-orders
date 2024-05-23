@@ -1,5 +1,14 @@
 ## 3.1.0 - Unreleased
 
+## 3.0.1 - Released (Quesnelia R1 2024)
+The primary focus of this release was enhancing HTTP Endpoint Security with TLS and FIPS-140-2 Compliant Cryptography feature
+[Full Changelog](https://github.com/folio-org/edge-orders/compare/v3.0.0...v3.0.1)
+
+## Stories
+* [EDGORDERS-83](https://folio-org.atlassian.net/browse/EDGORDERS-83) - Enhance HTTP Endpoint Security with TLS and FIPS-140-2 Compliant Cryptography
+* [EDGORDERS-82](https://folio-org.atlassian.net/browse/EDGORDERS-82) - Enhance WebClient TLS Configuration for Secure Connections to OKAPI
+
+
 ## 3.0.0 - Released (Quesnelia R1 2024)
 The primary focus of this release was to update vertx and edge-common versions
 
