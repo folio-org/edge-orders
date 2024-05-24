@@ -15,7 +15,6 @@ import org.folio.rest.mappings.model.Routing;
 
 import io.vertx.core.Handler;
 import io.vertx.core.MultiMap;
-import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.ext.web.client.HttpRequest;
@@ -24,10 +23,6 @@ import io.vertx.ext.web.client.HttpResponse;
 public class OrdersOkapiClient extends OkapiClient {
 
   private static final Logger logger = LogManager.getLogger(OrdersOkapiClient.class);
-
-  protected OrdersOkapiClient(Vertx vertx, String okapiURL, String tenant, int timeout) {
-    super(vertx, okapiURL, tenant, timeout);
-  }
 
   public OrdersOkapiClient(OkapiClient client) {
     super(client);
