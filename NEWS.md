@@ -1,5 +1,16 @@
 ## 3.1.0 - Unreleased
 
+## 3.0.2 - Released (Quesnelia R1 2024)
+The primary focus of this release was updating vertx dependency
+[Full Changelog](https://github.com/folio-org/edge-orders/compare/v3.0.1...v3.0.2)
+
+## Stories 
+* [EDGORDERS-87](https://folio-org.atlassian.net/browse/EDGORDERS-87) - Vertx 4.5.7 - netty-codec-http form POST OOM CVE-2024-29025
+
+### Dependencies
+* Bump `vertx` from `4.5.4` to `4.5.7`
+
+
 ## 3.0.1 - Released (Quesnelia R1 2024)
 The primary focus of this release was enhancing HTTP Endpoint Security with TLS and FIPS-140-2 Compliant Cryptography feature
 [Full Changelog](https://github.com/folio-org/edge-orders/compare/v3.0.0...v3.0.1)
