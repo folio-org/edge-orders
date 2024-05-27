@@ -4,6 +4,9 @@
 The primary focus of this release was updating vertx dependency
 [Full Changelog](https://github.com/folio-org/edge-orders/compare/v3.0.1...v3.0.2)
 
+## Stories 
+* [EDGORDERS-87](https://folio-org.atlassian.net/browse/EDGORDERS-87) - Vertx 4.5.7 - netty-codec-http form POST OOM CVE-2024-29025
+
 ### Dependencies
 * Bump `vertx` from `4.5.4` to `4.5.7`
 
