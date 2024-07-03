@@ -1,5 +1,17 @@
 ## 3.1.0 - Unreleased
 
+
+## 3.0.3 - Released (Quesnelia R1 2024)
+The primary focus of this release was updating edge-common dependency
+[Full Changelog](https://github.com/folio-org/edge-orders/compare/v3.0.2...v3.0.3)
+
+## Stories
+* [EDGORDERS-89](https://folio-org.atlassian.net/browse/EDGORDERS-89) - Release fix for Q CSP #1
+
+### Dependencies
+* Bump `edge-common` from `4.7.0` to `4.7.1`
+
+
 ## 3.0.2 - Released (Quesnelia R1 2024)
 The primary focus of this release was updating vertx dependency
 [Full Changelog](https://github.com/folio-org/edge-orders/compare/v3.0.1...v3.0.2)
