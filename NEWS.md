@@ -2,7 +2,8 @@
 
 
 ## 3.0.3 - Released (Quesnelia R1 2024)
-The primary focus of this release was updating edge-common dependency
+The primary focus of this release was updating edge-common dependency that
+extends AwsParamStore implementation to support FIPS-approved crypto modules.
 [Full Changelog](https://github.com/folio-org/edge-orders/compare/v3.0.2...v3.0.3)
 
 ## Stories
