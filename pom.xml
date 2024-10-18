@@ -44,6 +44,9 @@
     <log4j.version>2.24.1</log4j.version>
     <vertx.version>4.5.10</vertx.version>
 
+    <!--Folio dependencies properties-->
+    <folio-module-descriptor-validator.version>1.0.0</folio-module-descriptor-validator.version>
+
     <!--Dependency properties-->
     <edge-common.version>4.7.2</edge-common.version>
     <aws.sdk.ssm.version>1.12.774</aws.sdk.ssm.version>
@@ -360,6 +363,19 @@
           <pushChanges>false</pushChanges>
           <localCheckout>true</localCheckout>
         </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.folio</groupId>
+        <artifactId>folio-module-descriptor-validator</artifactId>
+        <version>${folio-module-descriptor-validator.version}</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>validate</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
