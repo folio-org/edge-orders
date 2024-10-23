@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.folio</groupId>
   <artifactId>edge-orders</artifactId>
-  <version>2.10.0-SNAPSHOT</version>
+  <version>3.1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>Edge API - Order Placement</name>
@@ -29,8 +29,9 @@
   </licenses>
 
   <properties>
+    <!--Project properties-->
+    <java.version>17</java.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
     <generated_sources_dir>${project.build.directory}/generated-sources</generated_sources_dir>
     <jsonschema2pojo_output_dir>${generated_sources_dir}/jsonschema2pojo</jsonschema2pojo_output_dir>
 
@@ -38,25 +39,56 @@
     <exec.mainClass>org.folio.edge.orders.MainVerticle</exec.mainClass>
     <sonar.exclusions>**/models/**.java</sonar.exclusions>
     <sonar.test.exclusions>**/*Test.java</sonar.test.exclusions>
-    <log4j.version>2.17.2</log4j.version>
+
+    <!--Dependency Management Properties-->
+    <log4j.version>2.24.1</log4j.version>
+    <vertx.version>4.5.10</vertx.version>
+
+    <!--Folio dependencies properties-->
+    <folio-module-descriptor-validator.version>1.0.0</folio-module-descriptor-validator.version>
+
+    <!--Dependency properties-->
+    <edge-common.version>4.7.2</edge-common.version>
+    <aws.sdk.ssm.version>1.12.774</aws.sdk.ssm.version>
+    <vault.java.driver.version>5.1.0</vault.java.driver.version>
+    <jjwt.version>0.12.6</jjwt.version>
+    <commons-lang3.version>3.17.0</commons-lang3.version>
+
+    <!--Test dependencies-->
+    <junit.version>4.13.2</junit.version>
+    <awaitility.version>4.2.2</awaitility.version>
+    <equalsverifier.version>3.17.1</equalsverifier.version>
+    <mockito-core.version>5.14.2</mockito-core.version>
+    <rest-assured.version>5.5.0</rest-assured.version>
+
+    <!--Maven plugin properties-->
+    <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
+    <maven-surefire-plugin.version>3.5.1</maven-surefire-plugin.version>
+    <maven-shade-plugin.version>3.6.0</maven-shade-plugin.version>
+    <jsonschema2pojo-maven-plugin.version>1.2.1</jsonschema2pojo-maven-plugin.version>
+    <exec-maven-plugin.version>3.4.1</exec-maven-plugin.version>
+    <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
+    <copy-rename-maven-plugin.version>1.0.1</copy-rename-maven-plugin.version>
+    <maven-release-plugin.version>3.1.1</maven-release-plugin.version>
+
     <argLine />
   </properties>
 
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>io.vertx</groupId>
-        <artifactId>vertx-stack-depchain</artifactId>
-        <version>4.3.8</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-      <dependency>
         <groupId>org.apache.logging.log4j</groupId>
         <artifactId>log4j-bom</artifactId>
         <version>${log4j.version}</version>
         <scope>import</scope>
         <type>pom</type>
+      </dependency>
+      <dependency>
+        <groupId>io.vertx</groupId>
+        <artifactId>vertx-stack-depchain</artifactId>
+        <version>${vertx.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -73,7 +105,7 @@
     <dependency>
       <groupId>io.jsonwebtoken</groupId>
       <artifactId>jjwt</artifactId>
-      <version>0.6.0</version>
+      <version>${jjwt.version}</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
@@ -86,19 +118,19 @@
     <dependency>
       <groupId>org.folio</groupId>
       <artifactId>edge-common</artifactId>
-      <version>4.4.1</version>
+      <version>${edge-common.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
-      <version>3.12.0</version>
+      <version>${commons-lang3.version}</version>
     </dependency>
 
     <!-- Only needed for AwsParamStore -->
     <dependency>
       <groupId>com.amazonaws</groupId>
       <artifactId>aws-java-sdk-ssm</artifactId>
-      <version>1.12.426</version>
+      <version>${aws.sdk.ssm.version}</version>
       <exclusions>
         <exclusion>
           <groupId>commons-logging</groupId>
@@ -112,7 +144,7 @@
     <dependency>
       <groupId>com.bettercloud</groupId>
       <artifactId>vault-java-driver</artifactId>
-      <version>3.1.0</version>
+      <version>${vault.java.driver.version}</version>
     </dependency>
 
     <dependency>
@@ -132,19 +164,19 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.13.2</version>
+      <version>${junit.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.awaitility</groupId>
       <artifactId>awaitility</artifactId>
-      <version>3.0.0</version>
+      <version>${awaitility.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>nl.jqno.equalsverifier</groupId>
       <artifactId>equalsverifier</artifactId>
-      <version>3.10</version>
+      <version>${equalsverifier.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -155,13 +187,13 @@
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
-      <version>5.3.1</version>
+      <version>${mockito-core.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>io.rest-assured</groupId>
       <artifactId>rest-assured</artifactId>
-      <version>5.1.0</version>
+      <version>${rest-assured.version}</version>
       <scope>test</scope>
     </dependency>
 
@@ -173,24 +205,16 @@
         Java 1.8 -->
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.1</version>
+        <version>${maven-compiler-plugin.version}</version>
         <configuration>
-          <release>17</release>
+          <release>${java.version}</release>
         </configuration>
       </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.22.2</version>
-        <configuration>
-          <argLine>@{argLine} -Duser.language=en -Duser.region=US</argLine>
-          <!-- TODO: update to version 3.0.0 and remove useSystemClassLoader
-               https://issues.folio.org/browse/FOLIO-1609
-               https://issues.apache.org/jira/browse/SUREFIRE-1588
-          -->
-          <useSystemClassLoader>false</useSystemClassLoader>
-        </configuration>
+        <version>${maven-surefire-plugin.version}</version>
       </plugin>
 
     <!-- You only need the part below if you want to build your application
@@ -199,7 +223,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
-        <version>3.2.4</version>
+        <version>${maven-shade-plugin.version}</version>
         <executions>
           <execution>
             <phase>package</phase>
@@ -207,6 +231,14 @@
               <goal>shade</goal>
             </goals>
             <configuration>
+              <filters>
+                <filter>
+                  <artifact>*:*</artifact>
+                  <excludes>
+                    <exclude>**/Log4j2Plugins.dat</exclude>
+                  </excludes>
+                </filter>
+              </filters>
               <transformers>
                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                   <manifestEntries>
@@ -228,7 +260,7 @@
       <plugin>
         <groupId>org.jsonschema2pojo</groupId>
         <artifactId>jsonschema2pojo-maven-plugin</artifactId>
-        <version>1.0.2</version>
+        <version>${jsonschema2pojo-maven-plugin.version}</version>
         <configuration>
           <includes>*.json</includes>
           <outputDirectory>${jsonschema2pojo_output_dir}</outputDirectory>
@@ -251,7 +283,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
-        <version>3.0.0</version>
+        <version>${exec-maven-plugin.version}</version>
         <executions>
           <execution>
             <!-- run the application using the fat jar -->
@@ -272,7 +304,7 @@
 
       <plugin>
         <artifactId>maven-resources-plugin</artifactId>
-        <version>3.1.0</version>
+        <version>${maven-resources-plugin.version}</version>
         <executions>
           <execution>
             <id>filter-descriptor-inputs</id>
@@ -297,7 +329,7 @@
       <plugin>
         <groupId>com.coderplus.maven.plugins</groupId>
         <artifactId>copy-rename-maven-plugin</artifactId>
-        <version>1.0.1</version>
+        <version>${copy-rename-maven-plugin.version}</version>
         <executions>
           <execution>
             <id>rename-descriptor-outputs</id>
@@ -324,13 +356,26 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-release-plugin</artifactId>
-        <version>2.5.3</version>
+        <version>${maven-release-plugin.version}</version>
         <configuration>
           <preparationGoals>clean verify</preparationGoals>
           <tagNameFormat>v@{project.version}</tagNameFormat>
           <pushChanges>false</pushChanges>
           <localCheckout>true</localCheckout>
         </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.folio</groupId>
+        <artifactId>folio-module-descriptor-validator</artifactId>
+        <version>${folio-module-descriptor-validator.version}</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>validate</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
