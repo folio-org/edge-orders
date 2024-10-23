@@ -125,6 +125,11 @@
       <artifactId>commons-lang3</artifactId>
       <version>${commons-lang3.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.folio</groupId>
+      <artifactId>folio-module-descriptor-validator</artifactId>
+      <version>${folio-module-descriptor-validator.version}</version>
+    </dependency>
 
     <!-- Only needed for AwsParamStore -->
     <dependency>
