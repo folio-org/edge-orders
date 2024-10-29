@@ -1,4 +1,17 @@
-## 3.1.0 - Unreleased
+## 3.2.0 - Unreleased
+
+## 3.1.0 - Released (Ramsons R2 2024)
+The primary focus of this release was to update libraries of dependant acq modules to the latest versions
+
+[Full Changelog](https://github.com/folio-org/edge-orders/compare/v3.0.0...v3.1.0)
+
+### Stories
+* [EDGORDERS-90](https://issues.folio.org/browse/EDGORDERS-90) - Update libraries of dependant acq modules to the latest versions
+
+### Dependencies
+* Bump `raml` from `35.2.0` to `35.3.0`
+* Added `folio-module-descriptor-validator` version `1.0.0`
+
 
 ## 3.0.0 - Released (Quesnelia R1 2024)
 The primary focus of this release was to update vertx and edge-common versions
