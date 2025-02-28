@@ -44,14 +44,14 @@
     <sonar.test.exclusions>**/*Test.java</sonar.test.exclusions>
 
     <!--Dependency Management Properties-->
-    <log4j.version>2.24.1</log4j.version>
+    <log4j.version>2.24.3</log4j.version>
     <vertx.version>4.5.13</vertx.version>
 
     <!--Folio dependencies properties-->
     <folio-module-descriptor-validator.version>1.0.0</folio-module-descriptor-validator.version>
+    <edge-common.version>4.8.0</edge-common.version>
 
     <!--Dependency properties-->
-    <edge-common.version>4.7.2</edge-common.version>
     <aws.sdk.ssm.version>1.12.774</aws.sdk.ssm.version>
     <vault.java.driver.version>5.1.0</vault.java.driver.version>
     <jjwt.version>0.12.6</jjwt.version>
@@ -59,9 +59,9 @@
 
     <!--Test dependencies-->
     <junit.version>4.13.2</junit.version>
-    <awaitility.version>4.2.2</awaitility.version>
-    <equalsverifier.version>3.17.1</equalsverifier.version>
-    <mockito-core.version>5.14.2</mockito-core.version>
+    <awaitility.version>4.3.0</awaitility.version>
+    <equalsverifier.version>3.19.1</equalsverifier.version>
+    <mockito-core.version>5.15.2</mockito-core.version>
     <rest-assured.version>5.5.1</rest-assured.version>
 
     <!--Maven plugin properties-->
