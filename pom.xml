@@ -49,10 +49,10 @@
 
     <!--Folio dependencies properties-->
     <folio-module-descriptor-validator.version>1.0.0</folio-module-descriptor-validator.version>
-    <edge-common.version>4.8.0</edge-common.version>
+    <edge-common.version>4.9.0-SNAPSHOT</edge-common.version>
 
     <!--Dependency properties-->
-    <aws.sdk.ssm.version>1.12.774</aws.sdk.ssm.version>
+    <aws.sdk.ssm.version>2.30.31</aws.sdk.ssm.version>
     <vault.java.driver.version>5.1.0</vault.java.driver.version>
     <jjwt.version>0.12.6</jjwt.version>
     <commons-lang3.version>3.17.0</commons-lang3.version>
@@ -131,8 +131,8 @@
 
     <!-- Only needed for AwsParamStore -->
     <dependency>
-      <groupId>com.amazonaws</groupId>
-      <artifactId>aws-java-sdk-ssm</artifactId>
+      <groupId>software.amazon.awssdk</groupId>
+      <artifactId>ssm</artifactId>
       <version>${aws.sdk.ssm.version}</version>
       <exclusions>
         <exclusion>

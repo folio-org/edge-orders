@@ -20,13 +20,13 @@ import org.folio.edge.core.utils.test.MockOkapi;
 import org.folio.edge.orders.model.ResponseWrapper;
 import org.w3c.dom.Document;
 
-import com.amazonaws.util.StringInputStream;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
+import software.amazon.awssdk.utils.StringInputStream;
 
 public class OrdersMockOkapi extends MockOkapi {
 
