@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.folio</groupId>
   <artifactId>edge-orders</artifactId>
-  <version>3.2.0-SNAPSHOT</version>
+  <version>3.3.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>Edge API - Order Placement</name>
@@ -49,7 +49,7 @@
 
     <!--Folio dependencies properties-->
     <folio-module-descriptor-validator.version>1.0.0</folio-module-descriptor-validator.version>
-    <edge-common.version>4.9.0-SNAPSHOT</edge-common.version>
+    <edge-common.version>4.9.0</edge-common.version>
 
     <!--Dependency properties-->
     <aws.sdk.ssm.version>2.30.31</aws.sdk.ssm.version>
