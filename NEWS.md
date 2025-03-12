@@ -1,4 +1,21 @@
-## 3.2.0 - Unreleased
+## 3.3.0 - Unreleased
+
+## 3.2.0 - Released (Sunflower R1 2025)
+The primary focus of this release was to update libraries to the latest versions
+
+[Full Changelog](https://github.com/folio-org/edge-orders/compare/v3.1.0...v3.2.0)
+
+### Stories
+* [FOLIO-4201](https://issues.folio.org/browse/FOLIO-4201) - Update to edge-orders Java 21
+
+### Dependencies
+* Bump `java` from `17` to `21`
+* Bump `edge-common` from `4.7.2` to `4.9.0`
+* Bump `vertx` from `4.5.10` to `4.5.13`
+* Bump `aws-sdk-ssm` from `1.12.774` to `2.30.31`
+* Bump `log4j` from `2.24.1` to `2.24.3`
+* Bump `rest-assured` from `5.5.0` to `5.5.1
+
 
 ## 3.1.0 - Released (Ramsons R2 2024)
 The primary focus of this release was to update libraries of dependant acq modules to the latest versions

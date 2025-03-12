@@ -49,7 +49,7 @@
 
     <!--Folio dependencies properties-->
     <folio-module-descriptor-validator.version>1.0.0</folio-module-descriptor-validator.version>
-    <edge-common.version>4.9.0-SNAPSHOT</edge-common.version>
+    <edge-common.version>4.9.0</edge-common.version>
 
     <!--Dependency properties-->
     <aws.sdk.ssm.version>2.30.31</aws.sdk.ssm.version>
