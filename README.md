@@ -36,7 +36,7 @@ Api Configuration format:
 | type        | GOBI             | Type of the system      |
 | pathPattern | /orders/validate | URL Path for mapping    |
 | method      | POST             | HTTP method for mapping |
-| proxyMehtod | POST             | HTTP method for proxy   |
+| proxyMethod | POST             | HTTP method for proxy   |
 | proxyPath   | /gobi/validate   | Path for proxy          |
 
 Example of api mapping content:
@@ -70,18 +70,19 @@ Configuration information is specified in two forms:
 
 ### System Properties
 
-| Property                  | Default             | Description                                                         |
-|---------------------------|---------------------|---------------------------------------------------------------------|
-| `port`                    | `8081`              | Server port to listen on                                            |
-| `okapi_url`               | *required*          | Where to find Okapi (URL)                                           |
-| `secure_store`            | `Ephemeral`         | Type of secure store to use.  Valid: `Ephemeral`, `AwsSsm`, `Vault` |
-| `secure_store_props`      | `NA`                | Path to a properties file specifying secure store configuration     |
-| `token_cache_ttl_ms`      | `3600000`           | How long to cache JWTs, in milliseconds (ms)                        |
-| `null_token_cache_ttl_ms` | `30000`             | How long to cache login failure (null JWTs), in milliseconds (ms)   |
-| `token_cache_capacity`    | `100`               | Max token cache size                                                |
-| `log_level`               | `INFO`              | Log4j Log Level                                                     |
-| `request_timeout_ms`      | `30000`             | Request Timeout                                                     |
-| `api_key_sources`         | `PARAM,HEADER,PATH` | Defines the sources (order of precendence) of the API key.          |
+| Property                    | Default             | Description                                                         |
+|-----------------------------|---------------------|---------------------------------------------------------------------|
+| `port`                      | `8081`              | Server port to listen on                                            |
+| `okapi_url`                 | *required*          | Where to find Okapi (URL)                                           |
+| `secure_store`              | `Ephemeral`         | Type of secure store to use.  Valid: `Ephemeral`, `AwsSsm`, `Vault` |
+| `secure_store_props`        | `NA`                | Path to a properties file specifying secure store configuration     |
+| `token_cache_ttl_ms`        | `3600000`           | How long to cache JWTs, in milliseconds (ms)                        |
+| `null_token_cache_ttl_ms`   | `30000`             | How long to cache login failure (null JWTs), in milliseconds (ms)   |
+| `token_cache_capacity`      | `100`               | Max token cache size                                                |
+| `log_level`                 | `INFO`              | Log4j Log Level                                                     |
+| `request_timeout_ms`        | `30000`             | Request Timeout                                                     |
+| `api_key_sources`           | `PARAM,HEADER,PATH` | Defines the sources (order of precedence) of the API key            |
+| `mod_order_storage_version` | `NA`                | Defines the version of mod-orders-storage deployed in the system    |
 
 ### Env variables for TLS configuration for Http server
 

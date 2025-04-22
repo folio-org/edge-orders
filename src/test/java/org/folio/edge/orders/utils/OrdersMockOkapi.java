@@ -31,6 +31,7 @@ import software.amazon.awssdk.utils.StringInputStream;
 public class OrdersMockOkapi extends MockOkapi {
 
   private static final Logger logger = LogManager.getLogger(OrdersMockOkapi.class);
+
   public static final String BODY_REQUEST_FOR_HEADER_INCONSISTENCY = "{Body request for exception}";
 
   public OrdersMockOkapi(int port, List<String> knownTenants) {
@@ -121,9 +122,9 @@ public class OrdersMockOkapi extends MockOkapi {
         String expression = "//ItemPONumber";
         id = xPath.compile(expression).evaluate(xmlDocument);
 
-        String body = null;
+        String body;
         String accept = ctx.request().getHeader(HttpHeaders.ACCEPT);
-        logger.info("ACCEPT = " + accept);
+        logger.info("ACCEPT = {}", accept);
         if (accept != null && accept.equals(APPLICATION_JSON)) {
           body = getGobiOrderAsJson("PO-" + id);
           ctx.response().putHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON);
@@ -154,7 +155,6 @@ public class OrdersMockOkapi extends MockOkapi {
     }
   }
 
-
   public static String getGobiOrderAsJson(String id) {
     try {
       ResponseWrapper resp = new ResponseWrapper(id);
@@ -163,5 +163,4 @@ public class OrdersMockOkapi extends MockOkapi {
       return "{ \"id\": \"" + id + "\" }";
     }
   }
-
 }

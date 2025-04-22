@@ -35,6 +35,78 @@
       "method": "GET",
       "pathPattern": "/orders/validate",
       "proxyPath": "/ebsconet/validate"
+    },
+    {
+      "type": "MOSAIC",
+      "method": "GET",
+      "pathPattern": "/mosaic/order-templates",
+      "proxyPath": "/orders/order-templates?offset=:offset&limit=:limit&query=:query"
+    },
+    {
+      "type": "MOSAIC",
+      "method": "GET",
+      "pathPattern": "/mosaic/funds",
+      "proxyPath": "/finance/funds"
+    },
+    {
+      "type": "MOSAIC",
+      "method": "GET",
+      "pathPattern": "/mosaic/expense-classes",
+      "proxyPath": "/finance/expense-classes"
+    },
+    {
+      "type": "MOSAIC",
+      "method": "GET",
+      "pathPattern": "/mosaic/expense-classes",
+      "proxyPath": "/finance/expense-classes"
+    },
+    {
+      "type": "MOSAIC",
+      "method": "GET",
+      "pathPattern": "/mosaic/locations",
+      "proxyPath": "/locations"
+    },
+    {
+      "type": "MOSAIC",
+      "method": "GET",
+      "pathPattern": "/mosaic/acquisitions-units",
+      "proxyPath": "/acquisitions-units/units"
+    },
+    {
+      "type": "MOSAIC",
+      "method": "GET",
+      "pathPattern": "/mosaic/organizations",
+      "proxyPath": "/organizations/organizations"
+    },
+    {
+      "type": "MOSAIC",
+      "method": "GET",
+      "pathPattern": "/mosaic/organizations",
+      "proxyPath": "/organizations/organizations"
+    },
+    {
+      "type": "MOSAIC",
+      "method": "GET",
+      "pathPattern": "/mosaic/custom-fields",
+      "proxyPath": "/custom-fields"
+    },
+    {
+      "type": "MOSAIC",
+      "method": "GET",
+      "pathPattern": "/mosaic/users",
+      "proxyPath": "/users"
+    },
+    {
+      "type": "MOSAIC",
+      "method": "GET",
+      "pathPattern": "/mosaic/billTo",
+      "proxyPath": "/configurations/entries?query=configName==tenant.addresses"
+    },
+    {
+      "type": "MOSAIC",
+      "method": "GET",
+      "pathPattern": "/mosaic/shipTo",
+      "proxyPath": "/configurations/entries?query=configName==tenant.addresses"
     }
   ]
 }

@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 import static org.folio.edge.core.utils.test.MockOkapi.MOCK_TOKEN;
 
@@ -59,14 +61,15 @@ public class OrdersOkapiClientTest {
     File folder = new File("src/test/resources/requests");
     File[] listOfFiles = folder.listFiles();
 
-    for (int i = 0; i < listOfFiles.length; i++) {
-      String filename = listOfFiles[i].getName();
+    for (File listOfFile : Objects.requireNonNull(listOfFiles)) {
+      String filename = listOfFile.getName();
       String woExt = filename.substring(0, filename.lastIndexOf("."));
       StringBuilder sb = new StringBuilder();
       try {
-        Files.lines(Paths.get(listOfFiles[i].toURI()), StandardCharsets.UTF_8)
-          .forEachOrdered(value -> sb.append(value).append('\n'));
-        mockRequests.put(woExt, sb.toString());
+        try (Stream<String> linesStream = Files.lines(Paths.get(listOfFile.toURI()), StandardCharsets.UTF_8)) {
+          linesStream.forEachOrdered(value -> sb.append(value).append('\n'));
+          mockRequests.put(woExt, sb.toString());
+        }
       } catch (IOException e) {
         logger.error("Exception loading mock requests", e);
       }
