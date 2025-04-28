@@ -14,7 +14,6 @@ public class Constants {
   public static final String HTTP_METHOD_PUT = "PUT";
 
   public enum ErrorCodes {
-
     // Subject to change pending additional information from the GOBI folks
     BAD_REQUEST(400),
     API_KEY_INVALID(-1),
@@ -48,7 +47,5 @@ public class Constants {
   }
 
   private Constants() {
-
   }
-
 }

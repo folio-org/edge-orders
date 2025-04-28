@@ -46,43 +46,43 @@
       "type": "MOSAIC",
       "method": "GET",
       "pathPattern": "/finance/funds",
-      "proxyPath": "/finance/funds?offset=0&limit=2147483647"
+      "proxyPath": "/finance/funds?offset=:offset&limit=:limit&query=:query"
     },
     {
       "type": "MOSAIC",
       "method": "GET",
       "pathPattern": "/finance/expense-classes",
-      "proxyPath": "/finance/expense-classes?offset=0&limit=2147483647"
+      "proxyPath": "/finance/expense-classes?offset=:offset&limit=:limit&query=:query"
     },
     {
       "type": "MOSAIC",
       "method": "GET",
       "pathPattern": "/locations",
-      "proxyPath": "/locations?offset=0&limit=2147483647"
+      "proxyPath": "/locations?offset=:offset&limit=:limit&query=:query"
     },
     {
       "type": "MOSAIC",
       "method": "GET",
       "pathPattern": "/acquisitions-units/units",
-      "proxyPath": "/acquisitions-units/units?offset=0&limit=2147483647"
+      "proxyPath": "/acquisitions-units/units?offset=:offset&limit=:limit&query=:query"
     },
     {
       "type": "MOSAIC",
       "method": "GET",
       "pathPattern": "/organizations/organizations",
-      "proxyPath": "/organizations/organizations?offset=0&limit=2147483647"
+      "proxyPath": "/organizations/organizations?offset=:offset&limit=:limit&query=:query"
     },
     {
       "type": "MOSAIC",
       "method": "GET",
       "pathPattern": "/custom-fields",
-      "proxyPath": "/custom-fields?offset=0&limit=2147483647"
+      "proxyPath": "/custom-fields?offset=:offset&limit=:limit&query=:query"
     },
     {
       "type": "MOSAIC",
       "method": "GET",
       "pathPattern": "/users",
-      "proxyPath": "/users?offset=0&limit=2147483647"
+      "proxyPath": "/users?offset=:offset&limit=:limit&query=:query"
     },
     {
       "type": "MOSAIC",

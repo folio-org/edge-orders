@@ -35,10 +35,8 @@ public class OrdersOkapiClientTest {
 
   private static final Logger logger = LogManager.getLogger(OrdersOkapiClientTest.class);
 
-  private static final String tenant = "diku";
-  private static final int reqTimeout = 3000;
-
-  private static Map<String, String> mockRequests;
+  private static final String TENANT = "diku";
+  private static final int REQ_TIMEOUT = 3000;
 
   private OrdersOkapiClient client;
   private OrdersMockOkapi mockOkapi;
@@ -48,15 +46,15 @@ public class OrdersOkapiClientTest {
     int okapiPort = TestUtils.getPort();
 
     List<String> knownTenants = new ArrayList<>();
-    knownTenants.add(tenant);
+    knownTenants.add(TENANT);
 
     mockOkapi = new OrdersMockOkapi(okapiPort, knownTenants);
     mockOkapi.start().onComplete(context.asyncAssertSuccess());
 
     client = new OrdersOkapiClient(new OkapiClientFactory(Vertx.vertx(),
-      "http://localhost:" + okapiPort, reqTimeout).getOkapiClient(tenant));
+      "http://localhost:" + okapiPort, REQ_TIMEOUT).getOkapiClient(TENANT));
 
-    mockRequests = new HashMap<>();
+    Map<String, String> mockRequests = new HashMap<>();
 
     File folder = new File("src/test/resources/requests");
     File[] listOfFiles = folder.listFiles();
@@ -120,14 +118,15 @@ public class OrdersOkapiClientTest {
       routing.setProxyPath("/gobi/validate");
 
       client.send(routing,
-          "",null, null,
-          resp -> {
-            context.assertEquals(200, resp.statusCode());
-            async.complete();
-          },
-          t -> context.fail(t.getMessage()));
+        "",null, null,
+        resp -> {
+          context.assertEquals(200, resp.statusCode());
+          async.complete();
+        },
+        t -> context.fail(t.getMessage()));
     });
   }
+
   @Test
   public void testPutEbsconetSuccess(TestContext context) {
     logger.info("=== Test successful PUT ebsconet order-line with id===");
@@ -143,10 +142,10 @@ public class OrdersOkapiClientTest {
       entries.add("id", "123");
 
       client.send(routing, "", entries, null, resp -> {
-          context.assertEquals(204, resp.statusCode());
-          async.complete();
-        },
-        t -> context.fail(t.getMessage()));
+        context.assertEquals(204, resp.statusCode());
+        async.complete();
+      },
+      t -> context.fail(t.getMessage()));
     });
   }
 }

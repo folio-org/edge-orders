@@ -89,9 +89,7 @@ public class OrdersOkapiClient extends OkapiClient {
     }
     for (Param param : Param.values()) {
       if (StringUtils.containsAny(proxyPath, String.format(":%s", param.getName())) && StringUtils.isEmpty(params.get(param.getName()))) {
-        proxyPath = !param.getDefaultValue().isBlank()
-          ? setDefaultParamValue(proxyPath, param)
-          : fullyRemoveParam(proxyPath, param);
+        proxyPath = !param.getDefaultValue().isBlank() ? setDefaultParamValue(proxyPath, param) : fullyRemoveParam(proxyPath, param);
       }
     }
     return proxyPath;
