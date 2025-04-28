@@ -8,6 +8,7 @@ import static org.folio.edge.orders.Constants.HTTP_METHOD_GET;
 import static org.folio.edge.orders.Constants.HTTP_METHOD_POST;
 import static org.folio.edge.orders.Constants.HTTP_METHOD_PUT;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
@@ -83,9 +84,11 @@ public class OrdersOkapiClient extends OkapiClient {
   }
 
   private String prepareProxyPathWithQueryStringParams(String proxyPath, MultiMap params) {
+    if (Objects.isNull(params)) {
+      return proxyPath;
+    }
     for (Param param : Param.values()) {
-      if (StringUtils.containsAny(proxyPath, String.format(":%s", param.getName()))
-        && StringUtils.isEmpty(params.get(param.getName()))) {
+      if (StringUtils.containsAny(proxyPath, String.format(":%s", param.getName())) && StringUtils.isEmpty(params.get(param.getName()))) {
         proxyPath = !param.getDefaultValue().isBlank()
           ? setDefaultParamValue(proxyPath, param)
           : fullyRemoveParam(proxyPath, param);
