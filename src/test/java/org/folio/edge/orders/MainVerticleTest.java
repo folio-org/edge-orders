@@ -1,5 +1,6 @@
 package org.folio.edge.orders;
 
+import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.folio.edge.core.Constants.APPLICATION_JSON;
 import static org.folio.edge.core.Constants.APPLICATION_XML;
@@ -13,10 +14,13 @@ import static org.folio.edge.core.Constants.SYS_REQUEST_TIMEOUT_MS;
 import static org.folio.edge.core.Constants.SYS_SECURE_STORE_PROP_FILE;
 import static org.folio.edge.core.Constants.TEXT_PLAIN;
 import static org.folio.edge.orders.Constants.API_CONFIGURATION_PROPERTY_NAME;
+import static org.folio.edge.orders.MosaicEndpoint.CREATE_ORDERS;
+import static org.folio.edge.orders.MosaicEndpoint.VALIDATE;
 import static org.folio.edge.orders.utils.OrdersMockOkapi.BODY_REQUEST_FOR_HEADER_INCONSISTENCY;
 import static org.folio.edge.orders.utils.OrdersMockOkapi.HAD_DATA_ID;
 import static org.folio.edge.orders.utils.OrdersMockOkapi.NO_DATA_ID;
 import static org.folio.edge.orders.utils.OrdersMockOkapi.TOTAL_RECORDS;
+import static org.folio.edge.orders.utils.OrdersMockOkapi.X_ECHO_STATUS_HEADER;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
@@ -41,6 +45,8 @@ import java.util.stream.Stream;
 import io.restassured.RestAssured;
 import io.restassured.http.Header;
 import io.restassured.response.Response;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.logging.log4j.LogManager;
@@ -209,7 +215,7 @@ public class MainVerticleTest {
 
     final Response resp = RestAssured
       .with()
-      .header("X-Echo-Status", 404)
+      .header(X_ECHO_STATUS_HEADER, 404)
       .get("/orders/validate?type=GOBI&apiKey=" + API_KEY)
       .then()
       .contentType(APPLICATION_XML)
@@ -623,12 +629,65 @@ public class MainVerticleTest {
   // MOSAIC
 
   @Test
-  public void testShouldReturnMosaicEndpointData() {
-    Arrays.stream(MosaicEndpoint.values())
+  public void testReturnMosaicValidatedResponse() {
+    logger.info("testReturnMosaicValidatedResponse:: Ingress URL: {}", VALIDATE.getIngressUrl());
+
+    RestAssured
+      .get(VALIDATE.getIngressUrl() + "?type=MOSAIC&apikey=" + API_KEY)
+      .then()
+      .contentType(APPLICATION_JSON)
+      .statusCode(SC_OK)
+      .body("status", equalTo("SUCCESS"));
+  }
+
+  @Test
+  public void testReturnMosaicValidatedResponseWith404() throws JsonProcessingException {
+    logger.info("testReturnMosaicValidatedResponseWith404:: Ingress URL: {}", VALIDATE.getIngressUrl());
+
+    final Response response = RestAssured
+      .with()
+      .header(X_ECHO_STATUS_HEADER, 404)
+      .get(VALIDATE.getIngressUrl() + "?type=MOSAIC&apiKey=" + API_KEY)
+      .then()
+      .contentType(APPLICATION_XML)
+      .statusCode(SC_NOT_FOUND)
+      .extract()
+      .response();
+
+    ResponseWrapper responseWrapper = new ResponseWrapper(new ErrorWrapper(ErrorCodes.NOT_FOUND.toString(),
+      "No suitable module found for path /mosaic/validate"));
+    assertEquals(responseWrapper.toXml(), response.body().asString());
+  }
+
+  @Test
+  public void testReturnMosaicCreatedOrder() {
+    logger.info("testReturnMosaicCreatedOrder:: Ingress URL: {}", CREATE_ORDERS.getIngressUrl());
+
+    String requestBody = new JsonObject()
+      .put("poNumber", "10000")
+      .put("poLines", new JsonArray().add(new JsonObject().put("poLineNumber", "10000-2")))
+      .toString();
+
+    RestAssured
+      .with()
+      .body(requestBody)
+      .post(CREATE_ORDERS.getEgressUrl() + "?type=MOSAIC&apikey=" + API_KEY)
+      .then()
+      .contentType(APPLICATION_JSON)
+      .statusCode(SC_OK)
+      .body(notNullValue())
+      .body(equalTo("10000-2"));
+  }
+
+  // COMMON
+
+  @Test
+  public void testShouldReturnCommonEndpointData() {
+    Arrays.stream(CommonEndpoint.values())
       .forEach(endpoint -> {
-        logger.info("testShouldReturnMosaicEndpointData:: Ingress: {}", endpoint.getIngressUrl());
+        logger.info("testShouldReturnCommonEndpointData:: Ingress URL: {}", endpoint.getIngressUrl());
         RestAssured
-          .get(endpoint.getIngressUrl() + "?type=MOSAIC&apikey=" + API_KEY)
+          .get(endpoint.getIngressUrl() + "?type=COMMON&apikey=" + API_KEY)
           .then()
           .contentType(APPLICATION_JSON)
           .statusCode(SC_OK)
@@ -638,13 +697,13 @@ public class MainVerticleTest {
   }
 
   @Test
-  public void testShouldReturnMosaicEndpointDataWithOffsetAndLimit() {
-    Arrays.stream(MosaicEndpoint.values())
-      .filter(MosaicEndpoint::isHasFiltering)
+  public void testShouldReturnCommonEndpointDataWithOffsetAndLimit() {
+    Arrays.stream(CommonEndpoint.values())
+      .filter(CommonEndpoint::isHasFiltering)
       .forEach(endpoint -> {
-        logger.info("testShouldReturnMosaicEndpointDataWithOffsetAndLimit:: Ingress: {}", endpoint.getIngressUrl());
+        logger.info("testShouldReturnCommonEndpointDataWithOffsetAndLimit:: Ingress URL: {}", endpoint.getIngressUrl());
         RestAssured
-          .get(endpoint.getIngressUrl() + "?type=MOSAIC&apikey=" + API_KEY + "&offset=0&limit=2")
+          .get(endpoint.getIngressUrl() + "?type=COMMON&apikey=" + API_KEY + "&offset=0&limit=2")
           .then()
           .contentType(APPLICATION_JSON)
           .statusCode(SC_OK)
@@ -654,13 +713,13 @@ public class MainVerticleTest {
   }
 
   @Test
-  public void testShouldReturnMosaicEndpointDataWithQuery() {
-    Arrays.stream(MosaicEndpoint.values())
-      .filter(MosaicEndpoint::isHasFiltering)
+  public void testShouldReturnCommonEndpointDataWithQuery() {
+    Arrays.stream(CommonEndpoint.values())
+      .filter(CommonEndpoint::isHasFiltering)
       .forEach(endpoint -> {
-        logger.info("testShouldReturnMosaicEndpointDataWithQuery:: Ingress: {}", endpoint.getIngressUrl());
+        logger.info("testShouldReturnCommonEndpointDataWithQuery:: Ingress URL: {}", endpoint.getIngressUrl());
         RestAssured
-          .get(endpoint.getIngressUrl() + "?type=MOSAIC&apikey=" + API_KEY + "&query=id==" + HAD_DATA_ID)
+          .get(endpoint.getIngressUrl() + "?type=COMMON&apikey=" + API_KEY + "&query=id==" + HAD_DATA_ID)
           .then()
           .contentType(APPLICATION_JSON)
           .statusCode(SC_OK)
@@ -670,13 +729,13 @@ public class MainVerticleTest {
   }
 
   @Test
-  public void testShouldReturnMosaicEndpointDataWithQueryNoData() {
-    Arrays.stream(MosaicEndpoint.values())
-      .filter(MosaicEndpoint::isHasFiltering)
+  public void testShouldReturnCommonEndpointDataWithQueryNoData() {
+    Arrays.stream(CommonEndpoint.values())
+      .filter(CommonEndpoint::isHasFiltering)
       .forEach(endpoint -> {
-        logger.info("testShouldReturnMosaicEndpointDataWithQueryNoData:: Ingress: {}", endpoint.getIngressUrl());
+        logger.info("testShouldReturnCommonEndpointDataWithQueryNoData:: Ingress URL: {}", endpoint.getIngressUrl());
         RestAssured
-          .get(endpoint.getIngressUrl() + "?type=MOSAIC&apikey=" + API_KEY + "&query=id==" + NO_DATA_ID)
+          .get(endpoint.getIngressUrl() + "?type=COMMON&apikey=" + API_KEY + "&query=id==" + NO_DATA_ID)
           .then()
           .contentType(APPLICATION_JSON)
           .statusCode(SC_OK)
@@ -686,13 +745,13 @@ public class MainVerticleTest {
   }
 
   @Test
-  public void testShouldReturnMosaicEndpointDataWithEmptyQuery() {
-    Arrays.stream(MosaicEndpoint.values())
-      .filter(MosaicEndpoint::isHasFiltering)
+  public void testShouldReturnCommonEndpointDataWithEmptyQuery() {
+    Arrays.stream(CommonEndpoint.values())
+      .filter(CommonEndpoint::isHasFiltering)
       .forEach(endpoint -> {
-        logger.info("testShouldReturnMosaicEndpointDataWithEmptyQuery:: Ingress: {}", endpoint.getIngressUrl());
+        logger.info("testShouldReturnCommonEndpointDataWithEmptyQuery:: Ingress URL: {}", endpoint.getIngressUrl());
         RestAssured
-          .get(endpoint.getIngressUrl() + "?type=MOSAIC&apikey=" + API_KEY + "&query=")
+          .get(endpoint.getIngressUrl() + "?type=COMMON&apikey=" + API_KEY + "&query=")
           .then()
           .contentType(APPLICATION_JSON)
           .statusCode(SC_OK)

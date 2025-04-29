@@ -15,7 +15,10 @@
       "id": "login",
       "version": "5.0 6.0 7.0 7.3"
     },
-
+    {
+      "id": "mosaic",
+      "version": "1.0"
+    },
     {
       "id": "order-templates",
       "version": "1.0"
@@ -43,14 +46,6 @@
     {
       "id": "custom-fields",
       "version": "3.0"
-    },
-    {
-      "id": "users",
-      "version": "16.4"
-    },
-    {
-      "id": "users",
-      "version": "16.4"
     },
     {
       "id": "configuration",

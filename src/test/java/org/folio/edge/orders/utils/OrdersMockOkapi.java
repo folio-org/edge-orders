@@ -1,12 +1,16 @@
 package org.folio.edge.orders.utils;
 
 import static io.vertx.core.http.HttpHeaders.CONTENT_TYPE;
+import static io.vertx.core.http.HttpMethod.GET;
+import static io.vertx.core.http.HttpMethod.POST;
 import static org.apache.http.HttpStatus.SC_FORBIDDEN;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.folio.edge.core.Constants.APPLICATION_JSON;
 import static org.folio.edge.core.Constants.APPLICATION_XML;
 import static org.folio.edge.core.Constants.TEXT_PLAIN;
 import static org.folio.edge.core.Constants.X_OKAPI_TOKEN;
+import static org.folio.edge.orders.MosaicEndpoint.CREATE_ORDERS;
+import static org.folio.edge.orders.MosaicEndpoint.VALIDATE;
 import static org.folio.edge.orders.Param.LIMIT;
 import static org.folio.edge.orders.Param.OFFSET;
 import static org.folio.edge.orders.Param.QUERY;
@@ -28,6 +32,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.folio.edge.core.utils.Mappers;
 import org.folio.edge.core.utils.test.MockOkapi;
+import org.folio.edge.orders.CommonEndpoint;
 import org.folio.edge.orders.MosaicEndpoint;
 import org.folio.edge.orders.model.ResponseWrapper;
 import org.w3c.dom.Document;
@@ -50,6 +55,7 @@ public class OrdersMockOkapi extends MockOkapi {
   public static final String TOTAL_RECORDS = "totalRecords";
   public static final String NO_DATA_ID = "5bafea52-57ea-40a7-9164-4e31b9473781";
   public static final String HAD_DATA_ID = "5bafea52-57ea-40a7-9164-4e31b9473782";
+  public static final String X_ECHO_STATUS_HEADER = "X-Echo-Status";
 
   public OrdersMockOkapi(int port, List<String> knownTenants) {
     super(port, knownTenants);
@@ -59,19 +65,22 @@ public class OrdersMockOkapi extends MockOkapi {
   public Router defineRoutes() {
     Router router = super.defineRoutes();
     // GOBI
-    router.route(HttpMethod.GET, "/gobi/validate").method(HttpMethod.POST).handler(this::validateHandler);
-    router.route(HttpMethod.POST, "/gobi/orders").handler(this::placeOrdersHandler);
+    router.route(GET, "/gobi/validate").method(POST).handler(this::validateHandler);
+    router.route(POST, "/gobi/orders").handler(this::placeOrdersHandler);
     // EBSCONET
     router.route(HttpMethod.PUT, "/ebsconet/order-lines/:id").handler(this::putOrderLinesHandler);
     // MOSAIC
     Arrays.stream(MosaicEndpoint.values()).forEach(endpoint ->
-      router.route(HttpMethod.GET, endpoint.getEgressUrl()).handler(ctx -> handleGeneric(endpoint, ctx)));
+      router.route(endpoint.getMethod(), endpoint.getEgressUrl()).handler(this::handleMosaicRequest));
+    // COMMON
+    Arrays.stream(CommonEndpoint.values()).forEach(endpoint ->
+      router.route(GET, endpoint.getEgressUrl()).handler(ctx -> handleCommonGetRequest(endpoint, ctx)));
     return router;
   }
 
   public void validateHandler(RoutingContext ctx) {
     String token = ctx.request().getHeader(X_OKAPI_TOKEN);
-    String status = ctx.request().getHeader("X-Echo-Status");
+    String status = ctx.request().getHeader(X_ECHO_STATUS_HEADER);
 
     if (token == null || !token.equals(MOCK_TOKEN)) {
       ctx.response()
@@ -84,7 +93,7 @@ public class OrdersMockOkapi extends MockOkapi {
           .putHeader(CONTENT_TYPE, TEXT_PLAIN)
           .end("No suitable module found for path /gobi/validate");
     } else {
-      if (ctx.request().method().equals(HttpMethod.GET)) {
+      if (ctx.request().method().equals(GET)) {
         ctx.response()
           .putHeader(CONTENT_TYPE, APPLICATION_XML)
           .setStatusCode(200)
@@ -186,58 +195,77 @@ public class OrdersMockOkapi extends MockOkapi {
     }
   }
 
-  public void handleGeneric(MosaicEndpoint endpoint, RoutingContext ctx) {
+  public void handleMosaicRequest(RoutingContext ctx) {
     String token = ctx.request().getHeader(X_OKAPI_TOKEN);
-    String moduleId = ctx.request().getHeader(MODULE_ID);
-
-    String offset = ctx.request().getParam(OFFSET.getName());
-    String limit = ctx.request().getParam(LIMIT.getName());
-    String query = ctx.request().getParam(QUERY.getName());
-
-    String dataKey = endpoint.getDataKey();
-
-    logger.info("handleGeneric:: Created handler: Ingress: {}, Egress: {}, Module Id: {}",
-      endpoint.getIngressUrl(), endpoint.getEgressUrl(), moduleId);
+    String status = ctx.request().getHeader(X_ECHO_STATUS_HEADER);
 
     if (token == null || !token.equals(MOCK_TOKEN)) {
       ctx.response()
         .setStatusCode(SC_FORBIDDEN)
         .putHeader(CONTENT_TYPE, TEXT_PLAIN)
-        .end("Access requires permission: mosaic.get");
-    } else {
-      String responseBody;
-      if (StringUtils.equals(query, "id==" + NO_DATA_ID)) {
-        responseBody = new JsonObject()
-          .put(dataKey, new JsonObject())
-          .put(TOTAL_RECORDS, 0)
-          .toString();
-      } else if (StringUtils.equals(query, "id==" + HAD_DATA_ID)) {
-        responseBody = new JsonObject()
-          .put(dataKey, new JsonArray()
-            .add(new JsonObject().put(ID, HAD_DATA_ID)))
-          .put(TOTAL_RECORDS, 1)
-          .toString();
-      } else if (StringUtils.equals(offset, "0") && StringUtils.equals(limit, "2")) {
-        responseBody = new JsonObject()
-          .put(dataKey, new JsonArray()
-            .add(new JsonObject().put(ID, UUID.randomUUID().toString()))
-            .add(new JsonObject().put(ID, UUID.randomUUID().toString())))
-          .put(TOTAL_RECORDS, 2)
-          .toString();
-      } else {
-        responseBody = new JsonObject()
-          .put(dataKey, new JsonArray()
-            .add(new JsonObject().put(ID, UUID.randomUUID().toString()))
-            .add(new JsonObject().put(ID, UUID.randomUUID().toString()))
-            .add(new JsonObject().put(ID, UUID.randomUUID().toString())))
-          .put(TOTAL_RECORDS, 3)
-          .toString();
-      }
-
+        .end("Access requires permission: mosaic.validate.get");
+    } else if (status != null && !status.isEmpty()) {
       ctx.response()
-        .putHeader(CONTENT_TYPE, APPLICATION_JSON)
-        .setStatusCode(SC_OK)
-        .end(responseBody);
+        .setStatusCode(Integer.parseInt(status))
+        .putHeader(CONTENT_TYPE, TEXT_PLAIN)
+        .end("No suitable module found for path /mosaic/validate");
+    } else {
+      if (ctx.request().method().equals(GET) && StringUtils.contains(ctx.request().uri(), VALIDATE.getEgressUrl()) ) {
+        ctx.response()
+          .putHeader(CONTENT_TYPE, APPLICATION_JSON)
+          .setStatusCode(SC_OK)
+          .end(new JsonObject().put("status", "SUCCESS").toString());
+      } else if (ctx.request().method().equals(POST) && StringUtils.contains(ctx.request().uri(), CREATE_ORDERS.getEgressUrl())) {
+        ctx.response()
+          .putHeader(CONTENT_TYPE, APPLICATION_JSON)
+          .setStatusCode(SC_OK)
+          .end("10000-2");
+      }
     }
+  }
+
+  public void handleCommonGetRequest(CommonEndpoint endpoint, RoutingContext ctx) {
+    String moduleId = ctx.request().getHeader(MODULE_ID);
+    String offset = ctx.request().getParam(OFFSET.getName());
+    String limit = ctx.request().getParam(LIMIT.getName());
+    String query = ctx.request().getParam(QUERY.getName());
+    String dataKey = endpoint.getDataKey();
+
+    logger.info("handleGeneric:: Created handler: Ingress URL: {}, Egress URL: {}, Module Id: {}",
+      endpoint.getIngressUrl(), endpoint.getEgressUrl(), moduleId);
+
+    String responseBody;
+    if (StringUtils.equals(query, "id==" + NO_DATA_ID)) {
+      responseBody = new JsonObject()
+        .put(dataKey, new JsonObject())
+        .put(TOTAL_RECORDS, 0)
+        .toString();
+    } else if (StringUtils.equals(query, "id==" + HAD_DATA_ID)) {
+      responseBody = new JsonObject()
+        .put(dataKey, new JsonArray()
+          .add(new JsonObject().put(ID, HAD_DATA_ID)))
+        .put(TOTAL_RECORDS, 1)
+        .toString();
+    } else if (StringUtils.equals(offset, "0") && StringUtils.equals(limit, "2")) {
+      responseBody = new JsonObject()
+        .put(dataKey, new JsonArray()
+          .add(new JsonObject().put(ID, UUID.randomUUID().toString()))
+          .add(new JsonObject().put(ID, UUID.randomUUID().toString())))
+        .put(TOTAL_RECORDS, 2)
+        .toString();
+    } else {
+      responseBody = new JsonObject()
+        .put(dataKey, new JsonArray()
+          .add(new JsonObject().put(ID, UUID.randomUUID().toString()))
+          .add(new JsonObject().put(ID, UUID.randomUUID().toString()))
+          .add(new JsonObject().put(ID, UUID.randomUUID().toString())))
+        .put(TOTAL_RECORDS, 3)
+        .toString();
+    }
+
+    ctx.response()
+      .putHeader(CONTENT_TYPE, APPLICATION_JSON)
+      .setStatusCode(SC_OK)
+      .end(responseBody);
   }
 }

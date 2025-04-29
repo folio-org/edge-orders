@@ -1,26 +1,26 @@
 package org.folio.edge.orders;
 
-public enum MosaicEndpoint {
-  ORDER_TEMPLATES("/orders/order-templates", "/orders/order-templates", "orderTemplates", true),
-  FUNDS("/finance/funds", "/finance/funds", "funds", true),
-  EXPENSE_CLASSES("/finance/expense-classes", "/finance/expense-classes", "expenseClasses", true),
-  LOCATIONS("/locations", "/locations","locations", true),
-  ACQUISITIONS_UNITS("/acquisitions-units/units", "/acquisitions-units/units", "acquisitionsUnits", true),
-  ORGANIZATIONS("/organizations/organizations", "/organizations/organizations", "organizations", true),
-  CUSTOM_FIELDS("/custom-fields", "/custom-fields", "customFields", true),
-  USERS("/users", "/users","users", true),
-  BILLING_AND_SHIPPING("/addresses/billing-and-shipping", "/configurations/entries", "configs", false);
+import io.vertx.core.http.HttpMethod;
 
+import static io.vertx.core.http.HttpMethod.GET;
+import static io.vertx.core.http.HttpMethod.POST;
+
+public enum MosaicEndpoint {
+  VALIDATE(GET, "/mosaic/validate", "/mosaic/validate"),
+  CREATE_ORDERS(POST, "/mosaic/orders", "/mosaic/orders");
+
+  private final HttpMethod method;
   private final String ingressUrl;
   private final String egressUrl;
-  private final String dataKey;
-  private final boolean hasFiltering;
 
-  MosaicEndpoint(String ingressUrl, String egressUrl, String dataKey, boolean hasFiltering) {
+  MosaicEndpoint(HttpMethod method, String ingressUrl, String egressUrl) {
+    this.method = method;
     this.ingressUrl = ingressUrl;
     this.egressUrl = egressUrl;
-    this.dataKey = dataKey;
-    this.hasFiltering = hasFiltering;
+  }
+
+  public HttpMethod getMethod() {
+    return method;
   }
 
   public String getIngressUrl() {
@@ -29,13 +29,5 @@ public enum MosaicEndpoint {
 
   public String getEgressUrl() {
     return egressUrl;
-  }
-
-  public String getDataKey() {
-    return dataKey;
-  }
-
-  public boolean isHasFiltering() {
-    return hasFiltering;
   }
 }
