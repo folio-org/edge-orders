@@ -5,12 +5,13 @@ import java.util.Map;
 
 public class Constants {
 
-  public static final String PARAM_TYPE = "type";
   public static final String API_CONFIGURATION_PROPERTY_NAME = "api_config";
   public static final String API_CONFIGURATION_DEFAULT = "api_configuration.json";
+  public static final String HTTP_METHOD_POST = "POST";
+  public static final String HTTP_METHOD_GET = "GET";
+  public static final String HTTP_METHOD_PUT = "PUT";
 
   public enum ErrorCodes {
-
     // Subject to change pending additional information from the GOBI folks
     BAD_REQUEST(400),
     API_KEY_INVALID(-1),
@@ -44,7 +45,5 @@ public class Constants {
   }
 
   private Constants() {
-
   }
-
 }

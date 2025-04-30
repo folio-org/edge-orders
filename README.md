@@ -36,7 +36,7 @@ Api Configuration format:
 | type        | GOBI             | Type of the system      |
 | pathPattern | /orders/validate | URL Path for mapping    |
 | method      | POST             | HTTP method for mapping |
-| proxyMehtod | POST             | HTTP method for proxy   |
+| proxyMethod | POST             | HTTP method for proxy   |
 | proxyPath   | /gobi/validate   | Path for proxy          |
 
 Example of api mapping content:

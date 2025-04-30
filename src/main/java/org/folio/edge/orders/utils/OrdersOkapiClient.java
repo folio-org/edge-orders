@@ -4,13 +4,18 @@ import static org.folio.edge.core.Constants.APPLICATION_JSON;
 import static org.folio.edge.core.Constants.APPLICATION_XML;
 import static org.folio.edge.core.Constants.TEXT_PLAIN;
 import static org.folio.edge.core.Constants.X_OKAPI_TOKEN;
+import static org.folio.edge.orders.Constants.HTTP_METHOD_GET;
+import static org.folio.edge.orders.Constants.HTTP_METHOD_POST;
+import static org.folio.edge.orders.Constants.HTTP_METHOD_PUT;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.folio.edge.core.utils.OkapiClient;
+import org.folio.edge.orders.Param;
 import org.folio.rest.mappings.model.Routing;
 
 import io.vertx.core.Handler;
@@ -38,12 +43,13 @@ public class OrdersOkapiClient extends OkapiClient {
                    Handler<Throwable> exceptionHandler) {
     logger.debug("send:: Trying to send request to Okapi with routing: {}, payload: {}", routing, payload);
     final String method = routing.getProxyMethod() == null ? routing.getMethod() : routing.getProxyMethod();
+    final String proxyPath = prepareProxyPathWithQueryStringParams(routing.getProxyPath(), params);
 
     String resultPath = Optional.ofNullable(params)
-      .map(it -> it.names().stream().reduce(routing.getProxyPath(), (acc, item) -> acc.replace(":" + item, params.get(item))))
-      .orElse(routing.getProxyPath());
+      .map(it -> it.names().stream().reduce(proxyPath, (acc, item) -> acc.replace(String.format(":%s", item), params.get(item))))
+      .orElse(proxyPath);
     switch (method) {
-      case "POST":
+      case HTTP_METHOD_POST:
         logger.info("Sending POST request to Okapi with routing: {}, payload: {}, resultPath: {}", routing, payload, resultPath);
         post(
           okapiURL + resultPath,
@@ -53,7 +59,7 @@ public class OrdersOkapiClient extends OkapiClient {
           responseHandler,
           exceptionHandler);
         break;
-      case "GET":
+      case HTTP_METHOD_GET:
         logger.info("Sending GET request to Okapi with routing: {}, payload: {}, resultPath: {}", routing, payload, resultPath);
         get(
           okapiURL + resultPath,
@@ -62,7 +68,7 @@ public class OrdersOkapiClient extends OkapiClient {
           responseHandler,
           exceptionHandler);
         break;
-      case "PUT":
+      case HTTP_METHOD_PUT:
         logger.info("Sending PUT request to Okapi with routing: {}, payload: {}, resultPath: {}", routing, payload, resultPath);
         put(
           okapiURL + resultPath,
@@ -72,7 +78,30 @@ public class OrdersOkapiClient extends OkapiClient {
           responseHandler,
           exceptionHandler);
         break;
+      default:
+        throw new UnsupportedOperationException(String.format("Unsupported method %s", method));
     }
+  }
+
+  private String prepareProxyPathWithQueryStringParams(String proxyPath, MultiMap params) {
+    if (Objects.isNull(params)) {
+      return proxyPath;
+    }
+    for (Param param : Param.values()) {
+      if (StringUtils.containsAny(proxyPath, String.format(":%s", param.getName())) && StringUtils.isEmpty(params.get(param.getName()))) {
+        proxyPath = !param.getDefaultValue().isBlank() ? setDefaultParamValue(proxyPath, param) : fullyRemoveParam(proxyPath, param);
+      }
+    }
+    return proxyPath;
+  }
+
+  private String setDefaultParamValue(String proxyPath, Param param) {
+    return proxyPath.replace(String.format(":%s", param.getName()), param.getDefaultValue());
+  }
+
+  private String fullyRemoveParam(String proxyPath, Param param) {
+    String placeholderPattern = String.format("(\\?|&)(%1$s=:%1$s)", param.getName());
+    return proxyPath.replaceAll(placeholderPattern, "");
   }
 
   public void put(String url, String tenant, String payload, MultiMap headers, Handler<HttpResponse<Buffer>> responseHandler,
@@ -100,6 +129,5 @@ public class OrdersOkapiClient extends OkapiClient {
         .onSuccess(responseHandler)
         .onFailure(exceptionHandler);
     }
-
   }
 }

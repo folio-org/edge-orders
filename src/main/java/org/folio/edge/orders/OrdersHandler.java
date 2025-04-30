@@ -5,7 +5,6 @@ import static org.folio.edge.core.Constants.APPLICATION_XML;
 import static org.folio.edge.core.Constants.MSG_ACCESS_DENIED;
 import static org.folio.edge.core.Constants.MSG_INVALID_API_KEY;
 import static org.folio.edge.core.Constants.MSG_REQUEST_TIMEOUT;
-import static org.folio.edge.orders.Constants.PARAM_TYPE;
 
 import java.util.List;
 import java.util.Map;
@@ -29,6 +28,7 @@ import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.client.HttpResponse;
 
 public class OrdersHandler extends Handler {
+
   private static final Logger logger = LogManager.getLogger(OrdersHandler.class);
 
   public OrdersHandler(SecureStore secureStore, OkapiClientFactory ocf) {
@@ -44,25 +44,24 @@ public class OrdersHandler extends Handler {
       ctx.request().headers().remove(HttpHeaders.ACCEPT_ENCODING);
     }
 
-    String type = ctx.request()
-        .getParam(PARAM_TYPE);
+    String type = ctx.request().getParam(Param.TYPE.getName());
     if (type == null || type.isEmpty()) {
       logger.warn("handleCommon:: Type is not specified");
-      badRequest(ctx, "Missing required parameter: " + PARAM_TYPE);
+      badRequest(ctx, "Missing required parameter: " + Param.TYPE.getName());
       return;
     }
 
     super.handleCommon(ctx, requiredParams, optionalParams, (client, params) -> {
       final OrdersOkapiClient ordersClient = new OrdersOkapiClient(client);
 
-      params.put(PARAM_TYPE, type);
+      params.put(Param.TYPE.getName(), type);
       action.apply(ordersClient, params);
     });
   }
 
   protected void handle(RoutingContext ctx, List<Routing> routingMapping) {
     handleCommon(ctx, new String[]{}, new String[]{}, (client, params) -> {
-      String type = params.get(PARAM_TYPE);
+      String type = params.get(Param.TYPE.getName());
 
       Routing routing;
       String currentPath = ctx.currentRoute().getPath();
@@ -103,7 +102,7 @@ public class OrdersHandler extends Handler {
     }
 
     ctx.response().setStatusCode(resp.statusCode());
-    if (body.length() > 0) {
+    if (!body.isEmpty()) {
       String respBody = body.toString();
       handleResponseWithBody(ctx, resp, respBody);
       if (logger.isDebugEnabled()) {
