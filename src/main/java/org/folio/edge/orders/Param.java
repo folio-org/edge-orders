@@ -1,10 +1,10 @@
 package org.folio.edge.orders;
 
 public enum Param {
-  TYPE("type",""),
+  TYPE("type", ""),
   OFFSET("offset", "0"),
   LIMIT("limit", "20"),
-  QUERY("query","");
+  QUERY("query", "");
 
   private final String name;
   private final String defaultValue;
