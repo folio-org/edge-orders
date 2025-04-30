@@ -75,13 +75,13 @@
     {
       "type": "COMMON",
       "method": "GET",
-      "pathPattern": "/acquisitions-units/units",
+      "pathPattern": "/acquisitions-units",
       "proxyPath": "/acquisitions-units/units?offset=:offset&limit=:limit&query=:query"
     },
     {
       "type": "COMMON",
       "method": "GET",
-      "pathPattern": "/organizations/organizations",
+      "pathPattern": "/organizations",
       "proxyPath": "/organizations/organizations?offset=:offset&limit=:limit&query=:query"
     },
     {

@@ -5,8 +5,8 @@ public enum CommonEndpoint {
   FUNDS("/finance/funds", "/finance/funds", "funds", true),
   EXPENSE_CLASSES("/finance/expense-classes", "/finance/expense-classes", "expenseClasses", true),
   LOCATIONS("/locations", "/locations","locations", true),
-  ACQUISITIONS_UNITS("/acquisitions-units/units", "/acquisitions-units/units", "acquisitionsUnits", true),
-  ORGANIZATIONS("/organizations/organizations", "/organizations/organizations", "organizations", true),
+  ACQUISITIONS_UNITS("/acquisitions-units", "/acquisitions-units/units", "acquisitionsUnits", true),
+  ORGANIZATIONS("/organizations", "/organizations/organizations", "organizations", true),
   BILLING_AND_SHIPPING("/addresses/billing-and-shipping", "/configurations/entries", "configs", false);
 
   private final String ingressUrl;
