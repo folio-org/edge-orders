@@ -78,7 +78,6 @@ public class MainVerticleTest {
   private static final String BAD_API_KEY = API_KEY + "0000";
   private static final String UNKNOWN_TENANT_API_KEY = ApiKeyUtils.generateApiKey(10, "bogus", "diku");
   private static final long REQUEST_TIMEOUT_MS = 3000L;
-  private static final String MOD_ORDERS_STORAGE_VERSION = "mod-orders-storage-14.0.0-SNAPSHOT.999";
 
   private static OrdersMockOkapi mockOkapi;
   private static Map<String, String> mockRequests;
@@ -99,7 +98,6 @@ public class MainVerticleTest {
     System.setProperty(SYS_OKAPI_URL, "http://localhost:" + okapiPort);
     System.setProperty(SYS_SECURE_STORE_PROP_FILE, "src/main/resources/ephemeral.properties");
     System.setProperty(API_CONFIGURATION_PROPERTY_NAME, "src/main/resources/api_configuration.json");
-    System.setProperty(Constants.MOD_ORDERS_STORAGE_VERSION, MOD_ORDERS_STORAGE_VERSION);
     System.setProperty(SYS_LOG_LEVEL, "TRACE");
     System.setProperty(SYS_REQUEST_TIMEOUT_MS, String.valueOf(REQUEST_TIMEOUT_MS));
 

@@ -5,14 +5,11 @@ import static org.folio.edge.core.Constants.APPLICATION_XML;
 import static org.folio.edge.core.Constants.MSG_ACCESS_DENIED;
 import static org.folio.edge.core.Constants.MSG_INVALID_API_KEY;
 import static org.folio.edge.core.Constants.MSG_REQUEST_TIMEOUT;
-import static org.folio.edge.orders.Constants.CUSTOM_FIELDS_ENDPOINT;
-import static org.folio.edge.orders.Constants.MOD_ORDERS_STORAGE_VERSION;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.apache.commons.lang3.StringUtils;
 import org.folio.edge.core.Handler;
 import org.folio.edge.core.security.SecureStore;
 import org.folio.edge.core.utils.OkapiClient;
@@ -21,7 +18,6 @@ import org.folio.edge.orders.Constants.ErrorCodes;
 import org.folio.edge.orders.model.ErrorWrapper;
 import org.folio.edge.orders.model.ResponseWrapper;
 import org.folio.edge.orders.utils.OrdersOkapiClient;
-import org.folio.okapi.common.XOkapiHeaders;
 import org.folio.rest.mappings.model.Routing;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -71,10 +67,6 @@ public class OrdersHandler extends Handler {
       String currentPath = ctx.currentRoute().getPath();
       String requestNormalisedPath = ctx.normalizedPath();
       String requestMethod = ctx.request().method().name();
-      String modOrderStorageVersion = System.getProperty(MOD_ORDERS_STORAGE_VERSION);
-      if (currentPath.contains(CUSTOM_FIELDS_ENDPOINT) && StringUtils.isNotEmpty(modOrderStorageVersion)) {
-        ctx.request().headers().add(XOkapiHeaders.MODULE_ID, modOrderStorageVersion);
-      }
 
       logger.debug("handle:: Trying to find routing for path: {}, method: {}", requestNormalisedPath, requestMethod);
       try {

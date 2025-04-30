@@ -7,7 +7,6 @@ public enum CommonEndpoint {
   LOCATIONS("/locations", "/locations","locations", true),
   ACQUISITIONS_UNITS("/acquisitions-units/units", "/acquisitions-units/units", "acquisitionsUnits", true),
   ORGANIZATIONS("/organizations/organizations", "/organizations/organizations", "organizations", true),
-  CUSTOM_FIELDS("/custom-fields", "/custom-fields", "customFields", true),
   BILLING_AND_SHIPPING("/addresses/billing-and-shipping", "/configurations/entries", "configs", false);
 
   private final String ingressUrl;

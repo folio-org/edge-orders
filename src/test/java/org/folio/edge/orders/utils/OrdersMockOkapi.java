@@ -14,7 +14,6 @@ import static org.folio.edge.orders.MosaicEndpoint.VALIDATE;
 import static org.folio.edge.orders.Param.LIMIT;
 import static org.folio.edge.orders.Param.OFFSET;
 import static org.folio.edge.orders.Param.QUERY;
-import static org.folio.okapi.common.XOkapiHeaders.MODULE_ID;
 
 import java.util.Arrays;
 import java.util.List;
@@ -225,14 +224,12 @@ public class OrdersMockOkapi extends MockOkapi {
   }
 
   public void handleCommonGetRequest(CommonEndpoint endpoint, RoutingContext ctx) {
-    String moduleId = ctx.request().getHeader(MODULE_ID);
     String offset = ctx.request().getParam(OFFSET.getName());
     String limit = ctx.request().getParam(LIMIT.getName());
     String query = ctx.request().getParam(QUERY.getName());
     String dataKey = endpoint.getDataKey();
 
-    logger.info("handleGeneric:: Created handler: Ingress URL: {}, Egress URL: {}, Module Id: {}",
-      endpoint.getIngressUrl(), endpoint.getEgressUrl(), moduleId);
+    logger.info("handleGeneric:: Created handler: Ingress URL: {}, Egress URL: {}", endpoint.getIngressUrl(), endpoint.getEgressUrl());
 
     String responseBody;
     if (StringUtils.equals(query, "id==" + NO_DATA_ID)) {

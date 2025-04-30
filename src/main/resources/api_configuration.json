@@ -87,12 +87,6 @@
     {
       "type": "COMMON",
       "method": "GET",
-      "pathPattern": "/custom-fields",
-      "proxyPath": "/custom-fields?offset=:offset&limit=:limit&query=:query"
-    },
-    {
-      "type": "COMMON",
-      "method": "GET",
       "pathPattern": "/addresses/billing-and-shipping",
       "proxyPath": "/configurations/entries?query=configName==tenant.addresses"
     }
