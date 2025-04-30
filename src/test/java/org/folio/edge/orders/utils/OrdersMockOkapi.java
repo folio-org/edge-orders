@@ -3,7 +3,6 @@ package org.folio.edge.orders.utils;
 import static io.vertx.core.http.HttpHeaders.CONTENT_TYPE;
 import static io.vertx.core.http.HttpMethod.GET;
 import static io.vertx.core.http.HttpMethod.POST;
-import static org.apache.http.HttpStatus.SC_FORBIDDEN;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.folio.edge.core.Constants.APPLICATION_JSON;
 import static org.folio.edge.core.Constants.APPLICATION_XML;
@@ -195,15 +194,9 @@ public class OrdersMockOkapi extends MockOkapi {
   }
 
   public void handleMosaicRequest(RoutingContext ctx) {
-    String token = ctx.request().getHeader(X_OKAPI_TOKEN);
     String status = ctx.request().getHeader(X_ECHO_STATUS_HEADER);
 
-    if (token == null || !token.equals(MOCK_TOKEN)) {
-      ctx.response()
-        .setStatusCode(SC_FORBIDDEN)
-        .putHeader(CONTENT_TYPE, TEXT_PLAIN)
-        .end("Access requires permission: mosaic.validate.get");
-    } else if (status != null && !status.isEmpty()) {
+    if (status != null && !status.isEmpty()) {
       ctx.response()
         .setStatusCode(Integer.parseInt(status))
         .putHeader(CONTENT_TYPE, TEXT_PLAIN)
