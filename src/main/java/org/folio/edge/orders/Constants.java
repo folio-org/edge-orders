@@ -7,8 +7,6 @@ public class Constants {
 
   public static final String API_CONFIGURATION_PROPERTY_NAME = "api_config";
   public static final String API_CONFIGURATION_DEFAULT = "api_configuration.json";
-  public static final String MOD_ORDERS_STORAGE_VERSION = "mod_order_storage_version";
-  public static final String CUSTOM_FIELDS_ENDPOINT = "custom-fields";
   public static final String HTTP_METHOD_POST = "POST";
   public static final String HTTP_METHOD_GET = "GET";
   public static final String HTTP_METHOD_PUT = "PUT";
