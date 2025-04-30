@@ -10,5 +10,4 @@ public class ErrorWrapperTest {
   public void testEqualsContract() {
     EqualsVerifier.forClass(ErrorWrapper.class).verify();
   }
-
 }

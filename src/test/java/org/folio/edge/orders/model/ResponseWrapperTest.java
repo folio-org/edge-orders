@@ -12,7 +12,9 @@ import org.junit.Test;
 import nl.jqno.equalsverifier.EqualsVerifier;
 
 public class ResponseWrapperTest {
+
   private static final Logger logger = LogManager.getLogger(ResponseWrapperTest.class);
+
   private ResponseWrapper respError;
   private ResponseWrapper respSuccess;
 
@@ -30,7 +32,7 @@ public class ResponseWrapperTest {
   @Test
   public void testErrorToFromJson() throws IOException {
     String json = respError.toJson();
-    logger.info("JSON: " + json);
+    logger.info("JSON: {}", json);
 
     ResponseWrapper fromJson = ResponseWrapper.fromJson(json);
     assertEquals(respError, fromJson);
@@ -39,7 +41,7 @@ public class ResponseWrapperTest {
   @Test
   public void testErrorToFromXml() throws IOException {
     String xml = respError.toXml();
-    logger.info("XML: " + xml);
+    logger.info("XML: {}", xml);
 
     ResponseWrapper fromXml = ResponseWrapper.fromXml(xml);
     assertEquals(respError, fromXml);
@@ -62,7 +64,7 @@ public class ResponseWrapperTest {
   @Test
   public void testSuccessToFromJson() throws IOException {
     String json = respSuccess.toJson();
-    logger.info("JSON: " + json);
+    logger.info("JSON: {}", json);
 
     ResponseWrapper fromJson = ResponseWrapper.fromJson(json);
     assertEquals(respSuccess, fromJson);
@@ -71,7 +73,7 @@ public class ResponseWrapperTest {
   @Test
   public void testSuccessToFromXml() throws IOException {
     String xml = respSuccess.toXml();
-    logger.info("XML: " + xml);
+    logger.info("XML: {}", xml);
 
     ResponseWrapper fromXml = ResponseWrapper.fromXml(xml);
     assertEquals(respSuccess, fromXml);
@@ -90,5 +92,4 @@ public class ResponseWrapperTest {
     assertEquals(respSuccess, fromJson);
     assertEquals(respSuccess, fromXml);
   }
-
 }

@@ -84,7 +84,6 @@ public class MainVerticle extends EdgeVerticleHttp {
         }
 
         try (InputStream in = url == null ? new FileInputStream(apiConfigurationPropFile) : url.openStream()) {
-
           apiConfiguration = mapper.readValue(in, ApiConfiguration.class);
           logger.info("initApiConfiguration:: ApiConfiguration has been loaded from file {}", apiConfigurationPropFile);
         }
