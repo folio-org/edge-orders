@@ -4,7 +4,6 @@ public enum CommonEndpoint {
   ORDER_TEMPLATES("/orders/order-templates", "/orders/order-templates", "orderTemplates", true),
   FUNDS("/finance/funds", "/finance/funds", "funds", true),
   EXPENSE_CLASSES("/finance/expense-classes", "/finance/expense-classes", "expenseClasses", true),
-  LOCATIONS("/locations", "/locations","locations", true),
   ACQUISITIONS_UNITS("/acquisitions-units", "/acquisitions-units/units", "acquisitionsUnits", true),
   ORGANIZATIONS("/organizations", "/organizations/organizations", "organizations", true),
   BILLING_AND_SHIPPING("/addresses/billing-and-shipping", "/configurations/entries", "configs", false);
