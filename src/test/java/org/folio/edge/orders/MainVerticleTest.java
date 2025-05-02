@@ -669,7 +669,7 @@ public class MainVerticleTest {
     RestAssured
       .with()
       .body(requestBody)
-      .post(CREATE_ORDERS.getEgressUrl() + "?type=MOSAIC&apikey=" + API_KEY)
+      .post(CREATE_ORDERS.getIngressUrl() + "?type=MOSAIC&apikey=" + API_KEY)
       .then()
       .contentType(APPLICATION_JSON)
       .statusCode(SC_OK)

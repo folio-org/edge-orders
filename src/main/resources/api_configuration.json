@@ -39,13 +39,13 @@
     {
       "type": "MOSAIC",
       "method": "GET",
-      "pathPattern": "/mosaic/validate",
+      "pathPattern": "/validate",
       "proxyPath": "/mosaic/validate"
     },
     {
       "type": "MOSAIC",
       "method": "POST",
-      "pathPattern": "/mosaic/orders",
+      "pathPattern": "/orders",
       "proxyPath": "/mosaic/orders"
     },
     {
@@ -65,12 +65,6 @@
       "method": "GET",
       "pathPattern": "/finance/expense-classes",
       "proxyPath": "/finance/expense-classes?offset=:offset&limit=:limit&query=:query"
-    },
-    {
-      "type": "COMMON",
-      "method": "GET",
-      "pathPattern": "/locations",
-      "proxyPath": "/locations?offset=:offset&limit=:limit&query=:query"
     },
     {
       "type": "COMMON",
