@@ -38,7 +38,7 @@
     },
     {
       "type": "MOSAIC",
-      "method": "GET",
+      "method": "POST",
       "pathPattern": "/mosaic/validate",
       "proxyPath": "/mosaic/validate"
     },

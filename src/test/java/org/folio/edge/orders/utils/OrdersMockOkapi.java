@@ -69,7 +69,7 @@ public class OrdersMockOkapi extends MockOkapi {
     router.route(HttpMethod.PUT, "/ebsconet/order-lines/:id").handler(this::putOrderLinesHandler);
     // MOSAIC
     Arrays.stream(MosaicEndpoint.values()).forEach(endpoint ->
-      router.route(endpoint.getMethod(), endpoint.getEgressUrl()).handler(this::handleMosaicRequest));
+      router.route(POST, endpoint.getEgressUrl()).handler(ctx -> handleMosaicGetRequest(endpoint, ctx)));
     // COMMON
     Arrays.stream(CommonEndpoint.values()).forEach(endpoint ->
       router.route(GET, endpoint.getEgressUrl()).handler(ctx -> handleCommonGetRequest(endpoint, ctx)));
@@ -193,8 +193,10 @@ public class OrdersMockOkapi extends MockOkapi {
     }
   }
 
-  public void handleMosaicRequest(RoutingContext ctx) {
+  public void handleMosaicGetRequest(MosaicEndpoint endpoint, RoutingContext ctx) {
     String status = ctx.request().getHeader(X_ECHO_STATUS_HEADER);
+
+    logger.info("handleMosaicGetRequest:: Created handler: Ingress URL: {}, Egress URL: {}", endpoint.getIngressUrl(), endpoint.getEgressUrl());
 
     if (status != null && !status.isEmpty()) {
       ctx.response()
@@ -202,12 +204,12 @@ public class OrdersMockOkapi extends MockOkapi {
         .putHeader(CONTENT_TYPE, TEXT_PLAIN)
         .end("No suitable module found for path /mosaic/validate");
     } else {
-      if (ctx.request().method().equals(GET) && StringUtils.contains(ctx.request().uri(), VALIDATE.getEgressUrl()) ) {
+      if (StringUtils.contains(ctx.request().uri(), VALIDATE.getEgressUrl()) ) {
         ctx.response()
           .putHeader(CONTENT_TYPE, APPLICATION_JSON)
           .setStatusCode(SC_OK)
           .end(new JsonObject().put("status", "SUCCESS").toString());
-      } else if (ctx.request().method().equals(POST) && StringUtils.contains(ctx.request().uri(), CREATE_ORDERS.getEgressUrl())) {
+      } else if (StringUtils.contains(ctx.request().uri(), CREATE_ORDERS.getEgressUrl())) {
         ctx.response()
           .putHeader(CONTENT_TYPE, APPLICATION_JSON)
           .setStatusCode(SC_OK)
@@ -222,7 +224,7 @@ public class OrdersMockOkapi extends MockOkapi {
     String query = ctx.request().getParam(QUERY.getName());
     String dataKey = endpoint.getDataKey();
 
-    logger.info("handleGeneric:: Created handler: Ingress URL: {}, Egress URL: {}", endpoint.getIngressUrl(), endpoint.getEgressUrl());
+    logger.info("handleCommonGetRequest:: Created handler: Ingress URL: {}, Egress URL: {}", endpoint.getIngressUrl(), endpoint.getEgressUrl());
 
     String responseBody;
     if (StringUtils.equals(query, "id==" + NO_DATA_ID)) {

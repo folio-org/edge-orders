@@ -631,7 +631,7 @@ public class MainVerticleTest {
     logger.info("testReturnMosaicValidatedResponse:: Ingress URL: {}", VALIDATE.getIngressUrl());
 
     RestAssured
-      .get(VALIDATE.getIngressUrl() + "?type=MOSAIC&apikey=" + API_KEY)
+      .post(VALIDATE.getIngressUrl() + "?type=MOSAIC&apikey=" + API_KEY)
       .then()
       .contentType(APPLICATION_JSON)
       .statusCode(SC_OK)
@@ -645,7 +645,7 @@ public class MainVerticleTest {
     final Response response = RestAssured
       .with()
       .header(X_ECHO_STATUS_HEADER, 404)
-      .get(VALIDATE.getIngressUrl() + "?type=MOSAIC&apiKey=" + API_KEY)
+      .post(VALIDATE.getIngressUrl() + "?type=MOSAIC&apiKey=" + API_KEY)
       .then()
       .contentType(APPLICATION_XML)
       .statusCode(SC_NOT_FOUND)
