@@ -20,6 +20,14 @@ See [edge-common](https://github.com/folio-org/edge-common) for a description of
 Institutional users should be granted the following permissions in order to use this edge API:
 
 - `gobi.all`
+- `mosaic.validate.get`
+- `mosaic.orders.item.post`
+- `orders.order-templates.collection.get`
+- `finance.funds.collection.get`
+- `finance.expense-classes.collection.get`
+- `acquisitions-units.units.collection.get`
+- `organizations.organizations.collection.get`
+- `configuration.entries.collection.get`
 
 ## Configuration
 
