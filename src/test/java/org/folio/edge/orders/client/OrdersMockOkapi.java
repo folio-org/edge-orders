@@ -1,4 +1,4 @@
-package org.folio.edge.orders.utils;
+package org.folio.edge.orders.client;
 
 import static io.vertx.core.http.HttpHeaders.CONTENT_TYPE;
 import static io.vertx.core.http.HttpMethod.GET;
@@ -70,6 +70,8 @@ public class OrdersMockOkapi extends MockOkapi {
     // MOSAIC
     Arrays.stream(MosaicEndpoint.values()).forEach(endpoint ->
       router.route(endpoint.getMethod(), endpoint.getEgressUrl()).handler(this::handleMosaicRequest));
+    // OKAPI PROXY MODULES
+    router.route(GET, "/_/proxy/tenants/diku/modules").handler(this::handleOkapiModuleIdRequest);
     // COMMON
     Arrays.stream(CommonEndpoint.values()).forEach(endpoint ->
       router.route(GET, endpoint.getEgressUrl()).handler(ctx -> handleCommonGetRequest(endpoint, ctx)));
@@ -214,6 +216,15 @@ public class OrdersMockOkapi extends MockOkapi {
           .end("10000-2");
       }
     }
+  }
+
+  public void handleOkapiModuleIdRequest(RoutingContext ctx) {
+    ctx.response()
+      .putHeader(CONTENT_TYPE, APPLICATION_JSON)
+      .setStatusCode(SC_OK)
+      .end("""
+        [{"id": "mod-orders-storage-13.8.0"}, {"id": "mod-users-1.2.3"}]
+      """);
   }
 
   public void handleCommonGetRequest(CommonEndpoint endpoint, RoutingContext ctx) {

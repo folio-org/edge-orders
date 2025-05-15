@@ -10,6 +10,8 @@ public class Constants {
   public static final String HTTP_METHOD_POST = "POST";
   public static final String HTTP_METHOD_GET = "GET";
   public static final String HTTP_METHOD_PUT = "PUT";
+  public static final String CUSTOM_FIELDS_INTERFACE_NAME = "custom-fields";
+  public static final String CUSTOM_FIELDS_MODULE_NAME = "mod-orders-storage";
 
   public enum ErrorCodes {
     // Subject to change pending additional information from the GOBI folks

@@ -5,11 +5,14 @@ import static org.folio.edge.core.Constants.APPLICATION_XML;
 import static org.folio.edge.core.Constants.MSG_ACCESS_DENIED;
 import static org.folio.edge.core.Constants.MSG_INVALID_API_KEY;
 import static org.folio.edge.core.Constants.MSG_REQUEST_TIMEOUT;
+import static org.folio.edge.orders.Constants.CUSTOM_FIELDS_INTERFACE_NAME;
+import static org.folio.edge.orders.Constants.CUSTOM_FIELDS_MODULE_NAME;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.apache.commons.lang3.StringUtils;
 import org.folio.edge.core.Handler;
 import org.folio.edge.core.security.SecureStore;
 import org.folio.edge.core.utils.OkapiClient;
@@ -17,7 +20,8 @@ import org.folio.edge.core.utils.OkapiClientFactory;
 import org.folio.edge.orders.Constants.ErrorCodes;
 import org.folio.edge.orders.model.ErrorWrapper;
 import org.folio.edge.orders.model.ResponseWrapper;
-import org.folio.edge.orders.utils.OrdersOkapiClient;
+import org.folio.edge.orders.client.AcquisitionsOkapiClient;
+import org.folio.okapi.common.XOkapiHeaders;
 import org.folio.rest.mappings.model.Routing;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -52,7 +56,7 @@ public class OrdersHandler extends Handler {
     }
 
     super.handleCommon(ctx, requiredParams, optionalParams, (client, params) -> {
-      final OrdersOkapiClient ordersClient = new OrdersOkapiClient(client);
+      final AcquisitionsOkapiClient ordersClient = new AcquisitionsOkapiClient(client);
 
       params.put(Param.TYPE.getName(), type);
       action.apply(ordersClient, params);
@@ -82,11 +86,37 @@ public class OrdersHandler extends Handler {
         return;
       }
 
-      logger.info("handle:: Request is from purchasing system: {}", type);
-      ((OrdersOkapiClient) client).send(routing, ctx.getBodyAsString(), ctx.request().params(), ctx.request().headers(),
-        resp -> handleResponse(ctx, resp),
-        t -> handleProxyException(ctx, t));
+      AcquisitionsOkapiClient acquisitionsClient = (AcquisitionsOkapiClient) client;
+      if (StringUtils.contains(routing.getPathPattern(), CUSTOM_FIELDS_INTERFACE_NAME)) {
+        sendForCustomFieldsRequest(acquisitionsClient, routing, ctx, type);
+      } else {
+        send(acquisitionsClient, routing, ctx, type);
+      }
     });
+  }
+
+  private void sendForCustomFieldsRequest(AcquisitionsOkapiClient client, Routing routing, RoutingContext ctx, String type) {
+    client.getModuleIdForMultipleInterface(CUSTOM_FIELDS_INTERFACE_NAME, CUSTOM_FIELDS_MODULE_NAME, ctx.request().headers())
+      .onComplete(res -> {
+        if (res.failed()) {
+          internalServerError(ctx, "Failed to get module id for custom fields interface: " + res.cause().getMessage());
+          return;
+        }
+        String moduleId = res.result();
+        if (StringUtils.isBlank(moduleId)) {
+          badRequest(ctx, "Module Id is blank when calling /custom-fields");
+          return;
+        }
+        ctx.request().headers().add(XOkapiHeaders.MODULE_ID, res.result());
+        send(client, routing, ctx, type);
+      });
+  }
+
+  private void send(AcquisitionsOkapiClient client, Routing routing, RoutingContext ctx, String type) {
+    logger.info("handle:: Request is from purchasing system: {}", type);
+    client.send(routing, ctx.getBodyAsString(), ctx.request().params(), ctx.request().headers(),
+      resp -> handleResponse(ctx, resp),
+      t -> handleProxyException(ctx, t));
   }
 
   protected void handleResponse(RoutingContext ctx, HttpResponse<Buffer> resp) {

@@ -57,6 +57,12 @@
     {
       "type": "COMMON",
       "method": "GET",
+      "pathPattern": "/orders/custom-fields",
+      "proxyPath": "/custom-fields?offset=:offset&limit=:limit&query=:query"
+    },
+    {
+      "type": "COMMON",
+      "method": "GET",
       "pathPattern": "/finance/funds",
       "proxyPath": "/finance/funds?offset=:offset&limit=:limit&query=:query"
     },
