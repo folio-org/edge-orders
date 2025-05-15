@@ -77,7 +77,7 @@ public class MainVerticleTest {
   private static final String API_KEY = ApiKeyUtils.generateApiKey(10, "diku", "diku");
   private static final String BAD_API_KEY = API_KEY + "0000";
   private static final String UNKNOWN_TENANT_API_KEY = ApiKeyUtils.generateApiKey(10, "bogus", "diku");
-  private static final long REQUEST_TIMEOUT_MS = 600000L;
+  private static final long REQUEST_TIMEOUT_MS = 60000L;
 
   private static OrdersMockOkapi mockOkapi;
   private static Map<String, String> mockRequests;
