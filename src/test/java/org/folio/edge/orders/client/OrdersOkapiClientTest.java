@@ -1,4 +1,4 @@
-package org.folio.edge.orders.utils;
+package org.folio.edge.orders.client;
 
 import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
@@ -38,7 +38,7 @@ public class OrdersOkapiClientTest {
   private static final String TENANT = "diku";
   private static final int REQ_TIMEOUT = 3000;
 
-  private OrdersOkapiClient client;
+  private AcquisitionsOkapiClient client;
   private OrdersMockOkapi mockOkapi;
 
   @Before
@@ -51,7 +51,7 @@ public class OrdersOkapiClientTest {
     mockOkapi = new OrdersMockOkapi(okapiPort, knownTenants);
     mockOkapi.start().onComplete(context.asyncAssertSuccess());
 
-    client = new OrdersOkapiClient(new OkapiClientFactory(Vertx.vertx(),
+    client = new AcquisitionsOkapiClient(new OkapiClientFactory(Vertx.vertx(),
       "http://localhost:" + okapiPort, REQ_TIMEOUT).getOkapiClient(TENANT));
 
     Map<String, String> mockRequests = new HashMap<>();
