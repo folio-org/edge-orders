@@ -6,6 +6,7 @@ public enum CommonEndpoint {
   FUNDS("/finance/funds", "/finance/funds", "funds", true),
   EXPENSE_CLASSES("/finance/expense-classes", "/finance/expense-classes", "expenseClasses", true),
   ACQUISITIONS_UNITS("/acquisitions-units", "/acquisitions-units/units", "acquisitionsUnits", true),
+  ACQUISITIONS_METHODS("/acquisition-methods", "/orders/acquisition-methods", "acquisitionMethods", true),
   ORGANIZATIONS("/organizations", "/organizations/organizations", "organizations", true),
   BILLING_AND_SHIPPING("/addresses/billing-and-shipping", "/configurations/entries", "configs", false);
 
