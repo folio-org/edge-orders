@@ -81,6 +81,12 @@
     {
       "type": "COMMON",
       "method": "GET",
+      "pathPattern": "/acquisition-methods",
+      "proxyPath": "/orders/acquisition-methods?offset=:offset&limit=:limit&query=:query"
+    },
+    {
+      "type": "COMMON",
+      "method": "GET",
       "pathPattern": "/organizations",
       "proxyPath": "/organizations/organizations?offset=:offset&limit=:limit&query=:query"
     },

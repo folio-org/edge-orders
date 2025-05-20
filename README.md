@@ -27,6 +27,7 @@ Institutional users should be granted the following permissions in order to use 
 - `finance.funds.collection.get`
 - `finance.expense-classes.collection.get`
 - `acquisitions-units.units.collection.get`
+- `orders.acquisition-methods.collection.get`
 - `organizations.organizations.collection.get`
 - `configuration.entries.collection.get`
 
