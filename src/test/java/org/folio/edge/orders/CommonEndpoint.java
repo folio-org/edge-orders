@@ -16,13 +16,13 @@ public enum CommonEndpoint {
   private final String ingressUrl;
   private final String egressUrl;
   private final String dataKey;
-  private final boolean hasEmptyExtraQuery;
+  private final boolean isEmptyExtraQuery;
 
-  CommonEndpoint(String ingressUrl, String egressUrl, String dataKey, boolean hasEmptyExtraQuery) {
+  CommonEndpoint(String ingressUrl, String egressUrl, String dataKey, boolean isEmptyExtraQuery) {
     this.ingressUrl = ingressUrl;
     this.egressUrl = egressUrl;
     this.dataKey = dataKey;
-    this.hasEmptyExtraQuery = hasEmptyExtraQuery;
+    this.isEmptyExtraQuery = isEmptyExtraQuery;
   }
 
   public String getIngressUrl() {
@@ -38,6 +38,6 @@ public enum CommonEndpoint {
   }
 
   public boolean isEmptyExtraQuery() {
-    return hasEmptyExtraQuery;
+    return isEmptyExtraQuery;
   }
 }
