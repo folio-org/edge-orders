@@ -9,9 +9,9 @@ public enum CommonEndpoint {
   ACQUISITIONS_METHODS("/acquisition-methods", "/orders/acquisition-methods", "acquisitionMethods", true),
   ORGANIZATIONS("/organizations", "/organizations/organizations", "organizations", true),
   BILLING_AND_SHIPPING("/addresses/billing-and-shipping", "/configurations/entries", "configs", false),
-  LOCATIONS("/locations-for-orders", "/locations", "locations", true),
-  MATERIAL_TYPES("/material-types-for-orders", "/material-types", "mtypes", true),
-  USERS("/users-for-orders", "/users", "users", true);
+  LOCATIONS("/locations-for-order", "/locations", "locations", true),
+  MATERIAL_TYPES("/material-types-for-order", "/material-types", "mtypes", true),
+  USERS("/users-for-order", "/users", "users", true);
 
   private final String ingressUrl;
   private final String egressUrl;
