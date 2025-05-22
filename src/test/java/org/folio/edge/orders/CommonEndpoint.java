@@ -8,18 +8,21 @@ public enum CommonEndpoint {
   ACQUISITIONS_UNITS("/acquisitions-units", "/acquisitions-units/units", "acquisitionsUnits", true),
   ACQUISITIONS_METHODS("/acquisition-methods", "/orders/acquisition-methods", "acquisitionMethods", true),
   ORGANIZATIONS("/organizations", "/organizations/organizations", "organizations", true),
-  BILLING_AND_SHIPPING("/addresses/billing-and-shipping", "/configurations/entries", "configs", false);
+  BILLING_AND_SHIPPING("/addresses/billing-and-shipping", "/configurations/entries", "configs", false),
+  LOCATIONS("/locations", "/locations", "locations", true),
+  MATERIAL_TYPES("/material-types", "/material-types", "mtypes", true),
+  USERS("/users", "/users", "users", true);
 
   private final String ingressUrl;
   private final String egressUrl;
   private final String dataKey;
-  private final boolean hasFiltering;
+  private final boolean hasEmptyExtraQuery;
 
-  CommonEndpoint(String ingressUrl, String egressUrl, String dataKey, boolean hasFiltering) {
+  CommonEndpoint(String ingressUrl, String egressUrl, String dataKey, boolean hasEmptyExtraQuery) {
     this.ingressUrl = ingressUrl;
     this.egressUrl = egressUrl;
     this.dataKey = dataKey;
-    this.hasFiltering = hasFiltering;
+    this.hasEmptyExtraQuery = hasEmptyExtraQuery;
   }
 
   public String getIngressUrl() {
@@ -34,7 +37,7 @@ public enum CommonEndpoint {
     return dataKey;
   }
 
-  public boolean isHasFiltering() {
-    return hasFiltering;
+  public boolean hasEmptyExtraQuery() {
+    return hasEmptyExtraQuery;
   }
 }

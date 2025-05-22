@@ -21,4 +21,8 @@ public enum Param {
   public String getDefaultValue() {
     return defaultValue;
   }
+
+  public boolean hasDefaultNonBlankValue() {
+    return !defaultValue.isBlank();
+  }
 }

@@ -30,6 +30,9 @@ Institutional users should be granted the following permissions in order to use 
 - `orders.acquisition-methods.collection.get`
 - `organizations.organizations.collection.get`
 - `configuration.entries.collection.get`
+- `inventory-storage.locations.collection.get`
+- `inventory-storage.material-types.collection.get`
+- `users.collection.get`
 
 ## Configuration
 

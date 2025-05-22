@@ -94,7 +94,26 @@
       "type": "COMMON",
       "method": "GET",
       "pathPattern": "/addresses/billing-and-shipping",
-      "proxyPath": "/configurations/entries?query=configName==tenant.addresses"
+      "proxyPath": "/configurations/entries?offset=:offset&limit=:limit&query=:query",
+      "extraQuery": "configName==tenant.addresses"
+    },
+    {
+      "type": "COMMON",
+      "method": "GET",
+      "pathPattern": "/locations",
+      "proxyPath": "/locations?offset=:offset&limit=:limit&query=:query"
+    },
+    {
+      "type": "COMMON",
+      "method": "GET",
+      "pathPattern": "/material-types",
+      "proxyPath": "/material-types?offset=:offset&limit=:limit&query=:query"
+    },
+    {
+      "type": "COMMON",
+      "method": "GET",
+      "pathPattern": "/users",
+      "proxyPath": "/users?offset=:offset&limit=:limit&query=:query"
     }
   ]
 }
