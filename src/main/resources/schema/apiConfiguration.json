@@ -30,7 +30,7 @@
             "type": "string"
           },
           "extraQuery": {
-            "description": "Extra query params to restrict all response from the path",
+            "description": "Extra query predicates to better restrict the proxy path response",
             "type": "string"
           }
         },
