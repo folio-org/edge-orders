@@ -11,7 +11,7 @@ public enum CommonEndpoint {
   BILLING_AND_SHIPPING("/addresses/billing-and-shipping", "/configurations/entries", "configs", false),
   LOCATIONS("/locations", "/locations", "locations", true),
   MATERIAL_TYPES("/material-types", "/material-types", "mtypes", true),
-  USERS("/users", "/users", "users", true);
+  USERS("/users", "/users", "users", false);
 
   private final String ingressUrl;
   private final String egressUrl;
