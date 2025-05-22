@@ -22,7 +22,7 @@ public enum Param {
     return defaultValue;
   }
 
-  public boolean hasDefaultNonBlankValue() {
+  public boolean isDefaultNonBlankValue() {
     return !defaultValue.isBlank();
   }
 }

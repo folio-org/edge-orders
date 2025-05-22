@@ -697,7 +697,7 @@ public class MainVerticleTest {
   @Test
   public void testShouldReturnCommonEndpointDataWithOffsetAndLimit() {
     Arrays.stream(CommonEndpoint.values())
-      .filter(CommonEndpoint::hasEmptyExtraQuery)
+      .filter(CommonEndpoint::isEmptyExtraQuery)
       .forEach(endpoint -> {
         logger.info("testShouldReturnCommonEndpointDataWithOffsetAndLimit:: Ingress URL: {}", endpoint.getIngressUrl());
         RestAssured
@@ -713,7 +713,7 @@ public class MainVerticleTest {
   @Test
   public void testShouldReturnCommonEndpointDataWithQuery() {
     Arrays.stream(CommonEndpoint.values())
-      .filter(CommonEndpoint::hasEmptyExtraQuery)
+      .filter(CommonEndpoint::isEmptyExtraQuery)
       .forEach(endpoint -> {
         logger.info("testShouldReturnCommonEndpointDataWithQuery:: Ingress URL: {}", endpoint.getIngressUrl());
         RestAssured
@@ -729,7 +729,7 @@ public class MainVerticleTest {
   @Test
   public void testShouldReturnCommonEndpointDataWithQueryNoData() {
     Arrays.stream(CommonEndpoint.values())
-      .filter(CommonEndpoint::hasEmptyExtraQuery)
+      .filter(CommonEndpoint::isEmptyExtraQuery)
       .forEach(endpoint -> {
         logger.info("testShouldReturnCommonEndpointDataWithQueryNoData:: Ingress URL: {}", endpoint.getIngressUrl());
         RestAssured
@@ -745,7 +745,7 @@ public class MainVerticleTest {
   @Test
   public void testShouldReturnCommonEndpointDataWithEmptyQuery() {
     Arrays.stream(CommonEndpoint.values())
-      .filter(CommonEndpoint::hasEmptyExtraQuery)
+      .filter(CommonEndpoint::isEmptyExtraQuery)
       .forEach(endpoint -> {
         logger.info("testShouldReturnCommonEndpointDataWithEmptyQuery:: Ingress URL: {}", endpoint.getIngressUrl());
         RestAssured

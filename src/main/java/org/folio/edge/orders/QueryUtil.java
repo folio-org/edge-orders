@@ -36,7 +36,7 @@ public class QueryUtil {
     }
     for (Param param : Param.values()) {
       if (checkPathHasQueryStringPlaceholderAndValue(proxyPath, params, param)) {
-        proxyPath = param.hasDefaultNonBlankValue() ? setDefaultValue(proxyPath, param) : fullyRemovePlaceholder(proxyPath, param);
+        proxyPath = param.isDefaultNonBlankValue() ? setDefaultValue(proxyPath, param) : fullyRemovePlaceholder(proxyPath, param);
       }
     }
     return proxyPath;

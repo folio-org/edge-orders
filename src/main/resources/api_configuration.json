@@ -113,8 +113,7 @@
       "type": "COMMON",
       "method": "GET",
       "pathPattern": "/users",
-      "proxyPath": "/users?offset=:offset&limit=:limit&query=:query",
-      "extraQuery": "type==staff"
+      "proxyPath": "/users?offset=:offset&limit=:limit&query=:query"
     }
   ]
 }
