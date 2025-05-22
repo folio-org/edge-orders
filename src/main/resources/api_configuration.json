@@ -100,19 +100,19 @@
     {
       "type": "COMMON",
       "method": "GET",
-      "pathPattern": "/locations",
+      "pathPattern": "/locations-for-orders",
       "proxyPath": "/locations?offset=:offset&limit=:limit&query=:query"
     },
     {
       "type": "COMMON",
       "method": "GET",
-      "pathPattern": "/material-types",
+      "pathPattern": "/material-types-for-orders",
       "proxyPath": "/material-types?offset=:offset&limit=:limit&query=:query"
     },
     {
       "type": "COMMON",
       "method": "GET",
-      "pathPattern": "/users",
+      "pathPattern": "/users-for-orders",
       "proxyPath": "/users?offset=:offset&limit=:limit&query=:query"
     }
   ]
