@@ -214,7 +214,6 @@ public class QueryUtilTest {
     assertEquals("/orders", result);
   }
 
-  //
   @Test
   public void testGetProxyPath_withNonEmptyString() {
     var params = HeadersMultiMap.headers();
