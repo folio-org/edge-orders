@@ -53,6 +53,11 @@ public class OrdersMockOkapi extends MockOkapi {
   public static final String TOTAL_RECORDS = "totalRecords";
   public static final String NO_DATA_ID = "5bafea52-57ea-40a7-9164-4e31b9473781";
   public static final String HAD_DATA_ID = "5bafea52-57ea-40a7-9164-4e31b9473782";
+  public static final String FISCAL_YEAR_CODE_FY2025 = "FY2025";
+  public static final String DELIMITER = "delimiter";
+  public static final String COLOR_DELIMITER = ":";
+  public static final String FUND_CODE = "AFRICAHIST";
+  public static final String LEDGER_CODE = "ONETIME";
   public static final String X_ECHO_STATUS_HEADER = "X-Echo-Status";
 
   public OrdersMockOkapi(int port, List<String> knownTenants) {
@@ -255,13 +260,28 @@ public class OrdersMockOkapi extends MockOkapi {
         .put(TOTAL_RECORDS, 2)
         .toString();
     } else {
-      responseBody = new JsonObject()
-        .put(dataKey, new JsonArray()
-          .add(new JsonObject().put(ID, UUID.randomUUID().toString()))
-          .add(new JsonObject().put(ID, UUID.randomUUID().toString()))
-          .add(new JsonObject().put(ID, UUID.randomUUID().toString())))
-        .put(TOTAL_RECORDS, 3)
-        .toString();
+      if (endpoint == CommonEndpoint.FUND_CODES_EXPENSE_CLASSES
+        && (StringUtils.contains(query, "fiscalYearCode==")
+        || StringUtils.containsNone(query, "fiscalYearCode=="))) {
+        responseBody = new JsonObject()
+          .put(DELIMITER, COLOR_DELIMITER)
+          .put(dataKey, new JsonArray()
+            .add(new JsonObject()
+              .put("fundCode", FUND_CODE)
+              .put("ledgerCode", LEDGER_CODE)
+              .put("activeFundCodeVsExpClasses", new JsonArray())
+              .put("inactiveFundCodeVsExpClasses", new JsonArray())))
+          .put(TOTAL_RECORDS, 1)
+          .toString();
+      } else {
+        responseBody = new JsonObject()
+          .put(dataKey, new JsonArray()
+            .add(new JsonObject().put(ID, UUID.randomUUID().toString()))
+            .add(new JsonObject().put(ID, UUID.randomUUID().toString()))
+            .add(new JsonObject().put(ID, UUID.randomUUID().toString())))
+          .put(TOTAL_RECORDS, 3)
+          .toString();
+      }
     }
 
     ctx.response()
