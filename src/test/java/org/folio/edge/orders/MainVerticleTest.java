@@ -18,7 +18,7 @@ import static org.folio.edge.orders.Constants.API_CONFIGURATION_PROPERTY_NAME;
 import static org.folio.edge.orders.MosaicEndpoint.CREATE_ORDERS;
 import static org.folio.edge.orders.MosaicEndpoint.VALIDATE;
 import static org.folio.edge.orders.client.OrdersMockOkapi.BODY_REQUEST_FOR_HEADER_INCONSISTENCY;
-import static org.folio.edge.orders.client.OrdersMockOkapi.COLOR_DELIMITER;
+import static org.folio.edge.orders.client.OrdersMockOkapi.COLON_DELIMITER;
 import static org.folio.edge.orders.client.OrdersMockOkapi.DELIMITER;
 import static org.folio.edge.orders.client.OrdersMockOkapi.FISCAL_YEAR_CODE_FY2025;
 import static org.folio.edge.orders.client.OrdersMockOkapi.HAD_DATA_ID;
@@ -44,7 +44,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Stream;
 
 import io.restassured.RestAssured;
@@ -779,7 +778,7 @@ public class MainVerticleTest {
           .contentType(APPLICATION_JSON)
           .statusCode(SC_OK)
           .body(FUND_CODES_EXPENSE_CLASSES.getDataKey(), notNullValue())
-          .body(DELIMITER, equalTo(COLOR_DELIMITER))
+          .body(DELIMITER, equalTo(COLON_DELIMITER))
           .body(TOTAL_RECORDS, equalTo(1));
       });
   }

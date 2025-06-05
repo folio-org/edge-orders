@@ -55,7 +55,7 @@ public class OrdersMockOkapi extends MockOkapi {
   public static final String HAD_DATA_ID = "5bafea52-57ea-40a7-9164-4e31b9473782";
   public static final String FISCAL_YEAR_CODE_FY2025 = "FY2025";
   public static final String DELIMITER = "delimiter";
-  public static final String COLOR_DELIMITER = ":";
+  public static final String COLON_DELIMITER = ":";
   public static final String FUND_CODE = "AFRICAHIST";
   public static final String LEDGER_CODE = "ONETIME";
   public static final String X_ECHO_STATUS_HEADER = "X-Echo-Status";
@@ -264,7 +264,7 @@ public class OrdersMockOkapi extends MockOkapi {
         && (StringUtils.contains(query, "fiscalYearCode==")
         || StringUtils.containsNone(query, "fiscalYearCode=="))) {
         responseBody = new JsonObject()
-          .put(DELIMITER, COLOR_DELIMITER)
+          .put(DELIMITER, COLON_DELIMITER)
           .put(dataKey, new JsonArray()
             .add(new JsonObject()
               .put("fundCode", FUND_CODE)
