@@ -4,7 +4,8 @@ public enum Param {
   TYPE("type", ""),
   OFFSET("offset", "0"),
   LIMIT("limit", "20"),
-  QUERY("query", "");
+  QUERY("query", ""),
+  FISCAL_YEAR_CODE("fiscalYearCode", "");
 
   private final String name;
   private final String defaultValue;

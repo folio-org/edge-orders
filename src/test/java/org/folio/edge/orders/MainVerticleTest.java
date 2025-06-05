@@ -13,10 +13,14 @@ import static org.folio.edge.core.Constants.SYS_PORT;
 import static org.folio.edge.core.Constants.SYS_REQUEST_TIMEOUT_MS;
 import static org.folio.edge.core.Constants.SYS_SECURE_STORE_PROP_FILE;
 import static org.folio.edge.core.Constants.TEXT_PLAIN;
+import static org.folio.edge.orders.CommonEndpoint.FUND_CODES_EXPENSE_CLASSES;
 import static org.folio.edge.orders.Constants.API_CONFIGURATION_PROPERTY_NAME;
 import static org.folio.edge.orders.MosaicEndpoint.CREATE_ORDERS;
 import static org.folio.edge.orders.MosaicEndpoint.VALIDATE;
 import static org.folio.edge.orders.client.OrdersMockOkapi.BODY_REQUEST_FOR_HEADER_INCONSISTENCY;
+import static org.folio.edge.orders.client.OrdersMockOkapi.COLON_DELIMITER;
+import static org.folio.edge.orders.client.OrdersMockOkapi.DELIMITER;
+import static org.folio.edge.orders.client.OrdersMockOkapi.FISCAL_YEAR_CODE_FY2025;
 import static org.folio.edge.orders.client.OrdersMockOkapi.HAD_DATA_ID;
 import static org.folio.edge.orders.client.OrdersMockOkapi.NO_DATA_ID;
 import static org.folio.edge.orders.client.OrdersMockOkapi.TOTAL_RECORDS;
@@ -682,6 +686,7 @@ public class MainVerticleTest {
   @Test
   public void testShouldReturnCommonEndpointData() {
     Arrays.stream(CommonEndpoint.values())
+      .filter(CommonEndpoint::isAdvancedQuerySupported)
       .forEach(endpoint -> {
         logger.info("testShouldReturnCommonEndpointData:: Ingress URL: {}", endpoint.getIngressUrl());
         RestAssured
@@ -697,6 +702,7 @@ public class MainVerticleTest {
   @Test
   public void testShouldReturnCommonEndpointDataWithOffsetAndLimit() {
     Arrays.stream(CommonEndpoint.values())
+      .filter(CommonEndpoint::isAdvancedQuerySupported)
       .filter(CommonEndpoint::isEmptyExtraQuery)
       .forEach(endpoint -> {
         logger.info("testShouldReturnCommonEndpointDataWithOffsetAndLimit:: Ingress URL: {}", endpoint.getIngressUrl());
@@ -713,6 +719,7 @@ public class MainVerticleTest {
   @Test
   public void testShouldReturnCommonEndpointDataWithQuery() {
     Arrays.stream(CommonEndpoint.values())
+      .filter(CommonEndpoint::isAdvancedQuerySupported)
       .filter(CommonEndpoint::isEmptyExtraQuery)
       .forEach(endpoint -> {
         logger.info("testShouldReturnCommonEndpointDataWithQuery:: Ingress URL: {}", endpoint.getIngressUrl());
@@ -729,6 +736,7 @@ public class MainVerticleTest {
   @Test
   public void testShouldReturnCommonEndpointDataWithQueryNoData() {
     Arrays.stream(CommonEndpoint.values())
+      .filter(CommonEndpoint::isAdvancedQuerySupported)
       .filter(CommonEndpoint::isEmptyExtraQuery)
       .forEach(endpoint -> {
         logger.info("testShouldReturnCommonEndpointDataWithQueryNoData:: Ingress URL: {}", endpoint.getIngressUrl());
@@ -745,6 +753,7 @@ public class MainVerticleTest {
   @Test
   public void testShouldReturnCommonEndpointDataWithEmptyQuery() {
     Arrays.stream(CommonEndpoint.values())
+      .filter(CommonEndpoint::isAdvancedQuerySupported)
       .filter(CommonEndpoint::isEmptyExtraQuery)
       .forEach(endpoint -> {
         logger.info("testShouldReturnCommonEndpointDataWithEmptyQuery:: Ingress URL: {}", endpoint.getIngressUrl());
@@ -755,6 +764,22 @@ public class MainVerticleTest {
           .statusCode(SC_OK)
           .body(endpoint.getDataKey(), notNullValue())
           .body(TOTAL_RECORDS, equalTo(3));
+      });
+  }
+
+  @Test
+  public void testReturnCommonEndpointFundCodesExpenseClassesData() {
+    Arrays.stream(new String[]{"", "&fiscalYearCode==", "&fiscalYearCode==%s".formatted(FISCAL_YEAR_CODE_FY2025)})
+      .forEach(queryString -> {
+        logger.info("testReturnCommonEndpointFundCodesExpenseClassesData:: Ingress URL: {}, query string: {}", FUND_CODES_EXPENSE_CLASSES.getIngressUrl(), queryString);
+        RestAssured
+          .get(FUND_CODES_EXPENSE_CLASSES.getIngressUrl() + "?type=COMMON&apikey=" + API_KEY + queryString)
+          .then()
+          .contentType(APPLICATION_JSON)
+          .statusCode(SC_OK)
+          .body(FUND_CODES_EXPENSE_CLASSES.getDataKey(), notNullValue())
+          .body(DELIMITER, equalTo(COLON_DELIMITER))
+          .body(TOTAL_RECORDS, equalTo(1));
       });
   }
 }

@@ -26,12 +26,15 @@ Institutional users should be granted the following permissions in order to use 
 - `orders.order-templates.collection.get`
 - `finance.funds.collection.get`
 - `finance.expense-classes.collection.get`
+- `finance.fund-codes-expense-classes.collection.get`
 - `acquisitions-units.units.collection.get`
 - `orders.acquisition-methods.collection.get`
 - `organizations.organizations.collection.get`
 - `configuration.entries.collection.get`
 - `inventory-storage.locations.collection.get`
 - `inventory-storage.material-types.collection.get`
+- `inventory-storage.identifier-types.collection.get`
+- `inventory-storage.contributor-name-types.collection.get`
 - `users.collection.get`
 
 ## Configuration
