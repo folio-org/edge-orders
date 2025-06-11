@@ -24,10 +24,13 @@ Institutional users should be granted the following permissions in order to use 
 - `mosaic.validate.get`
 - `mosaic.orders.item.post`
 - `orders.order-templates.collection.get`
+- `orders-storage.custom-fields.get`
+- `okapi.proxy.tenants.modules.list`
 - `finance.funds.collection.get`
 - `finance.expense-classes.collection.get`
 - `finance.fund-codes-expense-classes.collection.get`
 - `acquisitions-units.units.collection.get`
+- `orders_acquisitions-units-assignments.manage`
 - `orders.acquisition-methods.collection.get`
 - `organizations.organizations.collection.get`
 - `configuration.entries.collection.get`
