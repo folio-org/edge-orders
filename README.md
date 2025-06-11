@@ -30,7 +30,7 @@ Institutional users should be granted the following permissions in order to use 
 - `finance.expense-classes.collection.get`
 - `finance.fund-codes-expense-classes.collection.get`
 - `acquisitions-units.units.collection.get`
-- `orders_acquisitions-units-assignments.manage`
+- `orders.acquisitions-units-assignments.all`
 - `orders.acquisition-methods.collection.get`
 - `organizations.organizations.collection.get`
 - `configuration.entries.collection.get`
