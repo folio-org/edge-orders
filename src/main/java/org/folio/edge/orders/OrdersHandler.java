@@ -114,7 +114,7 @@ public class OrdersHandler extends Handler {
 
   private void send(AcquisitionsOkapiClient client, Routing routing, RoutingContext ctx, String type) {
     logger.info("handle:: Request is from purchasing system: {}", type);
-    client.send(routing, ctx.getBodyAsString(), ctx.request().params(), ctx.request().headers(),
+    client.send(routing, ctx.body().asString(), ctx.request().params(), ctx.request().headers(),
       resp -> handleResponse(ctx, resp),
       t -> handleProxyException(ctx, t));
   }
