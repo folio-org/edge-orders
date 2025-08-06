@@ -12,13 +12,13 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 import io.vertx.core.Future;
+import io.vertx.core.http.HttpResponseExpectation;
 import io.vertx.core.json.JsonArray;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.folio.edge.core.utils.OkapiClient;
 import org.folio.edge.orders.QueryUtil;
-import org.folio.okapi.common.ChattyHttpResponseExpectation;
 import org.folio.okapi.common.ModuleId;
 import org.folio.rest.mappings.model.Routing;
 
@@ -127,7 +127,7 @@ public class AcquisitionsOkapiClient extends OkapiClient {
     String requestUri = "/_/proxy/tenants/%s/modules?provide=%s"
       .formatted(tenant, interfaceName);
     return get(okapiURL + requestUri, tenant, combineHeadersWithDefaults(headers))
-      .expecting(ChattyHttpResponseExpectation.SC_OK)
+      .expecting(HttpResponseExpectation.SC_OK)
       .compose(res -> {
         var list = extractModuleIds(res.bodyAsJsonArray(), moduleName);
         if (list.isEmpty()) {
