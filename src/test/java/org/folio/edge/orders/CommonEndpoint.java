@@ -4,6 +4,7 @@ public enum CommonEndpoint {
   ORDER_TEMPLATES("/orders/order-templates", "/orders/order-templates", "orderTemplates", true, true),
   ORDER_CUSTOM_FIELDS("/orders/custom-fields", "/custom-fields", "customFields", true, true),
   FUNDS("/finance/funds", "/finance/funds", "funds", true, true),
+  FUND_EXPENSE_CLASSES("/finance/funds/:id/expense-classes", "/finance/funds/:id/expense-classes", "fundExpenseClasses", true, true),
   EXPENSE_CLASSES("/finance/expense-classes", "/finance/expense-classes", "expenseClasses", true, true),
   FUND_CODES_EXPENSE_CLASSES("/finance/fund-codes-expense-classes", "/finance/fund-codes-expense-classes", "fundCodeVsExpClassesTypes", false, true),
   ACQUISITIONS_UNITS("/acquisitions-units", "/acquisitions-units/units", "acquisitionsUnits", true, true),
