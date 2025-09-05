@@ -69,6 +69,12 @@
     {
       "type": "COMMON",
       "method": "GET",
+      "pathPattern": "/finance/funds/:id/expense-classes",
+      "proxyPath": "/finance/funds/:id/expense-classes?offset=:offset&limit=:limit&query=:query"
+    },
+    {
+      "type": "COMMON",
+      "method": "GET",
       "pathPattern": "/finance/expense-classes",
       "proxyPath": "/finance/expense-classes?offset=:offset&limit=:limit&query=:query"
     },

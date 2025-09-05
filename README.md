@@ -27,6 +27,7 @@ Institutional users should be granted the following permissions in order to use 
 - `orders-storage.custom-fields.collection.get`
 - `okapi.proxy.tenants.modules.list`
 - `finance.funds.collection.get`
+- `finance.funds.expense-classes.collection.get`
 - `finance.expense-classes.collection.get`
 - `finance.fund-codes-expense-classes.collection.get`
 - `acquisitions-units.units.collection.get`
