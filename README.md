@@ -20,6 +20,26 @@ See [edge-common](https://github.com/folio-org/edge-common) for a description of
 Institutional users should be granted the following permissions in order to use this edge API:
 
 - `gobi.all`
+- `ebsconet.all`
+- `mosaic.validate.get`
+- `mosaic.orders.item.post`
+- `orders.order-templates.collection.get`
+- `orders-storage.custom-fields.collection.get`
+- `okapi.proxy.tenants.modules.list`
+- `finance.funds.collection.get`
+- `finance.funds.expense-classes.collection.get`
+- `finance.expense-classes.collection.get`
+- `finance.fund-codes-expense-classes.collection.get`
+- `acquisitions-units.units.collection.get`
+- `orders.acquisitions-units-assignments.manage`
+- `orders.acquisition-methods.collection.get`
+- `organizations.organizations.collection.get`
+- `configuration.entries.collection.get`
+- `inventory-storage.locations.collection.get`
+- `inventory-storage.material-types.collection.get`
+- `inventory-storage.identifier-types.collection.get`
+- `inventory-storage.contributor-name-types.collection.get`
+- `users.collection.get`
 
 ## Configuration
 
@@ -36,7 +56,7 @@ Api Configuration format:
 | type        | GOBI             | Type of the system      |
 | pathPattern | /orders/validate | URL Path for mapping    |
 | method      | POST             | HTTP method for mapping |
-| proxyMehtod | POST             | HTTP method for proxy   |
+| proxyMethod | POST             | HTTP method for proxy   |
 | proxyPath   | /gobi/validate   | Path for proxy          |
 
 Example of api mapping content:

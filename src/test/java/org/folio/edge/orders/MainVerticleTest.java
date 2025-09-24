@@ -1,5 +1,7 @@
 package org.folio.edge.orders;
 
+import static org.apache.http.HttpStatus.SC_NOT_FOUND;
+import static org.apache.http.HttpStatus.SC_OK;
 import static org.folio.edge.core.Constants.APPLICATION_JSON;
 import static org.folio.edge.core.Constants.APPLICATION_XML;
 import static org.folio.edge.core.Constants.MSG_ACCESS_DENIED;
@@ -11,11 +13,21 @@ import static org.folio.edge.core.Constants.SYS_PORT;
 import static org.folio.edge.core.Constants.SYS_REQUEST_TIMEOUT_MS;
 import static org.folio.edge.core.Constants.SYS_SECURE_STORE_PROP_FILE;
 import static org.folio.edge.core.Constants.TEXT_PLAIN;
-import static org.folio.edge.core.utils.test.MockOkapi.X_DURATION;
-import static org.folio.edge.core.utils.test.MockOkapi.X_ECHO_STATUS;
+import static org.folio.edge.orders.CommonEndpoint.FUND_CODES_EXPENSE_CLASSES;
 import static org.folio.edge.orders.Constants.API_CONFIGURATION_PROPERTY_NAME;
-import static org.folio.edge.orders.utils.OrdersMockOkapi.BODY_REQUEST_FOR_HEADER_INCONSISTENCY;
+import static org.folio.edge.orders.MosaicEndpoint.CREATE_ORDERS;
+import static org.folio.edge.orders.MosaicEndpoint.VALIDATE;
+import static org.folio.edge.orders.client.OrdersMockOkapi.BODY_REQUEST_FOR_HEADER_INCONSISTENCY;
+import static org.folio.edge.orders.client.OrdersMockOkapi.COLON_DELIMITER;
+import static org.folio.edge.orders.client.OrdersMockOkapi.DELIMITER;
+import static org.folio.edge.orders.client.OrdersMockOkapi.FISCAL_YEAR_CODE_FY2025;
+import static org.folio.edge.orders.client.OrdersMockOkapi.HAD_DATA_ID;
+import static org.folio.edge.orders.client.OrdersMockOkapi.NO_DATA_ID;
+import static org.folio.edge.orders.client.OrdersMockOkapi.TOTAL_RECORDS;
+import static org.folio.edge.orders.client.OrdersMockOkapi.X_ECHO_STATUS_HEADER;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -27,13 +39,18 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 import io.restassured.RestAssured;
 import io.restassured.http.Header;
 import io.restassured.response.Response;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.logging.log4j.LogManager;
@@ -43,7 +60,7 @@ import org.folio.edge.core.utils.test.TestUtils;
 import org.folio.edge.orders.Constants.ErrorCodes;
 import org.folio.edge.orders.model.ErrorWrapper;
 import org.folio.edge.orders.model.ResponseWrapper;
-import org.folio.edge.orders.utils.OrdersMockOkapi;
+import org.folio.edge.orders.client.OrdersMockOkapi;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -61,15 +78,12 @@ public class MainVerticleTest {
 
   private static final Logger logger = LogManager.getLogger(MainVerticleTest.class);
 
-  private static final String apiKey = ApiKeyUtils.generateApiKey(10, "diku", "diku");
-  private static final String badApiKey = apiKey + "0000";
-  private static final String unknownTenantApiKey = ApiKeyUtils.generateApiKey(10, "bogus", "diku");
+  private static final String API_KEY = ApiKeyUtils.generateApiKey(10, "diku", "diku");
+  private static final String BAD_API_KEY = API_KEY + "0000";
+  private static final String UNKNOWN_TENANT_API_KEY = ApiKeyUtils.generateApiKey(10, "bogus", "diku");
+  private static final long REQUEST_TIMEOUT_MS = 60000L;
 
-  private static final long requestTimeoutMs = 3000L;
-
-  private static Vertx vertx;
   private static OrdersMockOkapi mockOkapi;
-
   private static Map<String, String> mockRequests;
 
   @BeforeClass
@@ -78,18 +92,18 @@ public class MainVerticleTest {
     int serverPort = TestUtils.getPort();
 
     List<String> knownTenants = new ArrayList<>();
-    knownTenants.add(ApiKeyUtils.parseApiKey(apiKey).tenantId);
+    knownTenants.add(ApiKeyUtils.parseApiKey(API_KEY).tenantId);
 
     mockOkapi = spy(new OrdersMockOkapi(okapiPort, knownTenants));
     mockOkapi.start().onComplete(context.asyncAssertSuccess());
 
-    vertx = Vertx.vertx();
+    Vertx vertx = Vertx.vertx();
     System.setProperty(SYS_PORT, String.valueOf(serverPort));
     System.setProperty(SYS_OKAPI_URL, "http://localhost:" + okapiPort);
     System.setProperty(SYS_SECURE_STORE_PROP_FILE, "src/main/resources/ephemeral.properties");
     System.setProperty(API_CONFIGURATION_PROPERTY_NAME, "src/main/resources/api_configuration.json");
     System.setProperty(SYS_LOG_LEVEL, "TRACE");
-    System.setProperty(SYS_REQUEST_TIMEOUT_MS, String.valueOf(requestTimeoutMs));
+    System.setProperty(SYS_REQUEST_TIMEOUT_MS, String.valueOf(REQUEST_TIMEOUT_MS));
 
     final DeploymentOptions opt = new DeploymentOptions();
     vertx.deployVerticle(MainVerticle.class.getName(), opt, context.asyncAssertSuccess());
@@ -103,14 +117,15 @@ public class MainVerticleTest {
     File folder = new File("src/test/resources/requests");
     File[] listOfFiles = folder.listFiles();
 
-    for (File listOfFile : listOfFiles) {
+    for (File listOfFile : Objects.requireNonNull(listOfFiles)) {
       String filename = listOfFile.getName();
       String woExt = filename.substring(0, filename.lastIndexOf("."));
       StringBuilder sb = new StringBuilder();
       try {
-        Files.lines(Paths.get(listOfFile.toURI()), StandardCharsets.UTF_8)
-          .forEachOrdered(value -> sb.append(value).append('\n'));
-        mockRequests.put(woExt, sb.toString());
+        try (Stream<String> linesStream = Files.lines(Paths.get(listOfFile.toURI()), StandardCharsets.UTF_8)) {
+          linesStream.forEachOrdered(value -> sb.append(value).append('\n'));
+          mockRequests.put(woExt, sb.toString());
+        }
       } catch (IOException e) {
         logger.error("Exception loading mock requests", e);
       }
@@ -122,6 +137,8 @@ public class MainVerticleTest {
     logger.info("Shutting down server");
     mockOkapi.close().onComplete(context.asyncAssertSuccess());
   }
+
+  // GOBI
 
   @Test
   public void testAdminHealth() {
@@ -144,7 +161,7 @@ public class MainVerticleTest {
     logger.info("=== Test GET validate w/ valid key ===");
 
     RestAssured
-      .get("/orders/validate?type=GOBI&apiKey=" + apiKey)
+      .get("/orders/validate?type=GOBI&apiKey=" + API_KEY)
       .then()
       .statusCode(200)
       .assertThat()
@@ -158,7 +175,7 @@ public class MainVerticleTest {
     RestAssured
       .with()
       .header(new Header(HttpHeaders.ACCEPT_ENCODING, "gzip deflate"))
-      .get("/orders/validate?type=GOBI&apiKey=" + apiKey)
+      .get("/orders/validate?type=GOBI&apiKey=" + API_KEY)
       .then()
       .statusCode(200)
       .assertThat()
@@ -167,15 +184,15 @@ public class MainVerticleTest {
 
   @Test
   public void testPostValidateSuccessIgnoreBody() {
-  	// EDGORDERS-15 - Ignore processing request body
+    // EDGORDERS-15 - Ignore processing request body
     logger.info("=== Test POST validate w/ valid key and ignore processing request body ===");
 
-    String PO = "118279";
-    String body = mockRequests.get(PO);
+    String purchaseOrder = "118279";
+    String body = mockRequests.get(purchaseOrder);
 
     RestAssured
-    .with().body(body)
-      .post("/orders/validate?type=GOBI&apiKey=" + apiKey)
+      .with().body(body)
+      .post("/orders/validate?type=GOBI&apiKey=" + API_KEY)
       .then()
       .statusCode(200)
       .assertThat()
@@ -187,7 +204,7 @@ public class MainVerticleTest {
     logger.info("=== Test POST validate w/ valid key ===");
 
     RestAssured
-      .post("/orders/validate?type=GOBI&apiKey=" + apiKey)
+      .post("/orders/validate?type=GOBI&apiKey=" + API_KEY)
       .then()
       .statusCode(200)
       .assertThat()
@@ -200,8 +217,8 @@ public class MainVerticleTest {
 
     final Response resp = RestAssured
       .with()
-      .header(X_ECHO_STATUS, 404)
-      .get("/orders/validate?type=GOBI&apiKey=" + apiKey)
+      .header(X_ECHO_STATUS_HEADER, 404)
+      .get("/orders/validate?type=GOBI&apiKey=" + API_KEY)
       .then()
       .contentType(APPLICATION_XML)
       .statusCode(404)
@@ -209,7 +226,7 @@ public class MainVerticleTest {
       .response();
 
     ResponseWrapper respBody = new ResponseWrapper(
-        new ErrorWrapper(ErrorCodes.NOT_FOUND.toString(), "No suitable module found for path /gobi/validate"));
+      new ErrorWrapper(ErrorCodes.NOT_FOUND.toString(), "No suitable module found for path /gobi/validate"));
     assertEquals(respBody.toXml(), resp.body().asString());
   }
 
@@ -218,7 +235,7 @@ public class MainVerticleTest {
     logger.info("=== Test validate w/ invalid key ===");
 
     final Response resp = RestAssured
-      .get("/orders/validate?type=GOBI&apiKey=" + badApiKey)
+      .get("/orders/validate?type=GOBI&apiKey=" + BAD_API_KEY)
       .then()
       .contentType(APPLICATION_XML)
       .statusCode(401)
@@ -226,7 +243,7 @@ public class MainVerticleTest {
       .response();
 
     ResponseWrapper respBody = new ResponseWrapper(
-        new ErrorWrapper(ErrorCodes.API_KEY_INVALID.name(), MSG_INVALID_API_KEY + ": " + badApiKey));
+      new ErrorWrapper(ErrorCodes.API_KEY_INVALID.name(), MSG_INVALID_API_KEY + ": " + BAD_API_KEY));
     assertEquals(respBody.toXml(), resp.body().asString());
   }
 
@@ -235,7 +252,7 @@ public class MainVerticleTest {
     logger.info("=== Test validate w/ bad type ===");
 
     final Response resp = RestAssured
-      .get("/orders/validate?type=bogus&apiKey=" + apiKey)
+      .get("/orders/validate?type=bogus&apiKey=" + API_KEY)
       .then()
       .contentType(APPLICATION_XML)
       .statusCode(400)
@@ -243,7 +260,7 @@ public class MainVerticleTest {
       .response();
 
     ResponseWrapper respBody = new ResponseWrapper(
-        new ErrorWrapper("BAD_REQUEST", "Unknown Purchasing System Specified: bogus"));
+      new ErrorWrapper("BAD_REQUEST", "Unknown Purchasing System Specified: bogus"));
     assertEquals(respBody.toXml(), resp.body().asString());
   }
 
@@ -252,7 +269,7 @@ public class MainVerticleTest {
     logger.info("=== Test validate w/ missing type ===");
 
     final Response resp = RestAssured
-      .get("/orders/validate?apiKey=" + apiKey)
+      .get("/orders/validate?apiKey=" + API_KEY)
       .then()
       .contentType(APPLICATION_XML)
       .statusCode(400)
@@ -260,7 +277,7 @@ public class MainVerticleTest {
       .response();
 
     ResponseWrapper respBody = new ResponseWrapper(
-        new ErrorWrapper("BAD_REQUEST", "Missing required parameter: type"));
+      new ErrorWrapper("BAD_REQUEST", "Missing required parameter: type"));
     assertEquals(respBody.toXml(), resp.body().asString());
   }
 
@@ -269,7 +286,7 @@ public class MainVerticleTest {
     logger.info("=== Test validate w/ empty type ===");
 
     final Response resp = RestAssured
-      .get("/orders/validate?type=&apiKey=" + apiKey)
+      .get("/orders/validate?type=&apiKey=" + API_KEY)
       .then()
       .contentType(APPLICATION_XML)
       .statusCode(400)
@@ -277,7 +294,7 @@ public class MainVerticleTest {
       .response();
 
     ResponseWrapper respBody = new ResponseWrapper(
-        new ErrorWrapper("BAD_REQUEST", "Missing required parameter: type"));
+      new ErrorWrapper("BAD_REQUEST", "Missing required parameter: type"));
     assertEquals(respBody.toXml(), resp.body().asString());
   }
 
@@ -285,75 +302,75 @@ public class MainVerticleTest {
   public void testPlaceOrderSuccess() throws JsonProcessingException {
     logger.info("=== Test place order - Success (XML) ===");
 
-    String PO = "118279";
-    String body = mockRequests.get(PO);
+    String purchaseOrder = "118279";
+    String body = mockRequests.get(purchaseOrder);
 
     final Response resp = RestAssured
       .with()
       .body(body)
-      .post("/orders?type=GOBI&apiKey=" + apiKey)
+      .post("/orders?type=GOBI&apiKey=" + API_KEY)
       .then()
       .contentType(APPLICATION_XML)
       .statusCode(201)
       .extract()
       .response();
 
-    assertEquals(new ResponseWrapper("PO-" + PO).toXml(), resp.body().asString());
+    assertEquals(new ResponseWrapper("PO-" + purchaseOrder).toXml(), resp.body().asString());
   }
 
   @Test
   public void testPlaceOrderJson() throws JsonProcessingException {
     logger.info("=== Test place order - Success (JSON) ===");
 
-    String PO = "118279";
-    String body = mockRequests.get(PO);
+    String purchaseOrder = "118279";
+    String body = mockRequests.get(purchaseOrder);
 
     final Response resp = RestAssured
       .with()
       .accept(APPLICATION_JSON)
       .body(body)
-      .post("/orders?type=GOBI&apiKey=" + apiKey)
+      .post("/orders?type=GOBI&apiKey=" + API_KEY)
       .then()
       .contentType(APPLICATION_JSON)
       .statusCode(201)
       .extract()
       .response();
 
-    assertEquals(new ResponseWrapper("PO-" + PO).toJson(), resp.body().asString());
+    assertEquals(new ResponseWrapper("PO-" + purchaseOrder).toJson(), resp.body().asString());
   }
 
   @Test
   public void testPlaceOrderXml() throws JsonProcessingException {
     logger.info("=== Test place order - Success (JSON) ===");
 
-    String PO = "118279";
-    String body = mockRequests.get(PO);
+    String purchaseOrder = "118279";
+    String body = mockRequests.get(purchaseOrder);
 
     final Response resp = RestAssured
       .with()
       .accept(APPLICATION_XML)
       .body(body)
-      .post("/orders?type=GOBI&apiKey=" + apiKey)
+      .post("/orders?type=GOBI&apiKey=" + API_KEY)
       .then()
       .contentType(APPLICATION_XML)
       .statusCode(201)
       .extract()
       .response();
 
-    assertEquals(new ResponseWrapper("PO-" + PO).toXml(), resp.body().asString());
+    assertEquals(new ResponseWrapper("PO-" + purchaseOrder).toXml(), resp.body().asString());
   }
 
   @Test
   public void testPlaceOrderBadType() throws JsonProcessingException {
     logger.info("=== Test place order - bad type argument ===");
 
-    String PO = "118279";
-    String body = mockRequests.get(PO);
+    String purchaseOrder = "118279";
+    String body = mockRequests.get(purchaseOrder);
 
     final Response resp = RestAssured
       .with()
       .body(body)
-      .post("/orders?type=bogus&apiKey=" + apiKey)
+      .post("/orders?type=bogus&apiKey=" + API_KEY)
       .then()
       .contentType(APPLICATION_XML)
       .statusCode(400)
@@ -361,7 +378,7 @@ public class MainVerticleTest {
       .response();
 
     ResponseWrapper respBody = new ResponseWrapper(
-        new ErrorWrapper("BAD_REQUEST", "Unknown Purchasing System Specified: bogus"));
+      new ErrorWrapper("BAD_REQUEST", "Unknown Purchasing System Specified: bogus"));
     assertEquals(respBody.toXml(), resp.body().asString());
   }
 
@@ -369,13 +386,13 @@ public class MainVerticleTest {
   public void testPlaceOrderBadApiKey() throws JsonProcessingException {
     logger.info("=== Test place order - Bad API Key ===");
 
-    String PO = "118279";
-    String body = mockRequests.get(PO);
+    String purchaseOrder = "118279";
+    String body = mockRequests.get(purchaseOrder);
 
     final Response resp = RestAssured
       .with()
       .body(body)
-      .post("/orders?type=GOBI&apiKey=" + badApiKey)
+      .post("/orders?type=GOBI&apiKey=" + BAD_API_KEY)
       .then()
       .contentType(APPLICATION_XML)
       .statusCode(401)
@@ -383,7 +400,7 @@ public class MainVerticleTest {
       .response();
 
     ResponseWrapper expected = new ResponseWrapper(
-        new ErrorWrapper(ErrorCodes.API_KEY_INVALID.name(), MSG_INVALID_API_KEY + ": " + badApiKey));
+      new ErrorWrapper(ErrorCodes.API_KEY_INVALID.name(), MSG_INVALID_API_KEY + ": " + BAD_API_KEY));
     assertEquals(expected.toXml(), resp.body().asString());
   }
 
@@ -391,8 +408,8 @@ public class MainVerticleTest {
   public void testPlaceOrderMissingApiKey() throws JsonProcessingException {
     logger.info("=== Test place order - Missing API Key ===");
 
-    String PO = "118279";
-    String body = mockRequests.get(PO);
+    String purchaseOrder = "118279";
+    String body = mockRequests.get(purchaseOrder);
 
     final Response resp = RestAssured
       .with()
@@ -405,7 +422,7 @@ public class MainVerticleTest {
       .response();
 
     ResponseWrapper respBody = new ResponseWrapper(
-        new ErrorWrapper(ErrorCodes.API_KEY_INVALID.name(), MSG_INVALID_API_KEY + ": "));
+      new ErrorWrapper(ErrorCodes.API_KEY_INVALID.name(), MSG_INVALID_API_KEY + ": "));
     assertEquals(respBody.toXml(), resp.body().asString());
   }
 
@@ -415,7 +432,7 @@ public class MainVerticleTest {
 
     RestAssured
       .with()
-      .post("/test" + unknownTenantApiKey)
+      .post("/test" + UNKNOWN_TENANT_API_KEY)
       .then()
       .statusCode(404)
       .assertThat()
@@ -426,13 +443,13 @@ public class MainVerticleTest {
   public void testPlaceOrderUnknownTenant() throws JsonProcessingException {
     logger.info("=== Test place order - Unknown Tenant ===");
 
-    String PO = "118279";
-    String body = mockRequests.get(PO);
+    String purchaseOrder = "118279";
+    String body = mockRequests.get(purchaseOrder);
 
     final Response resp = RestAssured
       .with()
       .body(body)
-      .post("/orders?type=GOBI&apiKey=" + unknownTenantApiKey)
+      .post("/orders?type=GOBI&apiKey=" + UNKNOWN_TENANT_API_KEY)
       .then()
       .contentType(APPLICATION_XML)
       .statusCode(401)
@@ -440,22 +457,22 @@ public class MainVerticleTest {
       .response();
 
     ResponseWrapper respBody = new ResponseWrapper(
-        new ErrorWrapper("ACCESS_DENIED", MSG_ACCESS_DENIED));
+      new ErrorWrapper("ACCESS_DENIED", MSG_ACCESS_DENIED));
     assertEquals(respBody.toXml(), resp.body().asString());
   }
 
   @Test
-  public void testPlaceOrderTimeout(TestContext context) throws JsonProcessingException {
+  public void testPlaceOrderTimeout() throws JsonProcessingException {
     logger.info("=== Test place order - Timeout ===");
 
-    String PO = "118279";
-    String body = mockRequests.get(PO);
+    String purchaseOrder = "118279";
+    String body = mockRequests.get(purchaseOrder);
 
     final Response resp = RestAssured
       .with()
-      .header(X_DURATION, requestTimeoutMs + 1000)
+      .header("X-Duration", REQUEST_TIMEOUT_MS + 1000)
       .body(body)
-      .post("/orders?type=GOBI&apiKey=" + apiKey)
+      .post("/orders?type=GOBI&apiKey=" + API_KEY)
       .then()
       .contentType(APPLICATION_XML)
       .statusCode(408)
@@ -463,7 +480,7 @@ public class MainVerticleTest {
       .response();
 
     ResponseWrapper respBody = new ResponseWrapper(
-        new ErrorWrapper("REQUEST_TIMEOUT", MSG_REQUEST_TIMEOUT));
+      new ErrorWrapper("REQUEST_TIMEOUT", MSG_REQUEST_TIMEOUT));
     assertEquals(respBody.toXml(), resp.body().asString());
   }
 
@@ -473,7 +490,7 @@ public class MainVerticleTest {
     final Response resp = RestAssured
       .with()
       .body(body)
-      .post("/orders?type=GOBI&apiKey=" + apiKey)
+      .post("/orders?type=GOBI&apiKey=" + API_KEY)
       .then()
       .statusCode(201)
       .extract()
@@ -488,7 +505,7 @@ public class MainVerticleTest {
       .with()
       .accept(APPLICATION_JSON)
       .body(BODY_REQUEST_FOR_HEADER_INCONSISTENCY)
-      .post("/orders?type=GOBI&apiKey=" + apiKey)
+      .post("/orders?type=GOBI&apiKey=" + API_KEY)
       .then()
       .contentType(APPLICATION_JSON)
       .statusCode(400)
@@ -502,7 +519,7 @@ public class MainVerticleTest {
       .with()
       .accept(APPLICATION_XML)
       .body(BODY_REQUEST_FOR_HEADER_INCONSISTENCY)
-      .post("/orders?type=GOBI&apiKey=" + apiKey)
+      .post("/orders?type=GOBI&apiKey=" + API_KEY)
       .then()
       .contentType(APPLICATION_XML)
       .statusCode(400)
@@ -519,7 +536,7 @@ public class MainVerticleTest {
       .with()
       .accept(APPLICATION_JSON)
       .body(BODY_REQUEST_FOR_HEADER_INCONSISTENCY)
-      .post("/orders?type=GOBI&apiKey=" + apiKey)
+      .post("/orders?type=GOBI&apiKey=" + API_KEY)
       .then()
       .contentType(APPLICATION_JSON)
       .statusCode(400)
@@ -536,7 +553,7 @@ public class MainVerticleTest {
       .with()
       .accept(TEXT_PLAIN)
       .body(BODY_REQUEST_FOR_HEADER_INCONSISTENCY)
-      .post("/orders?type=GOBI&apiKey=" + apiKey)
+      .post("/orders?type=GOBI&apiKey=" + API_KEY)
       .then()
       .contentType(TEXT_PLAIN)
       .statusCode(400)
@@ -550,7 +567,7 @@ public class MainVerticleTest {
       .with()
       .accept("*/*")
       .body(BODY_REQUEST_FOR_HEADER_INCONSISTENCY)
-      .post("/orders?type=GOBI&apiKey=" + apiKey)
+      .post("/orders?type=GOBI&apiKey=" + API_KEY)
       .then()
       .contentType(APPLICATION_XML)
       .statusCode(400)
@@ -566,7 +583,7 @@ public class MainVerticleTest {
     final Response resp = RestAssured
       .with()
       .body(BODY_REQUEST_FOR_HEADER_INCONSISTENCY)
-      .post("/orders?type=GOBI&apiKey=" + apiKey)
+      .post("/orders?type=GOBI&apiKey=" + API_KEY)
       .then()
       .contentType(APPLICATION_XML)
       .statusCode(400)
@@ -581,9 +598,9 @@ public class MainVerticleTest {
   public void testShouldReturnJSONErrorWithInternalFormatIfAcceptHeaderIsJSONAndXML() {
     final Response resp = RestAssured
       .with()
-      .accept(APPLICATION_JSON+","+APPLICATION_XML)
+      .accept(APPLICATION_JSON + "," + APPLICATION_XML)
       .body(BODY_REQUEST_FOR_HEADER_INCONSISTENCY)
-      .post("/orders?type=GOBI&apiKey=" + apiKey)
+      .post("/orders?type=GOBI&apiKey=" + API_KEY)
       .then()
       .contentType(APPLICATION_JSON)
       .statusCode(400)
@@ -595,12 +612,12 @@ public class MainVerticleTest {
   }
 
   @Test
-  public void testShouldReturnXMLErrorWithInternalFormatIfAcceptHeaderIsNotIndefined() {
+  public void testShouldReturnXMLErrorWithInternalFormatIfAcceptHeaderIsNotUndefined() {
     final Response resp = RestAssured
       .with()
       .accept("text/xml")
       .body(BODY_REQUEST_FOR_HEADER_INCONSISTENCY)
-      .post("/orders?type=GOBI&apiKey=" + apiKey)
+      .post("/orders?type=GOBI&apiKey=" + API_KEY)
       .then()
       .contentType(APPLICATION_XML)
       .statusCode(400)
@@ -609,5 +626,160 @@ public class MainVerticleTest {
     Object error = resp.path("Error");
 
     assertNotNull(error);
+  }
+
+  // MOSAIC
+
+  @Test
+  public void testReturnMosaicValidatedResponse() {
+    logger.info("testReturnMosaicValidatedResponse:: Ingress URL: {}", VALIDATE.getIngressUrl());
+
+    RestAssured
+      .get(VALIDATE.getIngressUrl() + "?type=MOSAIC&apikey=" + API_KEY)
+      .then()
+      .contentType(APPLICATION_JSON)
+      .statusCode(SC_OK)
+      .body("status", equalTo("SUCCESS"));
+  }
+
+  @Test
+  public void testReturnMosaicValidatedResponseWith404() throws JsonProcessingException {
+    logger.info("testReturnMosaicValidatedResponseWith404:: Ingress URL: {}", VALIDATE.getIngressUrl());
+
+    final Response response = RestAssured
+      .with()
+      .header(X_ECHO_STATUS_HEADER, 404)
+      .get(VALIDATE.getIngressUrl() + "?type=MOSAIC&apiKey=" + API_KEY)
+      .then()
+      .contentType(APPLICATION_XML)
+      .statusCode(SC_NOT_FOUND)
+      .extract()
+      .response();
+
+    ResponseWrapper responseWrapper = new ResponseWrapper(new ErrorWrapper(ErrorCodes.NOT_FOUND.toString(),
+      "No suitable module found for path /mosaic/validate"));
+    assertEquals(responseWrapper.toXml(), response.body().asString());
+  }
+
+  @Test
+  public void testReturnMosaicCreatedOrder() {
+    logger.info("testReturnMosaicCreatedOrder:: Ingress URL: {}", CREATE_ORDERS.getIngressUrl());
+
+    String requestBody = new JsonObject()
+      .put("poNumber", "10000")
+      .put("poLines", new JsonArray().add(new JsonObject().put("poLineNumber", "10000-2")))
+      .toString();
+
+    RestAssured
+      .with()
+      .body(requestBody)
+      .post(CREATE_ORDERS.getIngressUrl() + "?type=MOSAIC&apikey=" + API_KEY)
+      .then()
+      .contentType(APPLICATION_JSON)
+      .statusCode(SC_OK)
+      .body(notNullValue())
+      .body(equalTo("10000-2"));
+  }
+
+  // COMMON
+
+  @Test
+  public void testShouldReturnCommonEndpointData() {
+    Arrays.stream(CommonEndpoint.values())
+      .filter(CommonEndpoint::isAdvancedQuerySupported)
+      .forEach(endpoint -> {
+        logger.info("testShouldReturnCommonEndpointData:: Ingress URL: {}", endpoint.getIngressUrl());
+        RestAssured
+          .get(endpoint.getIngressUrl() + "?type=COMMON&apikey=" + API_KEY)
+          .then()
+          .contentType(APPLICATION_JSON)
+          .statusCode(SC_OK)
+          .body(endpoint.getDataKey(), notNullValue())
+          .body(TOTAL_RECORDS, equalTo(3));
+      });
+  }
+
+  @Test
+  public void testShouldReturnCommonEndpointDataWithOffsetAndLimit() {
+    Arrays.stream(CommonEndpoint.values())
+      .filter(CommonEndpoint::isAdvancedQuerySupported)
+      .filter(CommonEndpoint::isEmptyExtraQuery)
+      .forEach(endpoint -> {
+        logger.info("testShouldReturnCommonEndpointDataWithOffsetAndLimit:: Ingress URL: {}", endpoint.getIngressUrl());
+        RestAssured
+          .get(endpoint.getIngressUrl() + "?type=COMMON&apikey=" + API_KEY + "&offset=0&limit=2")
+          .then()
+          .contentType(APPLICATION_JSON)
+          .statusCode(SC_OK)
+          .body(endpoint.getDataKey(), notNullValue())
+          .body(TOTAL_RECORDS, equalTo(2));
+      });
+  }
+
+  @Test
+  public void testShouldReturnCommonEndpointDataWithQuery() {
+    Arrays.stream(CommonEndpoint.values())
+      .filter(CommonEndpoint::isAdvancedQuerySupported)
+      .filter(CommonEndpoint::isEmptyExtraQuery)
+      .forEach(endpoint -> {
+        logger.info("testShouldReturnCommonEndpointDataWithQuery:: Ingress URL: {}", endpoint.getIngressUrl());
+        RestAssured
+          .get(endpoint.getIngressUrl() + "?type=COMMON&apikey=" + API_KEY + "&query=id==" + HAD_DATA_ID)
+          .then()
+          .contentType(APPLICATION_JSON)
+          .statusCode(SC_OK)
+          .body(endpoint.getDataKey(), notNullValue())
+          .body(TOTAL_RECORDS, equalTo(1));
+      });
+  }
+
+  @Test
+  public void testShouldReturnCommonEndpointDataWithQueryNoData() {
+    Arrays.stream(CommonEndpoint.values())
+      .filter(CommonEndpoint::isAdvancedQuerySupported)
+      .filter(CommonEndpoint::isEmptyExtraQuery)
+      .forEach(endpoint -> {
+        logger.info("testShouldReturnCommonEndpointDataWithQueryNoData:: Ingress URL: {}", endpoint.getIngressUrl());
+        RestAssured
+          .get(endpoint.getIngressUrl() + "?type=COMMON&apikey=" + API_KEY + "&query=id==" + NO_DATA_ID)
+          .then()
+          .contentType(APPLICATION_JSON)
+          .statusCode(SC_OK)
+          .body(endpoint.getDataKey(), notNullValue())
+          .body(TOTAL_RECORDS, equalTo(0));
+      });
+  }
+
+  @Test
+  public void testShouldReturnCommonEndpointDataWithEmptyQuery() {
+    Arrays.stream(CommonEndpoint.values())
+      .filter(CommonEndpoint::isAdvancedQuerySupported)
+      .filter(CommonEndpoint::isEmptyExtraQuery)
+      .forEach(endpoint -> {
+        logger.info("testShouldReturnCommonEndpointDataWithEmptyQuery:: Ingress URL: {}", endpoint.getIngressUrl());
+        RestAssured
+          .get(endpoint.getIngressUrl() + "?type=COMMON&apikey=" + API_KEY + "&query=")
+          .then()
+          .contentType(APPLICATION_JSON)
+          .statusCode(SC_OK)
+          .body(endpoint.getDataKey(), notNullValue())
+          .body(TOTAL_RECORDS, equalTo(3));
+      });
+  }
+
+  @Test
+  public void testReturnCommonEndpointFundCodesExpenseClassesData() {
+    Arrays.stream(new String[]{"", "&fiscalYearCode==", "&fiscalYearCode==%s".formatted(FISCAL_YEAR_CODE_FY2025)})
+      .forEach(queryString -> {
+        logger.info("testReturnCommonEndpointFundCodesExpenseClassesData:: Ingress URL: {}, query string: {}", FUND_CODES_EXPENSE_CLASSES.getIngressUrl(), queryString);
+        RestAssured
+          .get(FUND_CODES_EXPENSE_CLASSES.getIngressUrl() + "?type=COMMON&apikey=" + API_KEY + queryString)
+          .then()
+          .contentType(APPLICATION_JSON)
+          .statusCode(SC_OK)
+          .body(FUND_CODES_EXPENSE_CLASSES.getDataKey(), notNullValue())
+          .body(DELIMITER, equalTo(COLON_DELIMITER))
+          .body(TOTAL_RECORDS, equalTo(1));
+      });
   }
 }

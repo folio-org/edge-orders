@@ -1,4 +1,4 @@
-package org.folio.edge.orders.utils;
+package org.folio.edge.orders.client;
 
 import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 import static org.folio.edge.core.utils.test.MockOkapi.MOCK_TOKEN;
 
@@ -33,12 +35,10 @@ public class OrdersOkapiClientTest {
 
   private static final Logger logger = LogManager.getLogger(OrdersOkapiClientTest.class);
 
-  private static final String tenant = "diku";
-  private static final int reqTimeout = 3000;
+  private static final String TENANT = "diku";
+  private static final int REQ_TIMEOUT = 3000;
 
-  private static Map<String, String> mockRequests;
-
-  private OrdersOkapiClient client;
+  private AcquisitionsOkapiClient client;
   private OrdersMockOkapi mockOkapi;
 
   @Before
@@ -46,27 +46,28 @@ public class OrdersOkapiClientTest {
     int okapiPort = TestUtils.getPort();
 
     List<String> knownTenants = new ArrayList<>();
-    knownTenants.add(tenant);
+    knownTenants.add(TENANT);
 
     mockOkapi = new OrdersMockOkapi(okapiPort, knownTenants);
     mockOkapi.start().onComplete(context.asyncAssertSuccess());
 
-    client = new OrdersOkapiClient(new OkapiClientFactory(Vertx.vertx(),
-      "http://localhost:" + okapiPort, reqTimeout).getOkapiClient(tenant));
+    client = new AcquisitionsOkapiClient(new OkapiClientFactory(Vertx.vertx(),
+      "http://localhost:" + okapiPort, REQ_TIMEOUT).getOkapiClient(TENANT));
 
-    mockRequests = new HashMap<>();
+    Map<String, String> mockRequests = new HashMap<>();
 
     File folder = new File("src/test/resources/requests");
     File[] listOfFiles = folder.listFiles();
 
-    for (int i = 0; i < listOfFiles.length; i++) {
-      String filename = listOfFiles[i].getName();
+    for (File listOfFile : Objects.requireNonNull(listOfFiles)) {
+      String filename = listOfFile.getName();
       String woExt = filename.substring(0, filename.lastIndexOf("."));
       StringBuilder sb = new StringBuilder();
       try {
-        Files.lines(Paths.get(listOfFiles[i].toURI()), StandardCharsets.UTF_8)
-          .forEachOrdered(value -> sb.append(value).append('\n'));
-        mockRequests.put(woExt, sb.toString());
+        try (Stream<String> linesStream = Files.lines(Paths.get(listOfFile.toURI()), StandardCharsets.UTF_8)) {
+          linesStream.forEachOrdered(value -> sb.append(value).append('\n'));
+          mockRequests.put(woExt, sb.toString());
+        }
       } catch (IOException e) {
         logger.error("Exception loading mock requests", e);
       }
@@ -117,14 +118,15 @@ public class OrdersOkapiClientTest {
       routing.setProxyPath("/gobi/validate");
 
       client.send(routing,
-          "",null, null,
-          resp -> {
-            context.assertEquals(200, resp.statusCode());
-            async.complete();
-          },
-          t -> context.fail(t.getMessage()));
+        "",null, null,
+        resp -> {
+          context.assertEquals(200, resp.statusCode());
+          async.complete();
+        },
+        t -> context.fail(t.getMessage()));
     });
   }
+
   @Test
   public void testPutEbsconetSuccess(TestContext context) {
     logger.info("=== Test successful PUT ebsconet order-line with id===");
@@ -140,10 +142,10 @@ public class OrdersOkapiClientTest {
       entries.add("id", "123");
 
       client.send(routing, "", entries, null, resp -> {
-          context.assertEquals(204, resp.statusCode());
-          async.complete();
-        },
-        t -> context.fail(t.getMessage()));
+        context.assertEquals(204, resp.statusCode());
+        async.complete();
+      },
+      t -> context.fail(t.getMessage()));
     });
   }
 }

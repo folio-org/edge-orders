@@ -28,6 +28,10 @@
           "proxyPath": {
             "description": "URI for proxy forwarding",
             "type": "string"
+          },
+          "extraQuery": {
+            "description": "Extra query predicates to better restrict the proxy path response",
+            "type": "string"
           }
         },
         "additionalProperties": false,

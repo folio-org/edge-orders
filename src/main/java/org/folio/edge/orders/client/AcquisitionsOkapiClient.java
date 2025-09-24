@@ -1,16 +1,25 @@
-package org.folio.edge.orders.utils;
+package org.folio.edge.orders.client;
 
 import static org.folio.edge.core.Constants.APPLICATION_JSON;
 import static org.folio.edge.core.Constants.APPLICATION_XML;
 import static org.folio.edge.core.Constants.TEXT_PLAIN;
 import static org.folio.edge.core.Constants.X_OKAPI_TOKEN;
+import static org.folio.edge.orders.Constants.HTTP_METHOD_GET;
+import static org.folio.edge.orders.Constants.HTTP_METHOD_POST;
+import static org.folio.edge.orders.Constants.HTTP_METHOD_PUT;
 
-import java.util.Optional;
+import java.util.List;
+import java.util.stream.IntStream;
 
+import io.vertx.core.Future;
+import io.vertx.core.json.JsonArray;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.folio.edge.core.utils.OkapiClient;
+import org.folio.edge.orders.QueryUtil;
+import org.folio.okapi.common.ChattyHttpResponseExpectation;
+import org.folio.okapi.common.ModuleId;
 import org.folio.rest.mappings.model.Routing;
 
 import io.vertx.core.Handler;
@@ -20,11 +29,11 @@ import io.vertx.core.http.HttpHeaders;
 import io.vertx.ext.web.client.HttpRequest;
 import io.vertx.ext.web.client.HttpResponse;
 
-public class OrdersOkapiClient extends OkapiClient {
+public class AcquisitionsOkapiClient extends OkapiClient {
 
-  private static final Logger logger = LogManager.getLogger(OrdersOkapiClient.class);
+  private static final Logger logger = LogManager.getLogger(AcquisitionsOkapiClient.class);
 
-  public OrdersOkapiClient(OkapiClient client) {
+  public AcquisitionsOkapiClient(OkapiClient client) {
     super(client);
   }
 
@@ -37,13 +46,12 @@ public class OrdersOkapiClient extends OkapiClient {
   public void send(Routing routing, String payload, MultiMap params, MultiMap headers, Handler<HttpResponse<Buffer>> responseHandler,
                    Handler<Throwable> exceptionHandler) {
     logger.debug("send:: Trying to send request to Okapi with routing: {}, payload: {}", routing, payload);
-    final String method = routing.getProxyMethod() == null ? routing.getMethod() : routing.getProxyMethod();
-
-    String resultPath = Optional.ofNullable(params)
-      .map(it -> it.names().stream().reduce(routing.getProxyPath(), (acc, item) -> acc.replace(":" + item, params.get(item))))
-      .orElse(routing.getProxyPath());
-    switch (method) {
-      case "POST":
+    QueryUtil.addOrUpsertExtraQueryString(routing.getExtraQuery(), params);
+    String requestMethod = QueryUtil.getRequestMethod(routing);
+    String proxyPath = QueryUtil.getProxyPath(routing.getProxyPath(), params);
+    String resultPath = QueryUtil.getResultPath(params, proxyPath);
+    switch (requestMethod) {
+      case HTTP_METHOD_POST:
         logger.info("Sending POST request to Okapi with routing: {}, payload: {}, resultPath: {}", routing, payload, resultPath);
         post(
           okapiURL + resultPath,
@@ -53,7 +61,7 @@ public class OrdersOkapiClient extends OkapiClient {
           responseHandler,
           exceptionHandler);
         break;
-      case "GET":
+      case HTTP_METHOD_GET:
         logger.info("Sending GET request to Okapi with routing: {}, payload: {}, resultPath: {}", routing, payload, resultPath);
         get(
           okapiURL + resultPath,
@@ -62,7 +70,7 @@ public class OrdersOkapiClient extends OkapiClient {
           responseHandler,
           exceptionHandler);
         break;
-      case "PUT":
+      case HTTP_METHOD_PUT:
         logger.info("Sending PUT request to Okapi with routing: {}, payload: {}, resultPath: {}", routing, payload, resultPath);
         put(
           okapiURL + resultPath,
@@ -72,6 +80,8 @@ public class OrdersOkapiClient extends OkapiClient {
           responseHandler,
           exceptionHandler);
         break;
+      default:
+        throw new UnsupportedOperationException(String.format("Unsupported requestMethod %s", requestMethod));
     }
   }
 
@@ -100,6 +110,42 @@ public class OrdersOkapiClient extends OkapiClient {
         .onSuccess(responseHandler)
         .onFailure(exceptionHandler);
     }
+  }
 
+  /**
+   * Get the module id header for the interface.
+   *
+   * <p>See <a href="https://github.com/folio-org/okapi/blob/master/doc/guide.md#multiple-interfaces">
+   * multiple interfaces</a> documentation.
+   *
+   * @param interfaceName the interface with "interfaceType": "multiple", for example custom-fields
+   * @param moduleName the module name (product name) without version, for example mod-orders-storage
+   * @param headers the headers to set
+   * @return future with the module id
+   */
+  public Future<String> getModuleIdForMultipleInterface(String interfaceName, String moduleName, MultiMap headers) {
+    String requestUri = "/_/proxy/tenants/%s/modules?provide=%s"
+      .formatted(tenant, interfaceName);
+    return get(okapiURL + requestUri, tenant, combineHeadersWithDefaults(headers))
+      .expecting(ChattyHttpResponseExpectation.SC_OK)
+      .compose(res -> {
+        var list = extractModuleIds(res.bodyAsJsonArray(), moduleName);
+        if (list.isEmpty()) {
+          return Future.failedFuture("No module found.");
+        }
+        if (list.size() != 1) {
+          return Future.failedFuture("Multiple modules found: " + list);
+        }
+        return Future.succeededFuture(list.getFirst());
+      }).onFailure( e -> logger.error("Failed to get moduleId for module name: {}", moduleName, e));
+  }
+
+  private static List<String> extractModuleIds(JsonArray jsonArray, String moduleName) {
+    return IntStream.range(0, jsonArray.size())
+      .mapToObj(jsonArray::getJsonObject)
+      .map(o -> o.getString("id"))
+      .filter(moduleId -> new ModuleId(moduleId).getProduct().equals(moduleName))
+      .distinct()
+      .toList();
   }
 }
