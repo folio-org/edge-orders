@@ -1,5 +1,16 @@
 ## 3.3.0 - Unreleased
 
+## 3.2.1 - Released (Sunflower R1 2025 Bug Fix)
+The primary focus of this release was to port new feature for the Mosaic integration.
+
+[Full Changelog](https://github.com/folio-org/edge-orders/compare/v3.2.0...v3.2.1)
+
+### Stories
+* [EDGEORDERS-101](https://issues.folio.org/browse/EDGEORDERS-101) - Enhancements for Mosaic integration support
+* [MODMO-15](https://issues.folio.org/browse/MODMO-15) - Update MosaicOrder schema & add more endpoints to edge-orders
+* [EDGEORDERS-98](https://issues.folio.org/browse/EDGEORDERS-98) - Add support for retrieving custom fields
+* [EDGEORDERS-96](https://issues.folio.org/browse/EDGEORDERS-96) - Build GET APIs for field data that is critical to order integrations
+
 ## 3.2.0 - Released (Sunflower R1 2025)
 The primary focus of this release was to update libraries to the latest versions
 
