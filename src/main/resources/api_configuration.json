@@ -39,13 +39,13 @@
     {
       "type": "MOSAIC",
       "method": "GET",
-      "pathPattern": "/mosaic/validate",
+      "pathPattern": "/orders/validate",
       "proxyPath": "/mosaic/validate"
     },
     {
       "type": "MOSAIC",
       "method": "POST",
-      "pathPattern": "/mosaic/orders",
+      "pathPattern": "/orders",
       "proxyPath": "/mosaic/orders"
     },
     {
