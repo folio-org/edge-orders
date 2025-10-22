@@ -6,8 +6,8 @@ import static io.vertx.core.http.HttpMethod.GET;
 import static io.vertx.core.http.HttpMethod.POST;
 
 public enum MosaicEndpoint {
-  VALIDATE(GET, "/mosaic/validate", "/mosaic/validate"),
-  CREATE_ORDERS(POST, "/mosaic/orders", "/mosaic/orders");
+  VALIDATE(GET, "/orders/validate", "/mosaic/validate"),
+  CREATE_ORDERS(POST, "/orders", "/mosaic/orders");
 
   private final HttpMethod method;
   private final String ingressUrl;
