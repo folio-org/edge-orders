@@ -1,5 +1,13 @@
 ## 3.3.0 - Unreleased
 
+## 3.2.2 - Released (Sunflower R1 2025 Bug Fix)
+The primary focus of this release was to adjust the mappings of 5 endpoints with the common /orders prefix.
+
+[Full Changelog](https://github.com/folio-org/edge-orders/compare/v3.2.1...v3.2.2)
+
+### Stories
+* [EDGORDERS-107](https://issues.folio.org/browse/EDGORDERS-107) - Adjust edge-orders endpoints mappings for Mosaic
+
 ## 3.2.1 - Released (Sunflower R1 2025 Bug Fix)
 The primary focus of this release was to port new feature for the Mosaic integration.
 
