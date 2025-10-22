@@ -87,13 +87,13 @@
     {
       "type": "COMMON",
       "method": "GET",
-      "pathPattern": "/acquisitions-units",
+      "pathPattern": "/orders/acquisitions-units",
       "proxyPath": "/acquisitions-units/units?offset=:offset&limit=:limit&query=:query"
     },
     {
       "type": "COMMON",
       "method": "GET",
-      "pathPattern": "/acquisition-methods",
+      "pathPattern": "/orders/acquisition-methods",
       "proxyPath": "/orders/acquisition-methods?offset=:offset&limit=:limit&query=:query"
     },
     {
@@ -105,7 +105,7 @@
     {
       "type": "COMMON",
       "method": "GET",
-      "pathPattern": "/addresses/billing-and-shipping",
+      "pathPattern": "/orders/addresses/billing-and-shipping",
       "proxyPath": "/configurations/entries?offset=:offset&limit=:limit&query=:query",
       "extraQuery": "configName==tenant.addresses"
     },
