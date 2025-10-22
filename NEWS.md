@@ -1,7 +1,7 @@
 ## 3.3.0 - Unreleased
 
 ## 3.2.2 - Released (Sunflower R1 2025 Bug Fix)
-The primary focus of this release was to adjust the mappings of three endpoints with the common /orders prefix.
+The primary focus of this release was to adjust the mappings of 5 endpoints with the common /orders prefix.
 
 [Full Changelog](https://github.com/folio-org/edge-orders/compare/v3.2.1...v3.2.2)
 
