@@ -10,7 +10,7 @@ public enum CommonEndpoint {
   ACQUISITIONS_UNITS("/orders/acquisitions-units", "/acquisitions-units/units", "acquisitionsUnits", true, true),
   ACQUISITIONS_METHODS("/orders/acquisition-methods", "/orders/acquisition-methods", "acquisitionMethods", true, true),
   ORGANIZATIONS("/organizations", "/organizations/organizations", "organizations", true, true),
-  BILLING_AND_SHIPPING("/orders/addresses/billing-and-shipping", "/configurations/entries", "configs", true, false),
+  BILLING_AND_SHIPPING("/orders/addresses/billing-and-shipping", "/settings/entries", "configs", true, false),
   LOCATIONS("/locations-for-order", "/locations", "locations", true, true),
   MATERIAL_TYPES("/material-types-for-order", "/material-types", "mtypes", true, true),
   IDENTIFIER_TYPES("/identifier-types-for-order", "/identifier-types", "identifierTypes", true, true),
