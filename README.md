@@ -34,8 +34,8 @@ Institutional users should be granted the following permissions in order to use 
 - `orders.acquisitions-units-assignments.manage`
 - `orders.acquisition-methods.collection.get`
 - `organizations.organizations.collection.get`
-- `mod-settings_entries.manage`
-- `ui-tenant-settings_settings_addresses.manage`
+- `mod-settings.entries.collection.get`
+- `ui-tenant-settings.settings.addresses`
 - `inventory-storage.locations.collection.get`
 - `inventory-storage.material-types.collection.get`
 - `inventory-storage.identifier-types.collection.get`
