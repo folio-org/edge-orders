@@ -106,7 +106,7 @@ public class MainVerticleTest {
     System.setProperty(SYS_REQUEST_TIMEOUT_MS, String.valueOf(REQUEST_TIMEOUT_MS));
 
     final DeploymentOptions opt = new DeploymentOptions();
-    vertx.deployVerticle(MainVerticle.class.getName(), opt, context.asyncAssertSuccess());
+    vertx.deployVerticle(MainVerticle.class.getName(), opt).onComplete(context.asyncAssertSuccess());
 
     RestAssured.baseURI = "http://localhost:" + serverPort;
     RestAssured.port = serverPort;

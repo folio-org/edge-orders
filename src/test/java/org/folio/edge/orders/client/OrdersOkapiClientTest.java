@@ -138,7 +138,7 @@ public class OrdersOkapiClientTest {
       routing.setMethod("PUT");
       routing.setPathPattern("/orders/order-lines/:id");
       routing.setProxyPath("/ebsconet/order-lines/:id");
-      MultiMap entries = new HeadersMultiMap();
+      MultiMap entries = HeadersMultiMap.httpHeaders();
       entries.add("id", "123");
 
       client.send(routing, "", entries, null, resp -> {

@@ -45,11 +45,11 @@
 
     <!--Dependency Management Properties-->
     <log4j.version>2.24.3</log4j.version>
-    <vertx.version>4.5.13</vertx.version>
+    <vertx.version>5.0.6</vertx.version>
 
     <!--Folio dependencies properties-->
     <folio-module-descriptor-validator.version>1.0.0</folio-module-descriptor-validator.version>
-    <edge-common.version>4.9.0</edge-common.version>
+    <edge-common.version>5.0.0</edge-common.version>
 
     <!--Dependency properties-->
     <aws.sdk.ssm.version>2.30.31</aws.sdk.ssm.version>

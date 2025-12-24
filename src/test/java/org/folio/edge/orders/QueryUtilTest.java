@@ -34,14 +34,14 @@ public class QueryUtilTest {
 
   @Test
   public void testAddOrUpsertExtraQueryString_withEmptyExtraQuery() {
-    var params = HeadersMultiMap.headers();
+    var params = HeadersMultiMap.httpHeaders();
     QueryUtil.addOrUpsertExtraQueryString("", params);
     assertTrue(params.isEmpty());
   }
 
   @Test
   public void testAddOrUpsertExtraQueryString_withNoExistingQuery() {
-    var params = HeadersMultiMap.headers();
+    var params = HeadersMultiMap.httpHeaders();
     var extraQuery = "status=active";
     QueryUtil.addOrUpsertExtraQueryString(extraQuery, params);
     assertEquals(extraQuery, params.get(QUERY.getName()));
@@ -49,7 +49,7 @@ public class QueryUtilTest {
 
   @Test
   public void testAddOrUpsertExtraQueryString_withExistingQuery() {
-    var params = HeadersMultiMap.headers();
+    var params = HeadersMultiMap.httpHeaders();
     params.add(QUERY.getName(), "name=book");
     var extraQuery = "status=active";
     QueryUtil.addOrUpsertExtraQueryString(extraQuery, params);
@@ -67,7 +67,7 @@ public class QueryUtilTest {
 
   @Test
   public void testGetResultPath_withParams() {
-    var params = HeadersMultiMap.headers();
+    var params = HeadersMultiMap.httpHeaders();
     params.add("orderId", "123456");
     var proxyPath = "/orders/:orderId";
     var result = QueryUtil.getResultPath(params, proxyPath);
@@ -76,7 +76,7 @@ public class QueryUtilTest {
 
   @Test
   public void testGetResultPath_withOffsetParam() {
-    var params = HeadersMultiMap.headers();
+    var params = HeadersMultiMap.httpHeaders();
     params.add(OFFSET.getName(), "20");
     var proxyPath = "/orders?offset=:offset";
     var result = QueryUtil.getResultPath(params, proxyPath);
@@ -85,7 +85,7 @@ public class QueryUtilTest {
 
   @Test
   public void testGetResultPath_withLimitParam() {
-    var params = HeadersMultiMap.headers();
+    var params = HeadersMultiMap.httpHeaders();
     params.add(LIMIT.getName(), "10");
     var proxyPath = "/orders?limit=:limit";
     var result = QueryUtil.getResultPath(params, proxyPath);
@@ -94,7 +94,7 @@ public class QueryUtilTest {
 
   @Test
   public void testGetResultPath_withQueryParam() {
-    var params = HeadersMultiMap.headers();
+    var params = HeadersMultiMap.httpHeaders();
     params.add(QUERY.getName(), "title=test");
     var proxyPath = "/orders?query=:query";
     var result = QueryUtil.getResultPath(params, proxyPath);
@@ -103,7 +103,7 @@ public class QueryUtilTest {
 
   @Test
   public void testGetResultPath_withMultipleQueryParams() {
-    var params = HeadersMultiMap.headers();
+    var params = HeadersMultiMap.httpHeaders();
     params.add(OFFSET.getName(), "20");
     params.add(LIMIT.getName(), "10");
     params.add(QUERY.getName(), "title=test");
@@ -114,7 +114,7 @@ public class QueryUtilTest {
 
   @Test
   public void testGetResultPath_withEmptyParamValues() {
-    var params = HeadersMultiMap.headers();
+    var params = HeadersMultiMap.httpHeaders();
     params.add(OFFSET.getName(), "");
     params.add(LIMIT.getName(), "");
     params.add(QUERY.getName(), "");
@@ -125,7 +125,7 @@ public class QueryUtilTest {
 
   @Test
   public void testGetResultPath_withParamsNotInPath() {
-    var params = HeadersMultiMap.headers();
+    var params = HeadersMultiMap.httpHeaders();
     params.add(OFFSET.getName(), "20");
     params.add(LIMIT.getName(), "10");
     var proxyPath = "/orders/search";
@@ -137,7 +137,7 @@ public class QueryUtilTest {
 
   @Test
   public void testGetNormalizedProxyPath_withSingleParam() {
-    var params = HeadersMultiMap.headers();
+    var params = HeadersMultiMap.httpHeaders();
     params.add("orderId", "123456");
     var proxyPath = "/orders/:orderId";
     var result = QueryUtil.getNormalizedProxyPath(params, proxyPath);
@@ -146,7 +146,7 @@ public class QueryUtilTest {
 
   @Test
   public void testGetNormalizedProxyPath_withMultipleParams() {
-    var params = HeadersMultiMap.headers();
+    var params = HeadersMultiMap.httpHeaders();
     params.add("orderId", "123456");
     params.add("lineId", "789012");
     var proxyPath = "/orders/:orderId/lines/:lineId";
@@ -156,7 +156,7 @@ public class QueryUtilTest {
 
   @Test
   public void testGetNormalizedProxyPath_withSpacesInParam() {
-    var params = HeadersMultiMap.headers();
+    var params = HeadersMultiMap.httpHeaders();
     params.add("query", "title contains Books");
     var proxyPath = "/orders?query=:query";
     var result = QueryUtil.getNormalizedProxyPath(params, proxyPath);
@@ -174,7 +174,7 @@ public class QueryUtilTest {
 
   @Test
   public void testGetProxyPath_withDefaultValue() {
-    var params = HeadersMultiMap.headers();
+    var params = HeadersMultiMap.httpHeaders();
     var proxyPath = "/orders?limit=:limit";
     var result = QueryUtil.getProxyPath(proxyPath, params);
     assertEquals("/orders?limit=" + LIMIT.getDefaultValue(), result);
@@ -182,7 +182,7 @@ public class QueryUtilTest {
 
   @Test
   public void testGetProxyPath_withoutDefaultValue() {
-    var params = HeadersMultiMap.headers();
+    var params = HeadersMultiMap.httpHeaders();
     var proxyPath = "/orders?query=:query";
     var result = QueryUtil.getProxyPath(proxyPath, params);
     assertEquals("/orders", result);
@@ -190,7 +190,7 @@ public class QueryUtilTest {
 
   @Test
   public void testGetProxyPath_withPlaceholderAndValue() {
-    var params = HeadersMultiMap.headers();
+    var params = HeadersMultiMap.httpHeaders();
     params.add(LIMIT.getName(), "10");
     var proxyPath = "/orders?limit=:limit";
     var result = QueryUtil.getProxyPath(proxyPath, params);
@@ -199,7 +199,7 @@ public class QueryUtilTest {
 
   @Test
   public void testGetProxyPath_withoutPlaceholder() {
-    var params = HeadersMultiMap.headers();
+    var params = HeadersMultiMap.httpHeaders();
     var proxyPath = "/orders?status=active";
     var result = QueryUtil.getProxyPath(proxyPath, params);
     assertEquals("/orders?status=active", result);
@@ -207,7 +207,7 @@ public class QueryUtilTest {
 
   @Test
   public void testGetProxyPath_withEmptyString() {
-    var params = HeadersMultiMap.headers();
+    var params = HeadersMultiMap.httpHeaders();
     params.add(QUERY.getName(), "");
     var proxyPath = "/orders?query=:query";
     var result = QueryUtil.getProxyPath(proxyPath, params);
@@ -216,7 +216,7 @@ public class QueryUtilTest {
 
   @Test
   public void testGetProxyPath_withNonEmptyString() {
-    var params = HeadersMultiMap.headers();
+    var params = HeadersMultiMap.httpHeaders();
     params.add(QUERY.getName(), "value");
     var proxyPath = "/orders?query=:query";
     var result = QueryUtil.getProxyPath(proxyPath, params);
@@ -225,7 +225,7 @@ public class QueryUtilTest {
 
   @Test
   public void testGetProxyPath_multipleParams() {
-    var params = HeadersMultiMap.headers();
+    var params = HeadersMultiMap.httpHeaders();
     var proxyPath = "/orders?offset=:offset&limit=:limit&query=:query";
     var result = QueryUtil.getProxyPath(proxyPath, params);
     assertEquals("/orders?offset=" + OFFSET.getDefaultValue() +
