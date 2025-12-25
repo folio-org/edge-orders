@@ -164,7 +164,7 @@ Examples:
 ```shell
 mvn clean package -DskipTests
 
-# Deploy on port 19001 point at gateway at http://kong.eureka:8000
+# Deploy on port 19001 pointing to the gateway at http://kong.eureka:8000
 java -Dokapi_url=http://kong.eureka:8000 \
   -XX:MaxRAMPercentage=80.0 \
   -Dsecure_store_props=src/main/resources/ephemeral.properties \
