@@ -130,7 +130,6 @@ If truststore parameters need to be populated, `FOLIO_CLIENT_TLS_TRUSTSTORETYPE`
 | `FOLIO_CLIENT_TLS_TRUSTSTOREPATH`       | `NA`              | Set the location of the keystore file in the local file system                   |
 | `FOLIO_CLIENT_TLS_TRUSTSTOREPASSWORD`   | `NA`              | Set the password for the keystore                                                |
 
-
 ## Additional information
 
 There will be a single instance of okapi client per OkapiClientFactory and per tenant, which means that this client
@@ -159,6 +158,21 @@ Examples:
 | application/xml,application/json | application/json |
 | text/plain,application/xml       | application/xml  |
 | other                            | application/xml  |
+
+## Build & run locally
+
+```shell
+mvn clean package -DskipTests
+
+# Deploy on port 19001 pointing to the gateway at http://kong.eureka:8000
+java -Dokapi_url=http://kong.eureka:8000 \
+  -XX:MaxRAMPercentage=80.0 \
+  -Dsecure_store_props=src/main/resources/ephemeral.properties \
+  -Dapi_config=src/main/resources/api_configuration.json \
+  -Dport=19001 \
+  -XX:+ExitOnOutOfMemoryError -cp . \
+  -jar target/edge-orders-fat.jar
+```
 
 ## Additional information
 
