@@ -52,7 +52,7 @@
     <edge-common.version>5.0.0</edge-common.version>
 
     <!--Dependency properties-->
-    <aws.sdk.ssm.version>2.40.15</aws.sdk.ssm.version>
+    <aws.sdk.ssm.version>2.40.16</aws.sdk.ssm.version>
     <vault.java.driver.version>5.1.0</vault.java.driver.version>
     <jjwt.version>0.13.0</jjwt.version>
     <commons-lang3.version>3.20.0</commons-lang3.version>
