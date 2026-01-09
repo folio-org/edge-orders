@@ -1,5 +1,13 @@
 ## 3.3.0 - Unreleased
 
+## 3.2.3 - Released (Sunflower R1 2025 Bug Fix)
+The primary focus of this release was to update Vertx to 4.5.23 with security fixes
+
+[Full Changelog](https://github.com/folio-org/edge-orders/compare/v3.2.2...v3.2.3)
+
+### Stories
+* [EDGORDERS-115](https://issues.folio.org/browse/EDGORDERS-115) - Sunflower CSP - Vertx 4.5.23 fixing CVE-2025-67735 netty CRLF
+
 ## 3.2.2 - Released (Sunflower R1 2025 Bug Fix)
 The primary focus of this release was to adjust the mappings of 5 endpoints with the common /orders prefix.
 
