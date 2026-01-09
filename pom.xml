@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.folio</groupId>
   <artifactId>edge-orders</artifactId>
-  <version>3.2.3</version>
+  <version>3.2.4-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>Edge API - Order Placement</name>
@@ -17,7 +17,7 @@
     <url>https://github.com/folio-org/edge-orders.git</url>
     <connection>scm:git:git://github.com/folio-org/edge-orders.git</connection>
     <developerConnection>scm:git:git@github.com:folio-org/edge-orders.git</developerConnection>
-    <tag>v3.2.3</tag>
+    <tag>v3.2.0</tag>
   </scm>
 
   <licenses>
