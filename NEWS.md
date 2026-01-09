@@ -1,5 +1,14 @@
 ## 3.2.0 - Unreleased
 
+## 3.1.1 - Released (Ramsons R2 2024)
+The primary focus of this release was to update Vertx to 4.5.23 with security fixes
+
+[Full Changelog](https://github.com/folio-org/edge-orders/compare/v3.1.0...v3.1.1)
+
+### Stories
+* [EDGORDERS-116](https://issues.folio.org/browse/EDGORDERS-116) - Ramsons CSP - Vertx 4.5.23 fixing CVE-2025-67735 netty CRLF
+
+
 ## 3.1.0 - Released (Ramsons R2 2024)
 The primary focus of this release was to update libraries of dependant acq modules to the latest versions
 
