@@ -3,7 +3,6 @@ package org.folio.edge.orders.client;
 import static org.folio.edge.core.Constants.APPLICATION_JSON;
 import static org.folio.edge.core.Constants.APPLICATION_XML;
 import static org.folio.edge.core.Constants.TEXT_PLAIN;
-import static org.folio.edge.core.Constants.X_OKAPI_TOKEN;
 import static org.folio.edge.orders.Constants.HTTP_METHOD_GET;
 import static org.folio.edge.orders.Constants.HTTP_METHOD_POST;
 import static org.folio.edge.orders.Constants.HTTP_METHOD_PUT;
@@ -45,14 +44,13 @@ public class AcquisitionsOkapiClient extends OkapiClient {
 
   public void send(Routing routing, String payload, MultiMap params, MultiMap headers, Handler<HttpResponse<Buffer>> responseHandler,
                    Handler<Throwable> exceptionHandler) {
-    logger.debug("send:: Trying to send request to Okapi with routing: {}, payload: {}", routing, payload);
+    logger.debug("send:: Trying to send request to Okapi with routing: {}", routing);
     QueryUtil.addOrUpsertExtraQueryString(routing.getExtraQuery(), params);
     String requestMethod = QueryUtil.getRequestMethod(routing);
     String proxyPath = QueryUtil.getProxyPath(routing.getProxyPath(), params);
     String resultPath = QueryUtil.getResultPath(params, proxyPath);
     switch (requestMethod) {
       case HTTP_METHOD_POST:
-        logger.info("Sending POST request to Okapi with routing: {}, payload: {}, resultPath: {}", routing, payload, resultPath);
         post(
           okapiURL + resultPath,
           tenant,
@@ -62,7 +60,6 @@ public class AcquisitionsOkapiClient extends OkapiClient {
           exceptionHandler);
         break;
       case HTTP_METHOD_GET:
-        logger.info("Sending GET request to Okapi with routing: {}, payload: {}, resultPath: {}", routing, payload, resultPath);
         get(
           okapiURL + resultPath,
           tenant,
@@ -71,7 +68,6 @@ public class AcquisitionsOkapiClient extends OkapiClient {
           exceptionHandler);
         break;
       case HTTP_METHOD_PUT:
-        logger.info("Sending PUT request to Okapi with routing: {}, payload: {}, resultPath: {}", routing, payload, resultPath);
         put(
           okapiURL + resultPath,
           tenant,
@@ -87,7 +83,7 @@ public class AcquisitionsOkapiClient extends OkapiClient {
 
   public void put(String url, String tenant, String payload, MultiMap headers, Handler<HttpResponse<Buffer>> responseHandler,
       Handler<Throwable> exceptionHandler) {
-    logger.debug("put:: Trying to send request to Okapi with url: {}, payload: {}, tenant: {}", url, payload, tenant);
+    logger.debug("put:: Trying to send request to gateway with tenant: {}", tenant);
     HttpRequest<Buffer> request = client.putAbs(url);
 
     if (headers != null) {
@@ -95,9 +91,6 @@ public class AcquisitionsOkapiClient extends OkapiClient {
     } else {
       request.headers().setAll(defaultHeaders);
     }
-
-    logger.info("PUT '{}' tenant: {} token: {}", () -> url, () -> tenant, () -> request.headers()
-      .get(X_OKAPI_TOKEN));
 
     request.timeout(reqTimeout);
     if (StringUtils.isEmpty(payload)) {
