@@ -78,7 +78,7 @@ public class OrdersHandler extends Handler {
           .findFirst()
           .orElseThrow(Exception::new);
       } catch (Exception e) {
-        logger.error("API configuration doesn't exist for type: {}", type);
+        logger.error("API configuration doesn't exist for type: {}", type, e);
         badRequest(ctx, "Unknown Purchasing System Specified: " + type);
         return;
       }
