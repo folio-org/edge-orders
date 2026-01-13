@@ -69,10 +69,7 @@ public class OrdersHandler extends Handler {
 
       Routing routing;
       String currentPath = ctx.currentRoute().getPath();
-      String requestNormalisedPath = ctx.normalizedPath();
       String requestMethod = ctx.request().method().name();
-
-      logger.debug("handle:: Trying to find routing for path: {}, method: {}", requestNormalisedPath, requestMethod);
       try {
         routing = routingMapping.stream()
           .filter(r -> r.getType().equalsIgnoreCase(type)
@@ -81,7 +78,7 @@ public class OrdersHandler extends Handler {
           .findFirst()
           .orElseThrow(Exception::new);
       } catch (Exception e) {
-        logger.error("API configuration doesn't exist for type: {} method: {} pathPattern: {}", type, requestMethod, requestNormalisedPath);
+        logger.error("API configuration doesn't exist for type: {}", type, e);
         badRequest(ctx, "Unknown Purchasing System Specified: " + type);
         return;
       }
@@ -123,7 +120,6 @@ public class OrdersHandler extends Handler {
     logger.debug("handleResponse:: Trying to handle response");
     final StringBuilder body = new StringBuilder();
     var buf = resp.body();
-
     if (logger.isTraceEnabled()) {
       logger.trace("read bytes: {}", buf);
     }
@@ -135,9 +131,7 @@ public class OrdersHandler extends Handler {
     if (!body.isEmpty()) {
       String respBody = body.toString();
       handleResponseWithBody(ctx, resp, respBody);
-      if (logger.isDebugEnabled()) {
-        logger.debug("handleResponse:: Response status: {}, body: {}", resp.statusCode(), respBody);
-      }
+      logger.debug("handleResponse:: Response status: {}", resp.statusCode());
     } else {
       ctx.response().end();
     }
@@ -179,7 +173,7 @@ public class OrdersHandler extends Handler {
   }
 
   private void handleResponseWithBody(RoutingContext ctx, HttpResponse<Buffer> response, String respBody) {
-    logger.debug("handleResponseWithBody:: Trying to handle response with body: {}", respBody);
+    logger.debug("handleResponseWithBody:: Trying to handle response");
     String contentType = response.headers().get(HttpHeaders.CONTENT_TYPE);
     int status = response.statusCode();
     if (isSuccessStatus(status)) {
@@ -188,7 +182,7 @@ public class OrdersHandler extends Handler {
         .setStatusCode(status)
         .end(respBody);
     } else {
-      logger.error("handleResponseWithBody:: Response status: {}, body: {}", status, respBody);
+      logger.error("handleResponseWithBody:: Response status: {}", status);
       processErrorResponse(ctx, respBody, contentType, status);
     }
   }
