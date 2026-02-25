@@ -106,7 +106,7 @@
       "type": "COMMON",
       "method": "GET",
       "pathPattern": "/orders/addresses/billing-and-shipping",
-      "proxyPath": "/tenant-addresses?offset=:offset&limit=:limit"
+      "proxyPath": "/tenant-addresses?offset=:offset&limit=:limit&query=:query"
     },
     {
       "type": "COMMON",
