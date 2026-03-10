@@ -35,11 +35,6 @@ Institutional users should be granted the following permissions in order to use 
 - `orders.acquisition-methods.collection.get`
 - `organizations.organizations.collection.get`
 - `tenant-addresses.collection.get`
-- `inventory-storage.locations.collection.get`
-- `inventory-storage.material-types.collection.get`
-- `inventory-storage.identifier-types.collection.get`
-- `inventory-storage.contributor-name-types.collection.get`
-- `users.collection.get`
 
 ## Configuration
 
