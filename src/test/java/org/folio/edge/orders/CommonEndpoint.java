@@ -10,7 +10,12 @@ public enum CommonEndpoint {
   ACQUISITIONS_UNITS("/orders/acquisitions-units", "/acquisitions-units/units", "acquisitionsUnits", true, true),
   ACQUISITIONS_METHODS("/orders/acquisition-methods", "/orders/acquisition-methods", "acquisitionMethods", true, true),
   ORGANIZATIONS("/organizations", "/organizations/organizations", "organizations", true, true),
-  BILLING_AND_SHIPPING("/orders/addresses/billing-and-shipping", "/tenant-addresses", "addresses", false, true);
+  BILLING_AND_SHIPPING("/orders/addresses/billing-and-shipping", "/tenant-addresses", "addresses", false, true),
+  LOCATIONS("/locations-for-order", "/locations", "locations", true, true),
+  MATERIAL_TYPES("/material-types-for-order", "/material-types", "mtypes", true, true),
+  IDENTIFIER_TYPES("/identifier-types-for-order", "/identifier-types", "identifierTypes", true, true),
+  CONTRIBUTOR_NAME_TYPES("/contributor-name-types-for-order", "/contributor-name-types", "contributorNameTypes", true, true),
+  USERS("/users-for-order", "/users", "users", true, true);
 
   private final String ingressUrl;
   private final String egressUrl;

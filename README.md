@@ -35,6 +35,24 @@ Institutional users should be granted the following permissions in order to use 
 - `orders.acquisition-methods.collection.get`
 - `organizations.organizations.collection.get`
 - `tenant-addresses.collection.get`
+- `inventory-storage.locations.collection.get`
+- `inventory-storage.material-types.collection.get`
+- `inventory-storage.identifier-types.collection.get`
+- `inventory-storage.contributor-name-types.collection.get`
+- `users.collection.get`
+
+## Deprecated Endpoints
+
+The following endpoints are **deprecated** and will be removed in the Umbrellaleaf release.
+Use the corresponding endpoints from `edge-users` and `edge-inventory` instead.
+
+| Deprecated Endpoint (edge-orders)       | Replacement                                      |
+|-----------------------------------------|--------------------------------------------------|
+| `GET /locations-for-order`              | Use `edge-inventory` `/locations`                |
+| `GET /material-types-for-order`         | Use `edge-inventory` `/material-types`           |
+| `GET /identifier-types-for-order`       | Use `edge-inventory` `/identifier-types`         |
+| `GET /contributor-name-types-for-order` | Use `edge-inventory` `/contributor-name-types`   |
+| `GET /users-for-order`                  | Use `edge-users` `/users`                        |
 
 ## Configuration
 

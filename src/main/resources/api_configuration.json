@@ -107,6 +107,36 @@
       "method": "GET",
       "pathPattern": "/orders/addresses/billing-and-shipping",
       "proxyPath": "/tenant-addresses?offset=:offset&limit=:limit&query=:query"
+    },
+    {
+      "type": "COMMON",
+      "method": "GET",
+      "pathPattern": "/locations-for-order",
+      "proxyPath": "/locations?offset=:offset&limit=:limit&query=:query"
+    },
+    {
+      "type": "COMMON",
+      "method": "GET",
+      "pathPattern": "/material-types-for-order",
+      "proxyPath": "/material-types?offset=:offset&limit=:limit&query=:query"
+    },
+    {
+      "type": "COMMON",
+      "method": "GET",
+      "pathPattern": "/identifier-types-for-order",
+      "proxyPath": "/identifier-types?offset=:offset&limit=:limit&query=:query"
+    },
+    {
+      "type": "COMMON",
+      "method": "GET",
+      "pathPattern": "/contributor-name-types-for-order",
+      "proxyPath": "/contributor-name-types?offset=:offset&limit=:limit&query=:query"
+    },
+    {
+      "type": "COMMON",
+      "method": "GET",
+      "pathPattern": "/users-for-order",
+      "proxyPath": "/users?offset=:offset&limit=:limit&query=:query"
     }
   ]
 }

@@ -39,7 +39,8 @@ public class MainVerticle extends EdgeVerticleHttp {
   public Router defineRoutes() {
     logger.debug("defineRoutes:: Trying to define routes");
     OkapiClientFactory ocf = OkapiClientFactoryInitializer.createInstance(vertx, config());
-    OrdersHandler ordersHandler = new OrdersHandler(secureStore, ocf);
+    ConfigResponseConverter configResponseConverter = new ConfigResponseConverter();
+    OrdersHandler ordersHandler = new OrdersHandler(secureStore, ocf, configResponseConverter);
 
     Router router = Router.router(vertx);
     router.route().handler(BodyHandler.create());
