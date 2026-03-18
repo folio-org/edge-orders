@@ -12,6 +12,7 @@ public class Constants {
   public static final String HTTP_METHOD_PUT = "PUT";
   public static final String CUSTOM_FIELDS_INTERFACE_NAME = "custom-fields";
   public static final String CUSTOM_FIELDS_MODULE_NAME = "mod-orders-storage";
+  public static final String BILLING_AND_SHIPPING_PATH = "/orders/addresses/billing-and-shipping";
 
   public enum ErrorCodes {
     // Subject to change pending additional information from the GOBI folks

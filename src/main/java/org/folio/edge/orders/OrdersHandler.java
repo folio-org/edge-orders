@@ -5,6 +5,7 @@ import static org.folio.edge.core.Constants.APPLICATION_XML;
 import static org.folio.edge.core.Constants.MSG_ACCESS_DENIED;
 import static org.folio.edge.core.Constants.MSG_INVALID_API_KEY;
 import static org.folio.edge.core.Constants.MSG_REQUEST_TIMEOUT;
+import static org.folio.edge.orders.Constants.BILLING_AND_SHIPPING_PATH;
 import static org.folio.edge.orders.Constants.CUSTOM_FIELDS_INTERFACE_NAME;
 import static org.folio.edge.orders.Constants.CUSTOM_FIELDS_MODULE_NAME;
 
@@ -28,6 +29,7 @@ import org.apache.logging.log4j.LogManager;
 
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpHeaders;
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.client.HttpResponse;
 
@@ -35,8 +37,11 @@ public class OrdersHandler extends Handler {
 
   private static final Logger logger = LogManager.getLogger(OrdersHandler.class);
 
-  public OrdersHandler(SecureStore secureStore, OkapiClientFactory ocf) {
+  private final ConfigResponseConverter configResponseConverter;
+
+  public OrdersHandler(SecureStore secureStore, OkapiClientFactory ocf, ConfigResponseConverter configResponseConverter) {
     super(secureStore, ocf);
+    this.configResponseConverter = configResponseConverter;
   }
 
   @Override
@@ -112,8 +117,30 @@ public class OrdersHandler extends Handler {
   private void send(AcquisitionsOkapiClient client, Routing routing, RoutingContext ctx, String type) {
     logger.info("handle:: Request is from purchasing system: {}", type);
     client.send(routing, ctx.body().asString(), ctx.request().params(), ctx.request().headers(),
-      resp -> handleResponse(ctx, resp),
+      resp -> resolveResponseHandler(routing, ctx, resp),
       t -> handleProxyException(ctx, t));
+  }
+
+  private void resolveResponseHandler(Routing routing, RoutingContext ctx, HttpResponse<Buffer> resp) {
+    if (BILLING_AND_SHIPPING_PATH.equals(routing.getPathPattern())) {
+      handleConfigConvertedResponse(ctx, resp);
+    } else {
+      handleResponse(ctx, resp);
+    }
+  }
+
+  private void handleConfigConvertedResponse(RoutingContext ctx, HttpResponse<Buffer> resp) {
+    if (!isSuccessStatus(resp.statusCode()) || resp.body() == null) {
+      handleResponse(ctx, resp);
+      return;
+    }
+    try {
+      JsonObject converted = configResponseConverter.fromTenantAddresses(resp.bodyAsJsonObject());
+      handleResponseWithBody(ctx, resp, converted.encode());
+    } catch (Exception e) {
+      logger.error("Failed to convert response to config format", e);
+      handleResponse(ctx, resp);
+    }
   }
 
   protected void handleResponse(RoutingContext ctx, HttpResponse<Buffer> resp) {
