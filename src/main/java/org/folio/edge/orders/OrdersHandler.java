@@ -136,7 +136,6 @@ public class OrdersHandler extends Handler {
     }
     try {
       JsonObject converted = configResponseConverter.fromTenantAddresses(resp.bodyAsJsonObject());
-      ctx.response().setStatusCode(resp.statusCode());
       handleResponseWithBody(ctx, resp, converted.encode());
     } catch (Exception e) {
       logger.error("Failed to convert response to config format", e);
