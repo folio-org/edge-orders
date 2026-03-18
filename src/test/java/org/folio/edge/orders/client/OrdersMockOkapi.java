@@ -59,6 +59,10 @@ public class OrdersMockOkapi extends MockOkapi {
   public static final String FUND_CODE = "AFRICAHIST";
   public static final String LEDGER_CODE = "ONETIME";
   public static final String X_ECHO_STATUS_HEADER = "X-Echo-Status";
+  public static final String ADDRESS_NAME_1 = "Main Library";
+  public static final String ADDRESS_VALUE_1 = "123 Main St";
+  public static final String ADDRESS_NAME_2 = "Branch Library";
+  public static final String ADDRESS_VALUE_2 = "456 Oak Ave";
 
   public OrdersMockOkapi(int port, List<String> knownTenants) {
     super(port, knownTenants);
@@ -233,6 +237,11 @@ public class OrdersMockOkapi extends MockOkapi {
   }
 
   public void handleCommonGetRequest(CommonEndpoint endpoint, RoutingContext ctx) {
+    if (endpoint == CommonEndpoint.BILLING_AND_SHIPPING) {
+      handleTenantAddressesRequest(ctx);
+      return;
+    }
+
     String offset = ctx.request().getParam(OFFSET.getName());
     String limit = ctx.request().getParam(LIMIT.getName());
     String query = ctx.request().getParam(QUERY.getName());
@@ -282,6 +291,56 @@ public class OrdersMockOkapi extends MockOkapi {
           .put(TOTAL_RECORDS, 3)
           .toString();
       }
+    }
+
+    ctx.response()
+      .putHeader(CONTENT_TYPE, APPLICATION_JSON)
+      .setStatusCode(SC_OK)
+      .end(responseBody);
+  }
+
+  private void handleTenantAddressesRequest(RoutingContext ctx) {
+    String query = ctx.request().getParam(QUERY.getName());
+
+    logger.info("handleTenantAddressesRequest:: handling tenant-addresses request");
+
+    JsonObject metadata = new JsonObject()
+      .put("createdDate", "2026-03-18T07:44:52.875+00:00")
+      .put("createdByUserId", "user-1")
+      .put("updatedDate", "2026-03-18T07:44:52.875+00:00")
+      .put("updatedByUserId", "user-1");
+
+    String responseBody;
+    if (StringUtils.equals(query, "id==" + NO_DATA_ID)) {
+      responseBody = new JsonObject()
+        .put("addresses", new JsonArray())
+        .put("resultInfo", new JsonObject().put("totalRecords", 0).put("diagnostics", new JsonArray()))
+        .toString();
+    } else if (StringUtils.equals(query, "id==" + HAD_DATA_ID)) {
+      responseBody = new JsonObject()
+        .put("addresses", new JsonArray()
+          .add(new JsonObject()
+            .put(ID, HAD_DATA_ID)
+            .put("name", ADDRESS_NAME_1)
+            .put("address", ADDRESS_VALUE_1)
+            .put("metadata", metadata)))
+        .put("resultInfo", new JsonObject().put("totalRecords", 1).put("diagnostics", new JsonArray()))
+        .toString();
+    } else {
+      responseBody = new JsonObject()
+        .put("addresses", new JsonArray()
+          .add(new JsonObject()
+            .put(ID, UUID.randomUUID().toString())
+            .put("name", ADDRESS_NAME_1)
+            .put("address", ADDRESS_VALUE_1)
+            .put("metadata", metadata))
+          .add(new JsonObject()
+            .put(ID, UUID.randomUUID().toString())
+            .put("name", ADDRESS_NAME_2)
+            .put("address", ADDRESS_VALUE_2)
+            .put("metadata", metadata)))
+        .put("resultInfo", new JsonObject().put("totalRecords", 2).put("diagnostics", new JsonArray()))
+        .toString();
     }
 
     ctx.response()

@@ -13,10 +13,15 @@ import static org.folio.edge.core.Constants.SYS_PORT;
 import static org.folio.edge.core.Constants.SYS_REQUEST_TIMEOUT_MS;
 import static org.folio.edge.core.Constants.SYS_SECURE_STORE_PROP_FILE;
 import static org.folio.edge.core.Constants.TEXT_PLAIN;
+import static org.folio.edge.orders.CommonEndpoint.BILLING_AND_SHIPPING;
 import static org.folio.edge.orders.CommonEndpoint.FUND_CODES_EXPENSE_CLASSES;
 import static org.folio.edge.orders.Constants.API_CONFIGURATION_PROPERTY_NAME;
 import static org.folio.edge.orders.MosaicEndpoint.CREATE_ORDERS;
 import static org.folio.edge.orders.MosaicEndpoint.VALIDATE;
+import static org.folio.edge.orders.client.OrdersMockOkapi.ADDRESS_NAME_1;
+import static org.folio.edge.orders.client.OrdersMockOkapi.ADDRESS_NAME_2;
+import static org.folio.edge.orders.client.OrdersMockOkapi.ADDRESS_VALUE_1;
+import static org.folio.edge.orders.client.OrdersMockOkapi.ADDRESS_VALUE_2;
 import static org.folio.edge.orders.client.OrdersMockOkapi.BODY_REQUEST_FOR_HEADER_INCONSISTENCY;
 import static org.folio.edge.orders.client.OrdersMockOkapi.COLON_DELIMITER;
 import static org.folio.edge.orders.client.OrdersMockOkapi.DELIMITER;
@@ -29,6 +34,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.spy;
@@ -765,6 +771,97 @@ public class MainVerticleTest {
           .body(endpoint.getDataKey(), notNullValue())
           .body(TOTAL_RECORDS, equalTo(3));
       });
+  }
+
+  @Test
+  public void testBillingAndShippingReturnsConfigFormat() {
+    logger.info("=== Test billing-and-shipping returns config format ===");
+
+    final Response resp = RestAssured
+      .get(BILLING_AND_SHIPPING.getIngressUrl() + "?type=COMMON&apikey=" + API_KEY)
+      .then()
+      .contentType(APPLICATION_JSON)
+      .statusCode(SC_OK)
+      .body("configs", notNullValue())
+      .body(TOTAL_RECORDS, equalTo(2))
+      .extract()
+      .response();
+
+    // Verify config structure
+    JsonArray configs = new JsonObject(resp.body().asString()).getJsonArray("configs");
+    assertEquals(2, configs.size());
+
+    JsonObject firstConfig = configs.getJsonObject(0);
+    assertNotNull(firstConfig.getString("id"));
+    assertNotNull(firstConfig.getString("value"));
+    assertNotNull(firstConfig.getJsonObject("metadata"));
+
+    // Verify value contains name and address as JSON string
+    JsonObject value = new JsonObject(firstConfig.getString("value"));
+    assertEquals(ADDRESS_NAME_1, value.getString("name"));
+    assertEquals(ADDRESS_VALUE_1, value.getString("address"));
+
+    JsonObject secondConfig = configs.getJsonObject(1);
+    JsonObject secondValue = new JsonObject(secondConfig.getString("value"));
+    assertEquals(ADDRESS_NAME_2, secondValue.getString("name"));
+    assertEquals(ADDRESS_VALUE_2, secondValue.getString("address"));
+
+    // Verify no legacy fields
+    assertTrue(firstConfig.fieldNames().stream()
+      .noneMatch(f -> List.of("module", "configName", "code", "enabled").contains(f)));
+
+    // Verify no resultInfo at root
+    JsonObject body = new JsonObject(resp.body().asString());
+    assertFalse(body.containsKey("resultInfo"));
+    assertFalse(body.containsKey("addresses"));
+  }
+
+  @Test
+  public void testBillingAndShippingWithQueryReturnsOneConfig() {
+    logger.info("=== Test billing-and-shipping with query returns single config ===");
+
+    RestAssured
+      .get(BILLING_AND_SHIPPING.getIngressUrl() + "?type=COMMON&apikey=" + API_KEY + "&query=id==" + HAD_DATA_ID)
+      .then()
+      .contentType(APPLICATION_JSON)
+      .statusCode(SC_OK)
+      .body("configs", notNullValue())
+      .body(TOTAL_RECORDS, equalTo(1));
+  }
+
+  @Test
+  public void testBillingAndShippingWithNoDataReturnsEmptyConfigs() {
+    logger.info("=== Test billing-and-shipping with no data returns empty configs ===");
+
+    final Response resp = RestAssured
+      .get(BILLING_AND_SHIPPING.getIngressUrl() + "?type=COMMON&apikey=" + API_KEY + "&query=id==" + NO_DATA_ID)
+      .then()
+      .contentType(APPLICATION_JSON)
+      .statusCode(SC_OK)
+      .body("configs", notNullValue())
+      .body(TOTAL_RECORDS, equalTo(0))
+      .extract()
+      .response();
+
+    JsonArray configs = new JsonObject(resp.body().asString()).getJsonArray("configs");
+    assertTrue(configs.isEmpty());
+  }
+
+  @Test
+  public void testBillingAndShippingBadApiKey() throws JsonProcessingException {
+    logger.info("=== Test billing-and-shipping with bad API key ===");
+
+    final Response resp = RestAssured
+      .get(BILLING_AND_SHIPPING.getIngressUrl() + "?type=COMMON&apiKey=" + BAD_API_KEY)
+      .then()
+      .contentType(APPLICATION_XML)
+      .statusCode(401)
+      .extract()
+      .response();
+
+    ResponseWrapper respBody = new ResponseWrapper(
+      new ErrorWrapper(ErrorCodes.API_KEY_INVALID.name(), MSG_INVALID_API_KEY + ": " + BAD_API_KEY));
+    assertEquals(respBody.toXml(), resp.body().asString());
   }
 
   @Test
