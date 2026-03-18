@@ -16,6 +16,7 @@ import static org.folio.edge.orders.Param.QUERY;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -311,12 +312,12 @@ public class OrdersMockOkapi extends MockOkapi {
       .put("updatedByUserId", "user-1");
 
     String responseBody;
-    if (StringUtils.equals(query, "id==" + NO_DATA_ID)) {
+    if (Objects.equals(query, "id==" + NO_DATA_ID)) {
       responseBody = new JsonObject()
         .put("addresses", new JsonArray())
         .put("resultInfo", new JsonObject().put("totalRecords", 0).put("diagnostics", new JsonArray()))
         .toString();
-    } else if (StringUtils.equals(query, "id==" + HAD_DATA_ID)) {
+    } else if (Objects.equals(query, "id==" + HAD_DATA_ID)) {
       responseBody = new JsonObject()
         .put("addresses", new JsonArray()
           .add(new JsonObject()
