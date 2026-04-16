@@ -1,4 +1,30 @@
 ## 3.3.0 - Unreleased
+The primary focus of this release was Mosaic integration support, Vert.x 5.0 upgrade, and tenant addresses management improvements
+
+### Stories
+* [EDGORDERS-118](https://issues.folio.org/browse/EDGORDERS-118) - Update GitHub Workflows for Maven
+* [EDGORDERS-117](https://issues.folio.org/browse/EDGORDERS-117) - Use GET/PUT /tenant-addresses to work with tenant addresses
+* [EDGORDERS-109](https://issues.folio.org/browse/EDGORDERS-109) - Move fetching tenant addresses from mod-configurations to mod-settings
+* [EDGORDERS-108](https://issues.folio.org/browse/EDGORDERS-108) - Deprecate inventory/users endpoints, add config response converter for addresses
+* [EDGORDERS-105](https://issues.folio.org/browse/EDGORDERS-105) - Upgrade module to Vert.x 5.0
+* [EDGORDERS-102](https://issues.folio.org/browse/EDGORDERS-102) - Setup dependabot for the module
+* [EDGORDERS-94](https://issues.folio.org/browse/EDGORDERS-94) - Sensitive data in logs cleanup
+
+### Bugfixes
+* Add a missing launcher dependency ([#121](https://github.com/folio-org/edge-orders/pull/121))
+
+### Dependencies
+* Bump `vertx` from `4.5.13` to `5.0.8`
+* Bump `edge-common` from `4.9.0` to `5.1.0`
+* Bump `log4j` from `2.24.3` to `2.25.3`
+* Bump `aws-sdk-ssm` from `2.30.31` to `2.42.15`
+* Bump `jjwt` from `0.12.6` to `0.13.0`
+* Bump `commons-lang3` from `3.17.0` to `3.20.0`
+* Bump `equalsverifier` from `3.19.1` to `4.4.1`
+* Bump `mockito-core` from `5.15.2` to `5.23.0`
+* Bump `rest-assured` from `5.5.1` to `6.0.0`
+* Bump `folio-module-descriptor-validator` from `1.0.0` to `1.0.1`
+* Added `vertx-launcher-application`
 
 ## 3.2.0 - Released (Sunflower R1 2025)
 The primary focus of this release was to update libraries to the latest versions
