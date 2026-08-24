@@ -60,9 +60,9 @@
     <!--Test dependencies-->
     <junit.version>4.13.2</junit.version>
     <awaitility.version>4.3.0</awaitility.version>
-    <equalsverifier.version>4.5</equalsverifier.version>
+    <equalsverifier.version>4.5.1</equalsverifier.version>
     <mockito-core.version>5.23.0</mockito-core.version>
-    <rest-assured.version>6.0.0</rest-assured.version>
+    <rest-assured.version>6.0.1</rest-assured.version>
 
     <!--Maven plugin properties-->
     <maven-compiler-plugin.version>3.15.0</maven-compiler-plugin.version>
