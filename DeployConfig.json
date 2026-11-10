@@ -1,0 +1,143 @@
+{
+  "description": "edge-orders configuration template. Default values are calibrated against a reference bugfest environment (tebfcon-edge-orders revision 4, image 3.3.0); see ADR-0013 (Module configuration management) for the governance model behind this file. edge-orders is a stateless Vert.x edge API that lets external vendor systems (GOBI, EBSCONET, Mosaic and others listed in api_configuration.json) reach FOLIO acquisitions with an API key. It has no database, no Kafka and no sidecar: it calls FOLIO through the gateway given in okapi_url and resolves each API key to an institutional user stored in the secure store. Note that edge-common reads its general settings (port, okapi_url, secure_store, token cache, request timeout) as Java system properties (-D...), not as environment variables, so they are documented under JAVA_OPTIONS; only TLS settings are read directly from the environment. The module is deployed without a sidecar, so sidecarDefaults is intentionally empty. Resource values and JVM limits must be adjusted to the target host capacity.",
+  "moduleDefaults": {
+    "resources": [
+      {
+        "name": "cpu",
+        "value": "64",
+        "description": "CPU request/limit for the edge-orders container"
+      },
+      {
+        "name": "memory",
+        "value": "1024",
+        "description": "Memory hard limit for the edge-orders container in MiB"
+      },
+      {
+        "name": "memoryReservation",
+        "value": "896",
+        "description": "Memory reservation (soft limit) for the edge-orders container in MiB"
+      }
+    ],
+    "java": [
+      {
+        "name": "xmx",
+        "value": "768m",
+        "description": "Maximum Java heap size. Value taken from bugfest. Together with MaxMetaspaceSize it leaves only about 128 MiB (12.5%) of the 1024 MiB container for code cache, thread stacks, GC structures and Netty direct buffers, which is tight; review before relying on it"
+      },
+      {
+        "name": "MaxMetaspaceSize",
+        "value": "128m",
+        "description": "Maximum Java metaspace size. Value taken from bugfest. Metaspace is committed lazily, so the cap costs nothing unless it is used"
+      },
+      {
+        "name": "MetaspaceSize",
+        "value": "88m",
+        "description": "Initial Java metaspace size, i.e. the threshold at which the first metaspace garbage collection is triggered rather than a limit. Value taken from bugfest"
+      }
+    ],
+    "deployment": {
+      "isHaSupported": true,
+      "replicasRecommendedCount": 2,
+      "description": "edge-orders is stateless: it has no database, no Kafka listeners and no scheduled jobs, and every request is proxied to mod-orders, mod-gobi, mod-ebsconet, mod-mosaic and related acquisitions modules within that request. The only per-instance state is the in-memory token cache (token_cache_*), which each replica fills independently from the secure store and the login endpoint, so replicas can run side by side behind a load balancer without coordination. Two replicas are recommended for availability."
+    },
+    "kong": {
+      "timeouts": {
+        "connect": "60s",
+        "send": "60s",
+        "read": "60s"
+      },
+      "description": "Default Kong proxy timeouts are sufficient. edge-orders itself gives up on an upstream FOLIO call after request_timeout_ms (30000 ms by default), which is below the 60s read timeout."
+    },
+    "EnvVars": [
+      {
+        "name": "JAVA_OPTIONS",
+        "value": "-Dport=8081 -Dlog_level=INFO -Drequest_timeout_ms=30000 -Dtoken_cache_ttl_ms=300000 -Dnull_token_cache_ttl_ms=30000 -Dtoken_cache_capacity=25 -Dvertx.logger-delegate-factory-class-name=io.vertx.core.logging.SLF4JLogDelegateFactory",
+        "description": "JVM options for the edge-orders process, and the only way to pass edge-common's general configuration, which is read with System.getProperty. This is the variable honoured by the run-java.sh entrypoint of the folioci/alpine-jre-openjdk21 base image; JAVA_OPTS and JAVA_ARGS are not read by it. Bugfest passes the same flags in JAVA_OPTS instead. The default value holds bugfest's environment-independent flags; each environment must append: -Dokapi_url=<gateway URL> (required, no default; without it no FOLIO call can be made), -Dsecure_store=<Ephemeral|AwsSsm|Vault> (default Ephemeral, which is for development only; bugfest uses AwsSsm), -Dsecure_store_props=<path to the secure store properties file> (region, useIAM, Vault address/token etc.), plus the heap sizing from the java block. Other supported properties: port (default 8081; must match the container port), log_level (default INFO), request_timeout_ms (default 30000; bugfest sets the misspelt request_timeout_ms2, so the default applies there too), token_cache_ttl_ms (module default 3600000; bugfest value 300000), null_token_cache_ttl_ms (default 30000), token_cache_capacity (module default 100; bugfest value 25), api_key_sources (default PARAM,HEADER,PATH), response_compression (default false), api_config (URL or path of an alternative API routing file; default is the bundled api_configuration.json). The module descriptor's Okapi launch configuration sets -XX:MaxRAMPercentage=66.0 here",
+        "type": "CONFIG",
+        "essential": true
+      },
+      {
+        "name": "LOG4J_CONFIGURATION_FILE",
+        "value": null,
+        "description": "Location of an external Log4j2 configuration file, overriding the log4j2.properties bundled with the module. The module also bundles log4j2-json.properties for JSON-formatted logs, which can be selected with this variable. Bugfest points it to an environment-specific S3 URL",
+        "type": "CONFIG",
+        "essential": false
+      },
+      {
+        "name": "AWS_REGION",
+        "value": null,
+        "description": "AWS region used by the AWS SDK SSM client when secure_store=AwsSsm and the secure store properties file does not set region. Not used with the Ephemeral or Vault secure stores. Credentials are resolved through the standard AWS SDK chain (IAM task role by default, useIAM=true)",
+        "type": "CONFIG",
+        "essential": false
+      },
+      {
+        "name": "SPRING_SSL_BUNDLE_JKS_WEBSERVER_KEYSTORE_TYPE",
+        "value": null,
+        "description": "Keystore type (JKS, PKCS12 or BCFKS) for TLS on the module's own HTTP server. TLS on the server is enabled only when this is set; KEYSTORE_LOCATION and KEYSTORE_PASSWORD are then required. Leave unset to serve plain HTTP, as on bugfest",
+        "type": "CONFIG",
+        "essential": false
+      },
+      {
+        "name": "SPRING_SSL_BUNDLE_JKS_WEBSERVER_KEYSTORE_LOCATION",
+        "value": null,
+        "description": "Path to the keystore file in the local file system used for TLS on the module's HTTP server. Required when SPRING_SSL_BUNDLE_JKS_WEBSERVER_KEYSTORE_TYPE is set",
+        "type": "CONFIG",
+        "essential": false
+      },
+      {
+        "name": "SPRING_SSL_BUNDLE_JKS_WEBSERVER_KEYSTORE_PASSWORD",
+        "value": null,
+        "description": "Password of the server keystore. Required when SPRING_SSL_BUNDLE_JKS_WEBSERVER_KEYSTORE_TYPE is set. Secret: supply it from the secret store, never as a literal",
+        "type": "CONFIG",
+        "essential": false
+      },
+      {
+        "name": "SPRING_SSL_BUNDLE_JKS_WEBSERVER_KEY_ALIAS",
+        "value": null,
+        "description": "Alias of the key within the server keystore. Optional; only used when server TLS is enabled",
+        "type": "CONFIG",
+        "essential": false
+      },
+      {
+        "name": "SPRING_SSL_BUNDLE_JKS_WEBSERVER_KEY_PASSWORD",
+        "value": null,
+        "description": "Password protecting the key named by SPRING_SSL_BUNDLE_JKS_WEBSERVER_KEY_ALIAS, if it differs from the keystore password. Optional. Secret: supply it from the secret store, never as a literal",
+        "type": "CONFIG",
+        "essential": false
+      },
+      {
+        "name": "FOLIO_CLIENT_TLS_ENABLED",
+        "value": false,
+        "description": "Enables TLS for the module's outgoing calls to FOLIO (the okapi_url gateway). When true and no truststore is configured, the JVM default truststore is used. Module default false, not set on bugfest",
+        "type": "CONFIG",
+        "essential": false
+      },
+      {
+        "name": "FOLIO_CLIENT_TLS_TRUSTSTORETYPE",
+        "value": null,
+        "description": "Truststore type for outgoing TLS calls to FOLIO. Optional even when FOLIO_CLIENT_TLS_ENABLED=true; if any truststore setting is given, TRUSTSTORETYPE, TRUSTSTOREPATH and TRUSTSTOREPASSWORD are all required",
+        "type": "CONFIG",
+        "essential": false
+      },
+      {
+        "name": "FOLIO_CLIENT_TLS_TRUSTSTOREPATH",
+        "value": null,
+        "description": "Path to the truststore file for outgoing TLS calls to FOLIO. See FOLIO_CLIENT_TLS_TRUSTSTORETYPE",
+        "type": "CONFIG",
+        "essential": false
+      },
+      {
+        "name": "FOLIO_CLIENT_TLS_TRUSTSTOREPASSWORD",
+        "value": null,
+        "description": "Password of the truststore for outgoing TLS calls to FOLIO. See FOLIO_CLIENT_TLS_TRUSTSTORETYPE. Secret: supply it from the secret store, never as a literal",
+        "type": "CONFIG",
+        "essential": false
+      }
+    ]
+  },
+  "sidecarDefaults": {
+    "resources": [],
+    "java": [],
+    "EnvVars": []
+  }
+}
