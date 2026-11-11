@@ -1,5 +1,5 @@
 {
-  "description": "edge-orders configuration template. Default values are calibrated against a reference bugfest environment (tebfcon-edge-orders revision 4, image 3.3.0); see ADR-0013 (Module configuration management) for the governance model behind this file. edge-orders is a stateless Vert.x edge API that lets external vendor systems (GOBI, EBSCONET, Mosaic and others listed in api_configuration.json) reach FOLIO acquisitions with an API key. It has no database, no Kafka and no sidecar: it calls FOLIO through the gateway given in okapi_url and resolves each API key to an institutional user stored in the secure store. Note that edge-common reads its general settings (port, okapi_url, secure_store, token cache, request timeout) as Java system properties (-D...), not as environment variables, so they are documented under JAVA_OPTIONS; only TLS settings are read directly from the environment. The module is deployed without a sidecar, so sidecarDefaults is intentionally empty. Resource values and JVM limits must be adjusted to the target host capacity.",
+  "description": "edge-orders configuration template. Default values are calibrated against a reference bugfest environment (tebfcon-edge-orders revision 4, image 3.3.0); see ADR-0013 (Module configuration management). edge-orders is a stateless Vert.x edge API that gives external vendor systems (GOBI, EBSCONET, Mosaic and others) API-key access to FOLIO acquisitions. It has no database, no Kafka and no sidecar (sidecarDefaults is intentionally empty) and calls FOLIO through okapi_url. edge-common reads its general settings as Java system properties, so they are documented under JAVA_OPTIONS. Resource values and JVM limits must be adjusted to the target host capacity.",
   "moduleDefaults": {
     "resources": [
       {
@@ -22,7 +22,7 @@
       {
         "name": "xmx",
         "value": "768m",
-        "description": "Maximum Java heap size. Value taken from bugfest. Together with MaxMetaspaceSize it leaves only about 128 MiB (12.5%) of the 1024 MiB container for code cache, thread stacks, GC structures and Netty direct buffers, which is tight; review before relying on it"
+        "description": "Maximum Java heap size. Value taken from bugfest"
       },
       {
         "name": "MaxMetaspaceSize",
@@ -38,7 +38,7 @@
     "deployment": {
       "isHaSupported": true,
       "replicasRecommendedCount": 2,
-      "description": "edge-orders is stateless: it has no database, no Kafka listeners and no scheduled jobs, and every request is proxied to mod-orders, mod-gobi, mod-ebsconet, mod-mosaic and related acquisitions modules within that request. The only per-instance state is the in-memory token cache (token_cache_*), which each replica fills independently from the secure store and the login endpoint, so replicas can run side by side behind a load balancer without coordination. Two replicas are recommended for availability."
+      "description": "Stateless: no database, Kafka or scheduled jobs, and each request is proxied to acquisitions modules within that request. The only per-instance state is the in-memory token cache, filled independently by each replica. Two replicas are recommended for availability."
     },
     "kong": {
       "timeouts": {
@@ -52,28 +52,28 @@
       {
         "name": "JAVA_OPTIONS",
         "value": "-Dport=8081 -Dlog_level=INFO -Drequest_timeout_ms=30000 -Dtoken_cache_ttl_ms=300000 -Dnull_token_cache_ttl_ms=30000 -Dtoken_cache_capacity=25 -Dvertx.logger-delegate-factory-class-name=io.vertx.core.logging.SLF4JLogDelegateFactory",
-        "description": "JVM options for the edge-orders process, and the only way to pass edge-common's general configuration, which is read with System.getProperty. This is the variable honoured by the run-java.sh entrypoint of the folioci/alpine-jre-openjdk21 base image; JAVA_OPTS and JAVA_ARGS are not read by it. Bugfest passes the same flags in JAVA_OPTS instead. The default value holds bugfest's environment-independent flags; each environment must append: -Dokapi_url=<gateway URL> (required, no default; without it no FOLIO call can be made), -Dsecure_store=<Ephemeral|AwsSsm|Vault> (default Ephemeral, which is for development only; bugfest uses AwsSsm), -Dsecure_store_props=<path to the secure store properties file> (region, useIAM, Vault address/token etc.), plus the heap sizing from the java block. Other supported properties: port (default 8081; must match the container port), log_level (default INFO), request_timeout_ms (default 30000; bugfest sets the misspelt request_timeout_ms2, so the default applies there too), token_cache_ttl_ms (module default 3600000; bugfest value 300000), null_token_cache_ttl_ms (default 30000), token_cache_capacity (module default 100; bugfest value 25), api_key_sources (default PARAM,HEADER,PATH), response_compression (default false), api_config (URL or path of an alternative API routing file; default is the bundled api_configuration.json). The module descriptor's Okapi launch configuration sets -XX:MaxRAMPercentage=66.0 here",
+        "description": "JVM options for edge-orders, read by the folioci run-java.sh entrypoint (JAVA_OPTS is ignored by it; bugfest sets the same flags in JAVA_OPTS). edge-common reads its configuration only as -D system properties, not as environment variables. The default value holds bugfest's environment-independent flags. Each environment must append -Dokapi_url=<gateway URL> (required, no default), -Dsecure_store=<Ephemeral|AwsSsm|Vault> (default Ephemeral, for development only) and -Dsecure_store_props=<path to the secure store properties file>. Bugfest overrides token_cache_ttl_ms (module default 3600000) and token_cache_capacity (module default 100). Other optional properties: api_key_sources (default PARAM,HEADER,PATH), response_compression (default false), api_config (alternative API routing file).",
         "type": "CONFIG",
         "essential": true
       },
       {
         "name": "LOG4J_CONFIGURATION_FILE",
         "value": null,
-        "description": "Location of an external Log4j2 configuration file, overriding the log4j2.properties bundled with the module. The module also bundles log4j2-json.properties for JSON-formatted logs, which can be selected with this variable. Bugfest points it to an environment-specific S3 URL",
+        "description": "Location of an external Log4j2 configuration file overriding the bundled log4j2.properties; the bundled log4j2-json.properties can be selected for JSON logs",
         "type": "CONFIG",
         "essential": false
       },
       {
         "name": "AWS_REGION",
         "value": null,
-        "description": "AWS region used by the AWS SDK SSM client when secure_store=AwsSsm and the secure store properties file does not set region. Not used with the Ephemeral or Vault secure stores. Credentials are resolved through the standard AWS SDK chain (IAM task role by default, useIAM=true)",
+        "description": "AWS region for the SSM client when secure_store=AwsSsm and the secure store properties file sets no region. Not used with the Ephemeral or Vault stores",
         "type": "CONFIG",
         "essential": false
       },
       {
         "name": "SPRING_SSL_BUNDLE_JKS_WEBSERVER_KEYSTORE_TYPE",
         "value": null,
-        "description": "Keystore type (JKS, PKCS12 or BCFKS) for TLS on the module's own HTTP server. TLS on the server is enabled only when this is set; KEYSTORE_LOCATION and KEYSTORE_PASSWORD are then required. Leave unset to serve plain HTTP, as on bugfest",
+        "description": "Keystore type (JKS, PKCS12 or BCFKS) for TLS on the module's HTTP server. Setting it enables server TLS and requires KEYSTORE_LOCATION and KEYSTORE_PASSWORD; leave unset for plain HTTP",
         "type": "CONFIG",
         "essential": false
       },
