@@ -1,3 +1,8 @@
+## WIP
+
+### Stories
+* [EDGORDERS-122](https://folio-org.atlassian.net/browse/EDGORDERS-122) - Upgrade from Java 21 to Java 25
+
 ## 3.3.0 - Unreleased
 The primary focus of this release was Mosaic integration support, Vert.x 5.0 upgrade, and tenant addresses management improvements
 
