@@ -1,4 +1,10 @@
-## 3.3.0 - Unreleased
+## 3.3.1 - Released (Trillium R1 2026)
+The primary focus of this release was adding the deployment configuration descriptor
+
+### Stories
+* [EDGORDERS-121](https://issues.folio.org/browse/EDGORDERS-121) - Add DeployConfig.json (ADR-0013 Configuration Management)
+
+## 3.3.0 - Released (Trillium R1 2026)
 The primary focus of this release was Mosaic integration support, Vert.x 5.0 upgrade, and tenant addresses management improvements
 
 ### Stories
